@@ -1,4 +1,6 @@
 # Arduino-ESP32-Nano-Word clock
+# Under construction
+
 Wordclock with an Arduino ESP32 Nano
 
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
