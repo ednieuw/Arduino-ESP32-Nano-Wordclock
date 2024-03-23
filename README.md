@@ -9,4 +9,11 @@ That means you have to use a different BLE service. Not FFE0 but 6e400001-b5a3-.
 
 See here: https://github.com/ednieuw/nRF-ESP32
 
+Because the ESP32-S3 chip of the Nano has may more ports and other port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
+
+There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.
+IMy choice was to use the Arduino pin numbering. But ... Then you have to use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analog pins. In the compiler settings the Arduino numbering is the default setting
+
+if you choose 'by GPIO number' you can use the GPIO numbers as an integer value. 
+
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
