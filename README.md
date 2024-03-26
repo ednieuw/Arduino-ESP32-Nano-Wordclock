@@ -55,15 +55,10 @@ A 5V >1A power supply can also be attached at the 5V power connection on the top
 
 The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Wordclock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android ot iPhone/iPad/iMac
 
-You can choose between four languages or make a four-language clock that display four languages with it 625 LEDs. (If you have a word plate ofcourse)[Upl[InternetShortcut]
-URL=https://github.com/ednieuw/FourLanguageClock
-oading GitHub - ednieuw-FourLanguageClock- Word clock with SK6812 LEDs in NL, DE, FR, UK.url…]()
+You can choose between four languages or make a four-language clock that display four languages with it 625 LEDs. If you have a word plate ofcourse. Word clock with SK6812 LEDs in NL, DE, FR. https://github.com/ednieuw/FourLanguageClock
 
 
-Or a single language clock https://github.com/ednieuw/Woordklok-witte-LEDs
-[Uploading GitHub - ednieu[InternetShortcut]
-URL=https://github.com/ednieuw/Woordklok-witte-LEDs
-w-Woordklok-witte-LEDs- Woordklok met witte LEDs.url…]()
+Or a !{single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
