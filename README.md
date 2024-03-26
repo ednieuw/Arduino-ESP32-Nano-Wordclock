@@ -2,7 +2,14 @@
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
-Word clock with one or four languages with an Arduino ESP32 Nano.
+Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
+You can control it with your phone of with a web page. <br>
+Software updates can be uploaded with OTA (Over the Air). <br>
+It will keep its time within the second correct with the internet NTP time and a time zone selection. <br>
+
+If you have a ILI9341 display [have a look here](https://github.com/ednieuw/ESP32-C3-Clock-and-more) for an alternative word clock.
+
+Do you happen to have a €50 LilyGo watch looking like a iWatch have [a look here](https://github.com/ednieuw/Lilygo-T-Watch-2020)
 
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
 The Arduino nao ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.
