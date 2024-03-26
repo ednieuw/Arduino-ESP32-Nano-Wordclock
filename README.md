@@ -3,9 +3,9 @@
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
-You can control it with your phone of with a web page. <br>
-Software updates can be uploaded with OTA (Over the Air). <br>
-It will keep its time within the second correct with the internet NTP time and a time zone selection. <br>
+You can control it with your phone of with a web page.<br>
+Software updates can be uploaded with OTA (Over the Air).<br>
+It will keep its time within the second correct with the internet NTP time and a time zone selection.
 
 If you have a ILI9341 display [have a look here](https://github.com/ednieuw/ESP32-C3-Clock-and-more) for an alternative word clock.
 
@@ -14,7 +14,9 @@ Do you happen to have a €50 LilyGo watch looking like a iWatch have [a look he
 But you can also not built a word clock and use the software to control SK6812 or WS2812 LEDs with your phone with Bluetooth or a web page.
 
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
-The Arduino nao ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.
+
+The Arduino Nano ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.<br>
+Futher more it has the same form faxtor as the Nano and Nano Every.
 
 The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI. BLE is not with the TI CC2541 chip but a Nordic nRF52 chip. <br>
 That means you have to use a different BLE service. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software.
@@ -30,7 +32,7 @@ if you choose 'by GPIO number' you can use the GPIO numbers as an integer value 
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
-For my clocks I use an with [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order with the Fritzing app itself.
+For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order with the Fritzing app itself.
 
 The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
