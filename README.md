@@ -11,6 +11,8 @@ If you have a ILI9341 display [have a look here](https://github.com/ednieuw/ESP3
 
 Do you happen to have a €50 LilyGo watch looking like a iWatch have [a look here](https://github.com/ednieuw/Lilygo-T-Watch-2020)
 
+But you can also not built a word clock and use the software to control SK6812 or WS2812 LEDs with your phone with Bluetooth or a web page.
+
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
 The Arduino nao ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.
 
