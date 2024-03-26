@@ -34,8 +34,18 @@ But in the end the SK6812 RGBW strip, with 14 LEDs, also happily worked when the
 
 The lesson of this story is that you can connect de SK6812 RBW with a 470 ohm resistor and a 200 - 1000 uF capacitor to the strip. 
 
-But you need a separate 5V power supply for the LEDs. You can draw the power from the VBUS-pin on the Nano if the Nano is powered with a USB-C cable.  
-VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
-The PCB can use all the different power options 
-
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)
+
+But you need a powerfull 5V power supply for the LEDs. Power can be drwn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
+VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
+
+The PCB can use different power connection options.
+
+If the blue line shortcut is closed then the LED-strip is powered via the Power 6-21V connection. This will also power the Nano ESP32. You can connect it to a 5V USB power supply allthought the minimum voltage is noted as 6V. 
+
+BUT KEEP IN MIND. this connection is fed to the LED-strip. If a higher voltage power supply us connected the LED will be destroyed but Nano will turn on happily.
+
+If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcutted. The LEDs will be powered by thus power source and must be 1A or more with longer strips cq more LEDs.
+
+![5VConnections](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/39ea30fc-2850-4c1c-9fdb-4b4bec752f9a)
+
