@@ -63,9 +63,9 @@ After connections are made the PCB and hardware looks like this
 
 # Software
 
-The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Wordclock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android ot iPhone/iPad/iMac
+The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android ot iPhone/iPad/iMac
 
-You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. If you have a word plate ofcourse. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
+You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. If you have a word plate of course. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
 With defines the software compiles for SK6812 or WS2812 LED-strips and you can choose between a Dutch or 4-languages clock.<br>
 It is simple to change the clock to a single French, German or English design.
@@ -105,10 +105,11 @@ settings of several preferences.</span></p>
 <table style="width: 51%" class="auto-style12">
 <tr>
 <td style="width: 342px">
-<img alt="Menu on iPhone" src="[https://github.com/ednieuw/ESP32-C3-Clock-and-more/](https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/phonemenu.jpg" width="350" class="auto-style10" /></td>
+<img alt="Menu on iPhone" src="Pics/phonemenu.jpg" width="350" class="auto-style10" /></td>
 <td style="width: 415px">
-<img alt="Termite terminal" src="[https://github.com/ednieuw/ESP32-C3-Clock-and-more/](https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/Termite.jpg" width="400" class="auto-style10" /></td>
+<img alt="Termite terminal" src="Pics/Termite.jpg" width="400" class="auto-style10" /></td>
 </tr>
+
 <tr>
 <td style="width: 342px" class="auto-style10">HTML page on iPhone.</td>
 <td style="width: 415px"><br class="auto-style10" />
@@ -213,7 +214,7 @@ ___________________________________</pre>
 <br class="auto-style10" />
 <span class="auto-style10">The clock will start much quicker because it 
 will not try to connect.</span><br class="auto-style10" />
-<img alt="Pocuter menu bottom" class="auto-style4" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/MenuBottom.gif" /></p>
+<img alt="Pocuter menu bottom" class="auto-style4" src="Pics/MenuBottom.gif" /></p>
 <p><span class="auto-style10">As mentioned before the clock can be controlled with the WIFI webpage or BLE 
 UART terminal app.</span><br class="auto-style10" />
 <span class="auto-style10">When the clock is connected to WIFI the IP-address is displayed in the Digital display.</span><br class="auto-style10" />
@@ -256,9 +257,9 @@ to white enter: Q2</span><br class="auto-style10" />
 <table cellspacing="6" class="auto-style2" style="width: auto">
 <tr>
 <td style="width: 318px">
-<img alt="Phone" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/IMG_9449.jpg" width="350" class="auto-style4" /></td>
+<img alt="Phone" src="Pics/IMG_9449.jpg" width="350" class="auto-style4" /></td>
 <td>
-<img alt="WIFI-BLE" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/IMG_9448.jpg" width="350" class="auto-style4" /></td>
+<img alt="WIFI-BLE" src="Pics/IMG_9448.jpg" width="350" class="auto-style4" /></td>
 </tr>
 <tr>
 <td style="width: 318px" class="auto-style10">HTML page</td>
@@ -415,7 +416,7 @@ It multiplies the reading as a percentage. So, entering
 The placement and sensitivity of your LDR can be 
 adjusted with this parameter Slope.</span></td>
 <td><span class="auto-style10">
-<img alt="Min Max Slope" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/MinMaxSlope.jpg" /><br />
+<img alt="Min Max Slope" src="Pics/MinMaxSlope.jpg" /><br />
 The effect of the value of the slope on the light intensity of the LEDs 
 or display.</span></td>
 </tr>
@@ -435,7 +436,7 @@ changed and the program must be restarted.<strong><br />
 state is printed.<br />
 		</span></td>
 		<td>
-<img alt="Bottom menu" class="auto-style4" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/tree/main/Pics/BottomMenu.gif" /></td>
+<img alt="Bottom menu" class="auto-style4" src="Pics/BottomMenu.gif" /></td>
 	</tr>
 	<tr>
 		<td colspan="2">
@@ -462,7 +463,7 @@ Settings are stored in the SPIFFS space from the ESP32-C3</p>
 Partition scheme is huge.<br />
 Remember to install the ESP32 boards as explained above in the chapter Materials<br />
 </p>
-<p><img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/Pics/img6.gif" width="488" /></p>
+<p><img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" /></p>
 <p class="auto-style10">&nbsp;</p>
 <p class="auto-style10"><strong>Program explanation</strong></p>
 <p><span class="auto-style10">The program uses the following standard libraries. </span> 
@@ -470,13 +471,16 @@ Remember to install the ESP32 boards as explained above in the chapter Materials
 </p>
 <pre><span class="auto-style11">// ESP32-C3 Includes defines and initialisations</span>
 
-<span class="auto-style11">#include &lt;NimBLEDevice.h&gt;          // For BLE communication https://github.com/h2zero/NimBLE-Arduino</span>
-<span class="auto-style11">#include &lt;ESPNtpClient.h&gt;          // https://github.com/gmag11/ESPNtpClient</span>
-<span class="auto-style11">#include &lt;WiFi.h&gt;                  // Used for NTP time and web page</span>
-<span class="auto-style11">#include &lt;AsyncTCP.h&gt;              // Used for webpage https://github.com/me-no-dev/ESPAsyncWebServer</span>
-<span class="auto-style11">#include &lt;ESPAsyncWebServer.h&gt;     // Used for webpage https://github.com/me-no-dev/ESPAsyncWebServer</span>
-<span class="auto-style11">#include &lt;Preferences.h&gt;           // for storage in SPIFFS</span>
-<span class="auto-style11">#include "Colors.h"                // Definition of the colour list</span></pre>
+#include <NimBLEDevice.h>        // For BLE communication  https://github.com/h2zero/NimBLE-Arduino
+#include <ESPNtpClient.h>        // https://github.com/gmag11/ESPNtpClient
+#include <WiFi.h>                // Used for web page 
+#include <AsyncTCP.h>            // Used for webpage   https://github.com/me-no-dev/ESPAsyncWebServer
+#include <ESPAsyncWebServer.h>   // Used for webpage   https://github.com/me-no-dev/ESPAsyncWebServer
+#include <ElegantOTA.h>          // Used for OTA new version
+#include <Preferences.h>
+#include "Colors.h"
+#include <Adafruit_NeoPixel.h>   // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+</pre>
 <p><span class="auto-style10">Colors.h is included in the program as a TAB in 
 the IDE. It contains color names and it associated RGB values</span><br class="auto-style10" />
 <span class="auto-style10">The other TAB is the web page to display in the 
@@ -500,7 +504,7 @@ R"rawliteral( </span><span class="auto-style10">&nbsp;... and ...&nbsp;
 </span><span class="auto-style10">Or copy the the code from the webpage.h into 
 MSexpression Code area and redesign the page as you like</span></p>
 <p>
-<img alt="MS expression" class="auto-style4" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/Pics/MSExpression.jpg" /><br class="auto-style10" />
+<img alt="MS expression" class="auto-style4" src="Pics/MSExpression.jpg" /><br class="auto-style10" />
 <span class="auto-style10">&nbsp;</span></p>
 <p><span class="auto-style10">A long list if definitions and initialisations follows.</span><br class="auto-style10" />
 <span class="auto-style10">I am not a fan of passing all the variables to and from functions and like to 
