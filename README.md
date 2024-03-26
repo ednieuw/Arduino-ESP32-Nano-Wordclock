@@ -57,11 +57,18 @@ The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK
 
 You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. If you have a word plate ofcourse. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
-With defines the software compiles for SK6812 or WS2812 LED-strips and you can choose between a Dutch or 4-languages clock.
+With defines the software compiles for SK6812 or WS2812 LED-strips and you can choose between a Dutch or 4-languages clock.<br>
 It is simple to change the clock to a single French, German or English design.
 
 Or a ![single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
+In the libraries.zip I packed the libraries I used for V006. Unpack them in you libraries folder.<br>
+Download the V006 folder and compile for ESP32<br>
+
+How to compile: Install Arduino Nano ESP32 boards<br>
+Board: Arduino Nano ESP32<br>
+Partition Scheme: With FAT<br>
+Pin Numbering: By GPIO number (legacy)<br>
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
 
