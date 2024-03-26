@@ -20,12 +20,22 @@ if you choose 'by GPIO number' you can use the GPIO numbers as an integer value 
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
-For my clocks I use a in Fritzing designed PCB. The SK6812 RGBW LED-strips operates with 5V. De data signal from the Nano is 3.3V 
-I tried to use optocouplers to amplify the data signal to 5V but failed. see here:
+For my clocks I use an in Fritzing designed PCB. 
+The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip .
+
+The SK6812 RGBW LED-strip operates at 5V. De data signal from the Nano is 3.3V. 
+
+I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here:
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html
-You can also read about the use of the 74HCT125 level shifter with good results. It has four port and I designed the PCB you can use the other three port for other uses. But in the end the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected to the 3.3V data line. I have not tested strips with more LEDs. 
+
+You can also read about the use of the 74HCT125 level shifter with good results. It has four ports and I designed the PCB it can also use the other three ports on the IC for other uses. 
+
+But in the end the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected to the 3.3V data line. I have not tested strips with more LEDs. 
+
 The lesson of this story is that you can connect de SK6812 RBW with a 470 ohm resistor and a 200 - 1000 uF capacitor to the strip. 
+
 But you need a separate 5V power supply for the LEDs. You can draw the power from the VBUS-pin on the Nano if the Nano is powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
+The PCB can use all the different power options 
 
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)
