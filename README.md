@@ -36,7 +36,7 @@ The lesson of this story is that you can connect de SK6812 RBW with a 470 ohm re
 
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)
 
-But you need a powerfull 5V power supply for the LEDs. Power can be drwn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
+But you need a powerfull 5V power supply for the LEDs. Power can be drawn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
 
 The PCB can use different power connection options.
@@ -47,5 +47,16 @@ BUT KEEP IN MIND. this connection is fed to the LED-strip. If a higher voltage p
 
 If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcutted. The LEDs will be powered by thus power source and must be 1A or more with longer strips cq more LEDs.
 
+A 5V >1A power supply can also be attached at the 5V power connection on the top left of the PCB and the Vin connection (red line) connected to 5V. 
+
 ![5VConnections](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/39ea30fc-2850-4c1c-9fdb-4b4bec752f9a)
+
+# Software
+
+The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Wordclock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android ot iPhone/iPad/iMac
+
+![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
+
+
+
 
