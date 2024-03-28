@@ -26,9 +26,7 @@ See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nR
 Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has may more ports and an other port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.
-My choice was to use 'by GPIO number'. But ... Then you have to use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analogue pins.
-
-if you choose 'by GPIO number' you can use the GPIO numbers as an integer value as used for an ESP32-S3 or as Arduino macro definitions like the numbers printed on the Nano ESP32 board. Like: D1,D2,A2,A5. 
+When you use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board both numbering methods can be used.
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
