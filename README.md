@@ -26,7 +26,10 @@ See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nR
 Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has may more ports and an other port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.
-When you use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board both numbering methods can be used.
+To keep  the coding compatible with other Espressif ESP32 board the code must be comiled with GPIO numbering selected.
+![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/0343f067-5690-4cb2-a720-78c113c53e2a)
+
+When you use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board GPIO numbering must be used.
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
@@ -736,12 +739,11 @@ Not all boards has a 12 bit AD converter like. </span>
 <br />
 <span class="auto-style10">Control the color and intensity of the LED on the 
 boards in one command</span><br class="auto-style10" />
-<span class="auto-style10">-1 leaves the LED unchanged. Values between 0 and 
-255.</span><pre>//--------------------------------------------
+<pre>//--------------------------------------------
 <span class="auto-style11">// CLOCK Control the LEDs on the ESP32</span>
-<span class="auto-style11">// -1 leaves intensity untouched</span>
+<span class="auto-style11">// 0 Low is LED off. Therefore the value is inversed with the ! Not</span>
 <span class="auto-style11">//--------------------------------------------</span>
-<span class="auto-style11">void SetStatusLED(int WW, int CW, int Re, int Gr, int Bl)</span>
+<span class="auto-style11">void SetStatusLED(bool Red, bool Green, bool Blue)</span>
 {</pre>
 <br />
 <span class="auto-style10">This function reads the analog port and calculates an 
