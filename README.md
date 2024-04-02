@@ -23,7 +23,7 @@ That means you have to use a different BLE service. Not FFE0 but 6e400001-b5a3-.
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
-Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has may more ports and an other port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
+Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has many more ports and an different port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.
 To keep  the coding compatible with other Espressif ESP32 board the code must be comiled with GPIO numbering selected.
