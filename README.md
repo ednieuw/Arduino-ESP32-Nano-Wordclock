@@ -62,7 +62,7 @@ BUT KEEP IN MIND. this connection is fed to the LED-strip via the 1N5817 diode. 
 The 1N5817 diode lowers the voltage with 0.5V to 4.5V (That is maybe the reason the SK6812 LED strip operates with 3.3V on the data line. The data line voltage must be higher that 2/3 of the input voltage  (2/3 * 4.5 = 3.0V) The LEDs still turn on at 4.5V. But you are living on the edge!)
 
 
-If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcutted. The LEDs will be powered by thus power source and must be 1A or more with longer strips cq more LEDs.
+If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcutted. The LEDs will be powered by this power source and must be 1A or more with longer strips cq more LEDs.
 
 A 5V >1A power supply can also be attached at the 5V power connection on the top left of the PCB and the Vin connection (red line) connected to 5V. 
 
