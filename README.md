@@ -55,7 +55,7 @@ VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is dis
 
 The PCB can use different power connection options.
 
-If the blue line shortcut is closed then the LED-strip is powered via the Power 6-21V connection. This will also power the Nano ESP32. You can connect it to a 5V USB power supply although the minimum voltage is noted as 6V. 
+If the red line shortcut (see picture below) is closed then the LED-strip is powered via the Power 6-21V connection. This will also power the Nano ESP32. You can connect it to a 5V USB power supply although the minimum voltage is noted as 6V. 
 
 BUT KEEP IN MIND. this connection is fed to the LED-strip via the 1N5817 diode. If a higher voltage power supply us connected the LED will be destroyed but Nano will turn on happily. 
 
