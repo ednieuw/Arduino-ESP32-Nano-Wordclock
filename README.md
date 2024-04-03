@@ -42,11 +42,11 @@ The SK6812 RGBW LED-strip operates at 5V. De data signal from the Nano is 3.3V.
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here:
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html
 
-You can also read about the use of the 74HCT125 level shifter with good results. It has four ports and I designed the PCB it can also use the other three ports on the IC for other uses. 
+For level switching the 74HCT125 level shifter is often used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. 
 
-But in the end the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected to the 3.3V data line. I have not tested strips with more LEDs in the strip. 
+But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more LEDs in the strip.
 
-The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND to the strip. 
+The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
 
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)
 
@@ -61,10 +61,9 @@ BUT KEEP IN MIND. this connection is fed to the LED-strip via the 1N5817 diode. 
 
 The 1N5817 diode lowers the voltage with 0.5V to 4.5V (That is maybe the reason the SK6812 LED strip operates with 3.3V on the data line. The data line voltage must be higher that 2/3 of the input voltage  (2/3 * 4.5 = 3.0V) The LEDs still turn on at 4.5V. But you are living on the edge!)
 
+If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcut. The LEDs will be powered by this power source and must be 1A or more with longer strips c.q. more LEDs.
 
-If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcutted. The LEDs will be powered by this power source and must be 1A or more with longer strips cq more LEDs.
-
-A 5V >1A power supply can also be attached at the 5V power connection on the top left of the PCB and the Vin connection (red line) connected to 5V. 
+A 5V, >1A power supply can also be attached at the 5V power connection on the top left of the PCB and the Vin connection (red line) connected to 5V. 
 
 ![5VConnections](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/39ea30fc-2850-4c1c-9fdb-4b4bec752f9a)
 
@@ -75,7 +74,7 @@ After connections are made the PCB and hardware looks like this
 
 # Software
 
-The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android ot iPhone/iPad/iMac
+The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android or iPhone/iPad/iMac
 
 You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. If you have a word plate of course. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
@@ -93,10 +92,6 @@ Partition Scheme: With FAT<br>
 Pin Numbering: By GPIO number (legacy)<br>
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
-
-
-
-
 
 </p>
 <h2><span class="auto-style10"><strong>Control of the clock</strong>&nbsp;
