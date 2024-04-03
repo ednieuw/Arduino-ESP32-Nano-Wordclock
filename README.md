@@ -18,8 +18,8 @@ The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/
 The Arduino Nano ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.<br>
 Futher more it has the same form faxtor as the Nano and Nano Every.
 
-The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI. BLE is not with the TI CC2541 chip but a Nordic nRF52 chip. <br>
-That means you have to use a different BLE service. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software.
+The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
+That means you have to use a different BLE service for the serial communication. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software. Depending on the app you use you probably must specify which protocol to use.
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
@@ -29,7 +29,7 @@ There are two compiler pin numbering methods: One method uses the GPIO numbering
 To keep  the coding compatible with other Espressif ESP32 board the code must be comiled with GPIO numbering selected.
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/0343f067-5690-4cb2-a720-78c113c53e2a)
 
-When you use the Arduino macro numbering D1, D2, ... , D13  for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board GPIO numbering must be used.
+When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board 'GPIO numbering' must be selected in the compiler. 
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
