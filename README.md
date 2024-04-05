@@ -76,12 +76,14 @@ After connections are made the PCB and hardware looks like this
 
 The ESP32Arduino_WordClockV006.ino or higher version turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server. You can operate the software via Bluetooth on your Android or iPhone/iPad/iMac
 
-You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. If you have a word plate of course. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
+You can choose between four languages or make a four-language clock that displays four languages at once with it 625 LEDs. 
+If you have a word plate of course. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
-With defines the software compiles for SK6812 or WS2812 LED-strips and you can choose between a Dutch or 4-languages clock.<br>
-It is simple to change the clock to a single French, German or English design.
 
-Or a ![single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
+With #defines the software compiles for SK6812 or WS2812 LED-strips and you can choose between a Dutch or 4-languages clock.<br>
+With a little programming experience it is not difficult to change the clock to a single French, German or English design.
+
+Or a [single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
 In the libraries.zip I packed the libraries I used to compile the software. Unpack them in you libraries folder.<br>
 Download the program folder and compile for Arduino Nano ESP32<br>
