@@ -83,8 +83,8 @@ It is simple to change the clock to a single French, German or English design.
 
 Or a ![single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
-In the libraries.zip I packed the libraries I used for V006. Unpack them in you libraries folder.<br>
-Download the V006 folder and compile for ESP32<br>
+In the libraries.zip I packed the libraries I used to compile the software. Unpack them in you libraries folder.<br>
+Download the program folder and compile for Arduino Nano ESP32<br>
 
 How to compile: Install Arduino Nano ESP32 boards<br>
 Board: Arduino Nano ESP32<br>
