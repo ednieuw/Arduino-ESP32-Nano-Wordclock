@@ -54,16 +54,16 @@ But you need a powerful 5V power supply for the LEDs. Power can be drawn from th
 VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
 
 The PCB can use different power connection options.
+A 5V, >1A power supply can be attached at the 5V power connection on the top left of the PCB.
 
-If the red line shortcut (see picture below) is closed then the LED-strip is powered via the Power 6-21V (VIN) connection with 5V. This will also power the Nano ESP32. You can connect the Vin on the ESP32 Nano with a 5V USB power supply although the minimum voltage is noted as 6V. 
+If the red line shortcut (see picture below) is closed then the LED-strip is powered via the Power 6-21V (VIN) connection with 5V. 
 
-BUT KEEP IN MIND. This connection is fed to the LED-strip via the 1N5817 diode. If a higher voltage power supply us connected the LEDs will be destroyed but Nano will turn on happily. 
+This will also power the Nano ESP32. You can connect the Vin on the ESP32 Nano with a 5V USB power supply although the minimum voltage is noted as 6V. the 1N5817 diode even lowers the voltage with 0.5V to 4.5V. 
 
-The 1N5817 diode lowers the voltage with 0.5V to 4.5V (That is maybe the reason the SK6812 LED strip operates with 3.3V on the data line. The data line voltage must be higher that 2/3 of the input voltage  (2/3 * 4.5 = 3.0V) The LEDs still turn on at 4.5V. But you are living on the edge!)
+BUT KEEP IN MIND. This 5V connection is fed to the LED-strip directly. If a higher voltage power supply us connected the LEDs will be destroyed but Nano will turn on happily. 
 
-If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcut. The LEDs will be powered by this power source and must be 1A or more with longer strips c.q. more LEDs.
+If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcut. The LEDs will be powered by this power source. This is fine with 20 LEDs but probably not for longer strips.
 
-A 5V, >1A power supply can also be attached at the 5V power connection on the top left of the PCB and the Vin connection (red line) connected to 5V. 
 
 ![5VConnections](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/39ea30fc-2850-4c1c-9fdb-4b4bec752f9a)
 
