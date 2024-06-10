@@ -140,53 +140,38 @@ settings of several preferences.
 </table>
 <br>
 
-<table style="width: 100%"><tr><td >
- 2. USE the BLE nRF connection with an UART serial terminal app 
-to control it with your mobile phone or tablet. <br> <br>
+2. USE the BLE nRF connection with an UART serial terminal app to control it with your mobile phone or tablet. <br> <br>
 Use the IOS app for iPhone or iPad:&nbsp;
-<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE 
-Serial Pro</a>. <br />
+<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
 Turn on Fast BLE with option Z in the menu. <br>
 <br>
- For Android use:
-<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
-Serial Bluetooth terminal</a>. <br />
+For Android use:<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">Serial Bluetooth terminal</a>. <br />
 Turn off (default) Fast BLE in the menu. 
 
- Start the app and find the MCU in the list of devices and connect to it. You 
-can change it's beacon name in the menu with option C. <br>
+Start the app and find the MCU in the list of devices and connect to it. You can change it's beacon name in the menu with option C. <br>
 <br>
- In both cases 
-<strong>send the character I 
-of Information and the menu shows up</strong> .<br>
- Enter the first character of the setting you want to change followed with a code. <br>
- Some entries just toggle On and Off. Like the W to set WIFI Off or On. 
+In both cases <strong>send the character I of Information and the menu shows up</strong> .<br>
+Enter the first character of the setting you want to change followed with a code. <br>
+Some entries just toggle On and Off. Like the W to set WIFI Off or On. 
   
 <p> To change the SSID and password: <br>
  <strong>A</strong> <span class="auto-style7"><strong>my-ssid</strong>   
 and send this command. Eg AFRITZ!Box01 or aFRITZ!Box01. Starting with an upper 
 or lower case character is an identical instruction in the command string <br>
- Then&nbsp; <strong>B</strong> <span class="auto-style1"> <strong>my-password</strong> and send that password. <br>
+Then <strong>B</strong> <span class="auto-style1"> <strong>my-password</strong> and send that password. <br>
  
-<strong>Cbroadcastname</strong>&nbsp;will change to name displayed in the Bluetooth 
-connection list.&nbsp;   <br>
- If the length of the SSID and/or password is less then 5 characters the WIFI 
-will be turned off automatically. This will speed up startup time if no internet connection is available <br>
- Use a length of minimal 8 characters for SSID and password. <br>
- Check in the menu (third row from the bottom) if WIFI and NTP are on. <br>
- If WIFI is connected the LED on the MCU will pulse green. <br>
- <br> Enter @ to reset the 
-MCU. It will restart and connections will be made. <br>
+<strong>Cbroadcastname</strong>&nbsp;will change to name displayed in the Bluetooth connection list.&nbsp;   <br>
+If the length of the SSID and/or password is less then 5 characters the WIFI will be turned off automatically. This will speed up startup time if no internet connection is available <br>
+Use a length of minimal 8 characters for SSID and password. <br>
+Check in the menu (third row from the bottom) if WIFI and NTP are on. <br>
+If WIFI is connected the LED on the MCU will pulse green. <br>
+<br> Enter @ to reset the MCU. It will restart and connections will be made. <br>
 <br>
- To set a time zone. Send the time zone string between the quotes prefixed with 
-the character E or e. <br>
- See the time zones at the bottom of this page. <br>
- For example; if you live in Australia/Sydney send the string: eAEST-10AEDT,M10.1.0,M4.1.0/3 
-</td>
-<td valign="bottom">
-<p >&nbsp;
+To set a time zone. Send the time zone string between the quotes prefixed with the character E or e. <br>
+See the time zones at the bottom of this page. <br>
+For example; if you live in Australia/Sydney send the string: eAEST-10AEDT,M10.1.0,M4.1.0/3 
 
-	<pre>______________________________
+<pre>______________________________
 A SSID B Password C BLE beacon name
 D Date (D15012021) T Time (T132145)
 E Timezone  (E<-02>2 or E<+01>-1)
@@ -220,17 +205,13 @@ LED strip: WS2812 (Send % to switch)
 Software: ESP32Arduino_WordClockV026.ino
 ______________________________________________________________________
 </pre>
-</td>
-</tr>
-<tr>
-<td style="width: 550px" >&nbsp;</td>
-<td >Menu shown in serial output.</td>
-</tr>
-</table>
- If no WIFI is not used check at the bottom of the menu if WIFI is OFF.<br>
- The clock will start much quicker because it will not try to connect. <br>
-<img alt="Pocuter menu bottom" class="auto-style4" src="Pics/MenuBottom.gif" />
- As mentioned before the clock can be controlled with the WIFI webpage or BLE 
+
+Menu shown in serial output.
+
+If no WIFI is not used check at the bottom of the menu if WIFI is OFF.<br>
+The clock will start much quicker because it will not try to connect. <br>
+<img alt="menu bottom" src="Pics/MenuBottom.gif" />
+As mentioned before the clock can be controlled with the WIFI webpage or BLE 
 UART terminal app. <br>
  When the clock is connected to WIFI the IP-address is displayed in the Digital display. <br>
  Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
