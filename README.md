@@ -7,6 +7,8 @@ You can control it with your phone of with a web page.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 It will keep its time within the second correct with the internet NTP time and a time zone selection.
 
+The  [Manual_ArduinoESP32Nano.pdf](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual_ArduinoESP32Nano.pdf) will contain the latest changes.
+
 If you have a ILI9341 display [have a look here](https://github.com/ednieuw/ESP32-C3-Clock-and-more) for an alternative word clock.
 
 Do you happen to have a €50 LilyGo watch looking like a iWatch have [a look here](https://github.com/ednieuw/Lilygo-T-Watch-2020)
