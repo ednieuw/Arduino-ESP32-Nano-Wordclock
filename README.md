@@ -372,11 +372,6 @@ when connected with an USB-cable.</span><br class="auto-style10" />
 </strong>Prints the LDR-readings and the calculated intensity output.</p>
 <p>
 <span class="auto-style10">
-<strong>L L0 = NL, L1 = UK, L2 = DE, L3 = FR, L4 = Wheel</strong></span><br class="auto-style10" />
-<span class="auto-style10">You can choose between four languages to display or show them randomly every 
-minute.</span><br class="auto-style10" />
-<br class="auto-style10" />
-<span class="auto-style10">
 <strong>N Display off between Nhhhh (N2208)</strong></span><br class="auto-style10" />
 <span class="auto-style10">With N2208 the display will be turned off between 22:00 and 
 08:00.</span><br class="auto-style10" />
