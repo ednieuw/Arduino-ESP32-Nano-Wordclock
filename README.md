@@ -74,13 +74,15 @@ After connections are made the PCB and hardware looks like this
 
 # Software
 
-The ESP32Arduino_WordClockVnnn.ino  turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server. The software can be controlled via Bluetooth on your Android or iPhone/iPad/iMac
+The ESP32Arduino_WordClockVnnn.ino  turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.<br>
+The software can be controlled via Bluetooth on your Android or iPhone/iPad/iMac.
 
 There are for the 144 LED clock four languages to select or make a four-language clock that displays four languages at once with it 625 LEDs. 
+
 If you have a word plate ofcourse. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
 
-The software can use SK6812 or WS2812 LED-strips.<br>
+The software can be used with SK6812 or WS2812 LED-strips.<br>
 With a little programming experience it is not difficult to change the clock to a single French, German or English design.
 
 Or a [single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
@@ -104,8 +106,8 @@ To make life easy it is preferred to use a phone or tablet and a Bluetooth commu
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec)
  	 	 
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
-- Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.
-For IOS: BLE Serial Pro or BLESerial nRF.
+- Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
+For IOS: BLE Serial Pro or BLESerial nRF.<br>
 For Android: Serial Bluetooth Terminal.
 
 
@@ -123,8 +125,7 @@ Termite</a> as serial terminal. <br>
  Sending the character 'I' for information will display the menu followed with the actual 
 settings of several preferences. 
 
-<table style="width: 51%">
-<tr>
+<table style="width: 51%"><tr>
 <td style="width: 342px">
 <img alt="Menu on iPhone" src="Pics/phonemenu.jpg" width="350"  /></td>
 <td style="width: 415px">
@@ -139,10 +140,9 @@ settings of several preferences.
 </table>
 <br>
 
-<table ><tr><td >
+<table style="width: 100%"><tr><td >
  2. USE the BLE nRF connection with an UART serial terminal app 
-to control it with your mobile phone or tablet. <br>
- <br />
+to control it with your mobile phone or tablet. <br> <br>
 Use the IOS app for iPhone or iPad:&nbsp;
 <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE 
 Serial Pro</a>. <br />
@@ -162,7 +162,6 @@ of Information and the menu shows up</strong> .<br>
  Enter the first character of the setting you want to change followed with a code. <br>
  Some entries just toggle On and Off. Like the W to set WIFI Off or On. 
   
-
 <p> To change the SSID and password: <br>
  <strong>A</strong> <span class="auto-style7"><strong>my-ssid</strong>   
 and send this command. Eg AFRITZ!Box01 or aFRITZ!Box01. Starting with an upper 
@@ -186,7 +185,8 @@ the character E or e. <br>
 </td>
 <td valign="bottom">
 <p >&nbsp;
-<pre>______________________________
+
+	<pre>______________________________
 A SSID B Password C BLE beacon name
 D Date (D15012021) T Time (T132145)
 E Timezone  (E<-02>2 or E<+01>-1)
