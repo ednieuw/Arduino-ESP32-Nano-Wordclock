@@ -74,7 +74,8 @@ After connections are made the PCB and hardware looks like this
 
 # Software
 
-The ESP32Arduino_WordClockVnnn.ino  turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.<br>
+The ESP32Arduino_WordClockVxxx.ino  turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
+
 The software can be controlled via Bluetooth on your Android or iPhone/iPad/iMac.
 
 There are for the 144 LED clock four languages to select or make a four-language clock that displays four languages at once with it 625 LEDs. 
@@ -90,18 +91,25 @@ Or a [single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
 Download the program folder and compile for Arduino Nano ESP32<br>
 
-How to compile: Install Arduino Nano ESP32 boards<br>
+# How to compile: 
+Install Arduino Nano ESP32 boards<br>
 Board: Arduino Nano ESP32<br>
 Partition Scheme: With FAT<br>
-Pin Numbering: By GPIO number (legacy)<br>
+<strong> Pin Numbering: By GPIO number (legacy)  !! change this </strong><br>
+The LEDs will not turn on when you use the "Arduino default pin settings" due to a bug in the Adafruit Neopixel library
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
 
-<h3>Before starting</h3>
+# Before starting
 
-The clock receives time from the internet if a DS3231 time module is not installed. When a DS3231 time module is attached to the circuit board an internet connection is not obliged. 
+The clock receives time from the internet if a DS3231 time module is not installed. 
+
+When a DS3231 time module is attached to the circuit board an internet connection is not obliged.
+
 To connect to the internet the name of the WIFI station and its password must be entered in the clock software to be able to connect to a WIFI router.
+
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
+
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec)
  	 	 
@@ -110,20 +118,18 @@ BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 For IOS: BLE Serial Pro or BLESerial nRF.<br>
 For Android: Serial Bluetooth Terminal.
 
+# Control of the clock
+If the clock is connected to the internet it will seek contact with a time server. (NTP connection can be turned off in the menu).
 
-<h3>Control of the clock</h3>
-If the clock is connected to the internet it will seek contact with a time 
-server. (NTP connection can be turned off in the menu).
 The time zone is set to UTC+1 Amsterdam but can be changed in the menu. <br>
- To connect to a WIFI network a SSID and password must be entered. <br>
- <br />
+To connect to a WIFI network a SSID and password must be entered. 
+ 
 There are a few methods: <br>
- 1. Connect the MCU with a serial cable to a PC and use a serial terminal. I 
-use the Arduino IDE or <a href="https://www.compuphase.com/software_termite.htm">
-Termite</a> as serial terminal. <br>
-<br>
- Sending the character 'I' for information will display the menu followed with the actual 
-settings of several preferences. 
+1. Connect the MCU with a serial cable to a PC and use a serial terminal.
+
+I use the Arduino IDE or <a href="https://www.compuphase.com/software_termite.htm"> Termite</a> as serial terminal. 
+
+Sending the character 'I' for information will display the menu followed with the actual settings of several preferences. 
 
 <table style="width: 51%"><tr>
 <td style="width: 342px">
@@ -140,27 +146,26 @@ settings of several preferences.
 </table>
 <br>
 
-2. USE the BLE nRF connection with an UART serial terminal app to control it with your mobile phone or tablet. <br> <br>
-Use the IOS app for iPhone or iPad:&nbsp;
-<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
-Turn on Fast BLE with option Z in the menu. <br>
-<br>
+2. USE the BLE nRF connection with an UART serial terminal app to control it with your mobile phone or tablet. 
+
+Use the IOS app for iPhone or iPad:<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
+Turn on Fast BLE with option Z in the menu. 
+
 For Android use:<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">Serial Bluetooth terminal</a>. <br />
 Turn off (default) Fast BLE in the menu. 
 
-Start the app and find the MCU in the list of devices and connect to it. You can change it's beacon name in the menu with option C. <br>
-<br>
-In both cases <strong>send the character I of Information and the menu shows up</strong> .<br>
+Start the app and find the MCU in the list of devices and connect to it. You can change it's beacon name in the menu with option C. 
+
+In both cases send the character I of Information and the menu shows up.<br>
 Enter the first character of the setting you want to change followed with a code. <br>
 Some entries just toggle On and Off. Like the W to set WIFI Off or On. 
   
 <p> To change the SSID and password: <br>
- <strong>A</strong> <span class="auto-style7"><strong>my-ssid</strong>   
-and send this command. Eg AFRITZ!Box01 or aFRITZ!Box01. Starting with an upper 
-or lower case character is an identical instruction in the command string <br>
-Then <strong>B</strong> <span class="auto-style1"> <strong>my-password</strong> and send that password. <br>
+Amy-ssid and send this command. Eg AFRITZ!Box01 or aFRITZ!Box01. 
+Starting with an upper or lower case character is an identical instruction in the command string <br>
+Then Bmy-passwordand send the password.(for example: bSecret<br>
  
-<strong>Cbroadcastname</strong>&nbsp;will change to name displayed in the Bluetooth connection list.&nbsp;   <br>
+Cbroadcastname will change to name displayed in the Bluetooth connection list. <br>
 If the length of the SSID and/or password is less then 5 characters the WIFI will be turned off automatically. This will speed up startup time if no internet connection is available <br>
 Use a length of minimal 8 characters for SSID and password. <br>
 Check in the menu (third row from the bottom) if WIFI and NTP are on. <br>
@@ -211,30 +216,24 @@ Menu shown in serial output.
 If no WIFI is not used check at the bottom of the menu if WIFI is OFF.<br>
 The clock will start much quicker because it will not try to connect. <br>
 <img alt="menu bottom" src="Pics/MenuBottom.gif" />
-As mentioned before the clock can be controlled with the WIFI webpage or BLE 
-UART terminal app. <br>
- When the clock is connected to WIFI the IP-address is displayed in the Digital display. <br>
- Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
-your internet addresses (URL). <br>
- Or <br>
- Open the BLE terminal app. Look for the WordClock to connect to and connect. <br>
- BLE connection can be made with my app
-<a href="https://ednieuw.home.xs4all.nl/BLESerial/BLESerialPRO.html">BLE Serial 
-pro</a> on the
-<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app 
-store</a> for Apple IOS devices.   <br>
- For Android
-<a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
-&nbsp;nRF UART terminal program </a>and
-<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
+
+As mentioned before the clock can be controlled with the WIFI webpage or BLE UART terminal app. <br>
+When the clock is connected to WIFI the IP-address is displayed in the Digital display. <br>
+Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
+your internet addresses (URL). 
+
+Or 
+Open the BLE terminal app. Look for the WordClock to connect to and connect.
+
+for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.home.xs4all.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
+
+For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
+&nbsp;nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
 Serial Bluetooth terminal</a>. <br />
-Unfortunately these Android apps 
-can not read strings longer than 20 characters. <br>
- If you see a garbled menu enter and send the character 'Z' to select the slower 
-transmission mode. <br>
-<br>
+Unfortunately these Android apps can not read strings longer than 20 characters. <br>
+If you see a garbled menu enter and send the character 'Z' to select the slower transmission mode. 
  
-<strong>Settings are set by entering the first character of a command following by parameters if necessary.</strong>  <br />
+Settings are set by entering the first character of a command following by parameters if necessary. <br />
 For example to set the colours of the characters in the display to white enter: Q2 <br>
 <br>
  To shown random all four languages every minute send L4. <br>
@@ -259,9 +258,8 @@ Reset to default setting by send R.<br><br>
 </tr>
 </table>
 
-<h2> <strong>Detailed description</strong> </h2>
-<pre>
-______________________________
+# Detailed description
+<pre>______________________________
 A SSID B Password C BLE beacon name
 D Date (D15012021) T Time (T132145)
 E Timezone  (E<-02>2 or E<+01>-1)
@@ -296,93 +294,80 @@ Software: ESP32Arduino_WordClockV026.ino
 ___________________________________</pre>
 
  With the menu many preferences can be set. <br />
-These preferences are permanently stored in the ESP32-S3 SPIFFS-storage space. <br>
-&nbsp;<br>
- Enter the first character in the menu of the item to be changed followed with the parameter. <br>
- For most entries upper and lower case are identical. <br>
-<br>
- <strong>A SSID B Password C BLE beacon name</strong> <br>
- Change the name of the SSID of the router to be connected to.<br>
- aFRITZ!BoxEd or AFRITZ!BoxEd <br>
- Then enter the password. For example: BSecret_pass <br>
- Restart the MCU by sending @. <br>
- Entering a single 'b' will show the used password. This Easter egg can can used to check if a valid password was entered. <br> 
- <br>
-<strong>D Set Date</strong>&nbsp; and <strong>T Set Time</strong>  <br>
- If you are not connected to WIFI you have to set the time and date by hand. <br>
- For example enter: D06112022 to set the date to 6 November 2022.  <br>
-<p >Enter for example T132145 (or 132145 , or t132145)&nbsp; to set the time to 45 seconds and 21 minutes past one o'clock. <br>
-  <br>
-<strong>E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1</strong> <br>
- At the bottom of this page you can find the time zones used in 2022.  <br>
- It is a rather complicated string and it is therefore wise to copy it. <br>
- Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
- Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
- E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 <br>
- <br>
-<strong>F Own colour  (Hex FWWRRGGBB </strong><br>
-You can set the colours of the highlighted and dimmed characters and&nbsp;the background. <br>
-Time is shown with the colour defined when Display choice Q3 or Q4 is chosen and the rest of the not highlighted characters are coloured with the settings from Dimmed font. <br>
- The format to be entered is hexadecimal. 0123456789ABCDEF are the character that can be used. <br>
- The command is 2 digits for Red followed with&nbsp;two digits for Green and ending with two digits for Blue.<br>
- To colour the characters intense red enter FF0000 prefixed with the character F, G or H. <br>
- To set the background to intense blue enter: H0000FF <br>
- To set the dimmed character to dark gray enter for example: G191919. 
-<br />
-You get gray if red, green and blue has the same intensity. <br>
+These preferences are permanently stored in the ESP32-S3 SPIFFS-storage space. 
 
-<strong>I To print this Info menu</strong> <br>
- Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. <br>
+Enter the first character in the menu of the item to be changed followed with the parameter. <br>
+For most entries upper and lower case are identical. 
 
-<p ><strong>K LDR reads/sec toggle On/Off<br /></strong>
-Prints the LDR-readings and the calculated intensity output.<br>
+# A SSID B Password C BLE beacon name<br>
+Change the name of the SSID of the router to be connected to.<br>
+aFRITZ!BoxEd or AFRITZ!BoxEd <br>
+Then enter the password. For example: BSecret_pass <br>
+Restart the MCU by sending @. <br>
+Entering a single 'b' will show the used password. This Easter egg can can used to check if a valid password was entered.
 
-<strong>N Display off between Nhhhh (N2208)</strong> <br>
- With N2208 the display will be turned off between 22:00 and 08:00. <br>
+# D Set Date and T Set Time <br>
+If you are not connected to WIFI you have to set the time and date by hand. <br>
+For example enter: D06112022 to set the date to 6 November 2022.  <br>
+Enter for example T132145 (or 132145 , or t132145)&nbsp; to set the time to 45 seconds and 21 minutes past one o'clock.
 
-<strong>O Display toggle On/Off</strong> <br>
- O toggles the display off and on. <br>
+# E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
+At the bottom of this page you can find the time zones used in 2022.  <br>
+It is a rather complicated string and it is therefore wise to copy it. <br>
+Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
+Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
+E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
+
+# F Own colour  (Hex FWWRRGGBB <br>
+ou can set the colours of the highlighted and dimmed characters and&nbsp;the background. <br>
+ime is shown with the colour defined when Display choice Q3 or Q4 is chosen and the rest of the not highlighted characters are coloured ith the settings from Dimmed font. <br>
+The format to be entered is hexadecimal. 0123456789ABCDEF are the character that can be used. <br>
+The command is 2 digits for Red followed with&nbsp;two digits for Green and ending with two digits for Blue.<br>
+To colour the characters intense red enter FF0000 prefixed with the character F, G or H. <br>
+To set the background to intense blue enter: H0000FF <br>
+To set the dimmed character to dark gray enter for example: G191919. <br>
+You get gray if red, green and blue has the same intensity.
+
+# I To print this Info menu<br>
+Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
+
+# K LDR reads/sec toggle On/Off<br />
+Prints the LDR-readings and the calculated intensity output.
+
+# N Display off between Nhhhh (N2208)<br>
+With N2208 the display will be turned off between 22:00 and 08:00. 
+
+# O Display toggle On/Off<br>
+ O toggles the display off and on.
  
-<strong> Q Display colour choice (Q0-6)</strong> <br>
-Q0 Yellow Q1 hourly<br>
-Q2 White Q3 All Own<br>
-Q4 Own Q5 Wheel<br>
-Q6 Digital display <br>
-<br>
- Q0 will show the time with yellow words. <br>
- Q1 will show every hour another colour. <br>
- Q2 shows all the texts white. <br>
- Q3 and Q4 uses you own defined colours. <br>
- Q5 will follow rainbow colours every minute. <br>
- Q6 is the digital display with the IP-address and date until seconds are 00. <br>
- The selected choice is displayed at the bottom of the menu. <br>
- Send an 'I' to display the latest's settings 
- <strong>R Reset settings </strong> 
-<br>
- R will set all preferences to default settings and clears the SSID and password. 
- <strong>Light intensity (1-250)</strong> <strong><br>
-</strong> <strong>S=Slope V=Min&nbsp; U=Max&nbsp; 
-(S100 L5 M200)</strong> 
+#  Q Display colour choice (Q0-6)<br>
+Q0 Yellow Q1 hourly Q2 White Q3 All Own Q4 Own Q5 Wheel Q6 Digital display <br>
+Q0 will show the time with yellow words. <br>
+Q1 will show every hour another colour. <br>
+Q2 shows all the texts white. <br>
+Q3 and Q4 uses you own defined colours. <br>
+Q5 will follow rainbow colours every minute. <br>
+Q6 is the digital display with the IP-address and date until seconds are 00. <br>
+The selected choice is displayed at the bottom of the menu. <br>
+Send an 'I' to display the latest's settings 
+
+# R Reset settings <br>
+R will set all preferences to default settings and clears the SSID and password. 
+
+# Light intensity (1-250)
+S=Slope V=Min&nbsp; U=Max (S100 L5 M200)
 
 <table style="width: 100%">
 <tr>
-<td> To control the light intensity three parameters 
-can be set. <br>
- The values ranges between 0 and 255. <br>
- The minimal light intensity is to avoid that the 
-display turns completely off when it is dark. <br />
-It also prevents flickering when 
-the input value are very low, like 2 and 3 bits.  <br>
- Values ranging between 5 and 20 are suggested. When 
-no LDR is attached the Min value can be set to 255.<br />
-The maximum light intensity is 255 bits for 100% intensity.  
-<br>
- The Slope (sensitivity) controls the speed at with the maximum 
-value is reached. <br />
-It multiplies the reading as a percentage. So, entering
-100 is a multiplication by one. <br />
-The placement and sensitivity of your LDR can be 
-adjusted with this parameter Slope. </td>
+<td> To control the light intensity three parameters can be set. <br>
+The values ranges between 0 and 255. <br>
+The minimal light intensity is to avoid that the display turns completely off when it is dark. <br />
+It also prevents flickering when the input value are very low, like 2 and 3 bits. <br>
+Values ranging between 5 and 20 are suggested. When no LDR is attached the Min value can be set to 255.<br />
+The maximum light intensity is 255 bits for 100% intensity.  <br>
+The Slope (sensitivity) controls the speed at with the maximum value is reached. <br />
+It multiplies the reading as a percentage. So, entering 100 is a multiplication by one. <br />
+The placement and sensitivity of your LDR can be adjusted with this parameter Slope. </td>
 <td> 
 <img alt="Min Max Slope" src="Pics/MinMaxSlope.jpg" /><br />
 The effect of the value of the slope on the light intensity of the LEDs 
@@ -393,12 +378,12 @@ or display. </td>
 <table style="width: 100%">
 	<tr>
 		<td> 
-		<strong>@ = Restart MCU<br>
-		</strong>@ will restart the MCU. This is handy when the SSID, password, et cetera are 
-changed and the program must be restarted.<strong><br />
+		# @ = Restart MCU<br>
+		@ will restart the MCU. This is handy when the SSID, password, et cetera are 
+changed and the program must be restarted.# <br />
 		<br />
 		W=WIFI, X=NTP, Y=BLE<br />
-		</strong>Toggle WIFI, NTP and BLE on and off.<br />
+		Toggle WIFI, NTP and BLE on and off.<br />
 		Sending the character will toggle it on or off. <br />
 		At the bottom of the menu the 
 state is printed.<br />
@@ -408,27 +393,25 @@ state is printed.<br />
 	</tr>
 	<tr>
 		<td colspan="2">
- <strong>Z Fast BLE</strong> <br>
- The
-BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
- The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />
-With most apps you will see these will truncate the long strings of the menu.<br />
-Then turn off Fast BLE.   <br>
- Option Z toggles between the long and short packages.&nbsp; 
-<p >
-Settings are stored in the SPIFFS space from the ESP32-S3
+
+# Z Fast BLE<br>
+The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
+The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />With most apps you will see these will truncate the long strings of the menu.<br>
+Then turn off Fast BLE. <br>
+Option Z toggles between the long and short packages.&nbsp; 
+Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 </td>
 </tr>
 </table>
-<h2>
-<strong>Compilation and uploading</strong></h2>
-<p >The settings of the ESP32C3 board is as follows.<br />
-Partition scheme is huge.<br />
+
+# Compilation and uploading
+
+The settings of the Arduino Nano ESP32 board is as follows.<br />
 Remember to install the ESP32 boards as explained above in the chapter Materials<br />
 
 <img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" />
 <p >&nbsp;
-<p ><strong>Program explanation</strong>
+<p ># Program explanation
  The program uses the following standard libraries.   
 <br>
 <pre>// ESP32-S3 Includes defines and initialisations 
@@ -881,10 +864,10 @@ void notFound(AsyncWebServerRequest *request)
 <br />
 <p >@Ed Nieuwenhuys, May 2023&nbsp;
 <p >&nbsp;
-<h2> <strong>Time zones</strong>   </h2>
+#Time zones
  
 <br>
- Copy the text <strong>between the quotes </strong>and paste them after the character E 
+ Copy the text between the quotes and paste them after the character E 
   
 
 <pre> Africa/Abidjan,"GMT0" 
