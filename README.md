@@ -18,7 +18,7 @@ But you can also not built a word clock and use the software to control SK6812 o
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
 
 The Arduino Nano ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.<br>
-Further more it has the same form faxtor as the Nano and Nano Every.
+Further more it has the same form factor as the Nano and Nano Every.
 
 The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
 That means you have to use a different BLE service for the serial communication. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software. Depending on the app you use you probably must specify which protocol to use.
