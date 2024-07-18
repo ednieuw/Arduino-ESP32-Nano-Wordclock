@@ -41,7 +41,7 @@ The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device
 
 The SK6812 RGBW LED-strip operates at 5V. De data signal from the Nano is 3.3V. 
 
-I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here:
+I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html
 
 For level switching the 74HCT125 level shifter is often used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. 
@@ -50,7 +50,8 @@ But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line 
 
 The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
 
-![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)
+![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)<br>
+The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
 But you need a powerful 5V power supply for the LEDs. Power can be drawn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
