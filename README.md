@@ -151,7 +151,8 @@ Sending the character 'I' for information will display the menu followed with th
 
 2. USE the BLE nRF connection with an UART serial terminal app to control it with your mobile phone or tablet. 
 
-Use the IOS app for iPhone or iPad:<a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
+Use the IOS app for iPhone or iPad: <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
+or the free app BLEserial nRF: https://apps.apple.com/nl/app/bleserial-nrf/id1632235163?l=en-GB
 Turn on Fast BLE with option Z in the menu. 
 
 For Android use:<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">Serial Bluetooth terminal</a>. <br />
