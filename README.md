@@ -118,8 +118,14 @@ To make life easy it is preferred to use a phone or tablet and a Bluetooth commu
  	 	 
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 - Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
-For IOS: BLE Serial Pro or BLESerial nRF.<br>
-For Android: Serial Bluetooth Terminal.
+
+- For IOS iPhone or iPad: [BLE Serial Pro](https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en). <br />
+Or the free less sophisticated app: [BLE serial nRF](https://apps.apple.com/nl/app/bleserial-nrf/id1632235163?l).<br>
+Tip: Turn on Fast BLE with option Z in the menu for a faster transmission.
+
+- For Android use: [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal). <br />
+Do not turn on Fast BLE in the menu. (Off = default)
+
 
 # Control of the clock
 If the clock is connected to the internet it will seek contact with a time server. (NTP connection can be turned off in the menu).
