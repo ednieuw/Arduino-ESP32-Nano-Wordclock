@@ -25,17 +25,19 @@ That means you have to use a different BLE service for the serial communication.
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
-Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has many more ports and an different port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
+Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has many more ports and a different port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
+
+At the moment of writing the Espressif ESP32 board V3.0.4 with the Arduino Nano ESP32 selected does not compile to a working program. Select the Nano ESP32 board from Arduino. The difference is easy to see; if there is only one board to select from it is right, if there is a very long list of MCU's to select from it is wrong.
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.<br>
-This code must be compiled with GPIO numbering selected. When the LEDs do not turn on then check this GPIO numbering setting
+This code must be compiled with GPIO numbering selected. If the LEDs do not turn on check this GPIO numbering setting.
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/0343f067-5690-4cb2-a720-78c113c53e2a)
 
 When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board 'GPIO numbering' must be selected in the compiler. 
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
-For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order with the Fritzing app itself.
+For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself. 
 
 The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
@@ -44,7 +46,7 @@ The SK6812 RGBW LED-strip operates at 5V. De data signal from the Nano is 3.3V.
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html
 
-For level switching the 74HCT125 level shifter is often used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. 
+For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. 
 
 But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more LEDs in the strip.
 
@@ -53,11 +55,11 @@ The lesson of this story is that you can connect the SK6812 RGBW strip with a 47
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)<br>
 The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
-A PCB to drive RGB(W) LEDs and /or white 2835 LED strips with shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
+A universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips with shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
 One PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks run with a Arduino Nano ES32. 
 
-But you need a powerful 5V power supply for the LEDs. Power can be drawn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
-VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board.
+A powerful 5V power supply for the LEDs. Power can be drawn from the VBUS-pin (5V USB) on the Nano if the Nano is powered with a USB-C cable.  
+VBUS provides 5V whenever powered via USB. If powered via the VIN pin, it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board. 
 
 The PCB can use different power connection options.
 A 5V, >1A power supply can be attached at the 5V power connection on the top left of the PCB.
