@@ -37,7 +37,9 @@ When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and 
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
-For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself. 
+For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.
+
+[PCBWay](https://www.pcbway.com/) can also print for $5 10 PCB's. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.  
 
 The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
