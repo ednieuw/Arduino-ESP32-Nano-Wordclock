@@ -39,7 +39,9 @@ When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and 
 
 For my clocks I use a [Fritzing software](https://fritzing.org/) designed PCB. This is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.
 
-[PCBWay](https://www.pcbway.com/) can also print for $5 10 PCB's. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.  
+[PCBWay](https://www.pcbway.com/) can also print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.  
+
+The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
 The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
@@ -55,7 +57,7 @@ But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line 
 The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
 
 ![Nano_ESP32-PCB_V02](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/9b5c5c5a-e908-4ae9-8d86-66cb5d0ebd43)<br>
-The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
+
 
 A universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips with shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
 One PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks run with a Arduino Nano ES32. 
