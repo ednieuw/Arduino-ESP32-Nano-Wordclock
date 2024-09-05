@@ -5,9 +5,14 @@
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
 You can control it with your phone of with a web page.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
-It will keep its time within the second correct with the internet NTP time and a time zone selection.
+It will keep its time within the second correct with the internet NTP time and a time zone selection.<br>
+If no internet is available a DS3231 RTC module can be attached to get an accurate time. With a rotary or membrane pad the time can be set.<br>
+A LDR is used to give the LED an optimal brightness.<br>
+A DCF77 time receiver can be attached to receive the time from the air in the EU.<br>
 
-The  [Manual_ArduinoESP32Nano.pdf](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual_ArduinoESP32Nano.pdf) will contain the latest changes.
+A PCB with shift registers for white LED clocks and for use with RGB(W) LED strips [with the Arduino Nano ESP32 here.](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock)
+
+[Manual_ArduinoESP32Nano.pdf](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual_ArduinoESP32Nano.pdf)
 
 If you have a ILI9341 display [have a look here](https://github.com/ednieuw/ESP32-C3-Clock-and-more) for an alternative word clock.
 
@@ -18,16 +23,16 @@ But you can also not built a word clock and use the software to control SK6812 o
 The Arduino Nano word clocks from my older projects, https://github.com/ednieuw/Word-Colour-Clock-SK6812-WS2812, must have a DS3231 RTC and a Bluetooth module attached to get and keep the time.
 
 The Arduino Nano ESP32 can receive its time with WIFI from the internet and has an built-in RTC module.<br>
-Further more it has the same form factor as the Nano and Nano Every.
 
 The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
 That means you have to use a different BLE service for the serial communication. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software. Depending on the app you use you probably must specify which protocol to use.
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
-Due to the fact that the ESP32-S3 chip used in the  Nano ESP32 has many more ports and a different port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
+Due to the fact that the ESP32-S3 chip used in the Nano ESP32 has many more ports and a different port numbering as the ATMEGA chips Arduino had to change the pin numbering in the software. 
 
-At the moment of writing the Espressif ESP32 board V3.0.4 with the Arduino Nano ESP32 selected does not compile to a working program. Select the Nano ESP32 board from Arduino. The difference is easy to see; if there is only one board to select from it is right, if there is a very long list of MCU's to select from it is wrong.
+At the moment of writing the Espressif ESP32 board V3.0.4 with the Arduino Nano ESP32 selected does not compile to a working program. 
+Select the Nano ESP32 board from Arduino. The difference is easy to see; if there is only one board to select from it is right, if there is a very long list of MCU's to select from it is wrong.
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.<br>
 This code must be compiled with GPIO numbering selected. If the LEDs do not turn on check this GPIO numbering setting.
@@ -104,7 +109,7 @@ In the libraries.zip are the libraries to compile the software. Unpack them in y
 Download the program folder and compile for Arduino Nano ESP32<br>
 
 # How to compile: 
-Install Arduino Nano ESP32 boards<br>
+Install Arduino Nano ESP32 board<br>
 Board: Arduino Nano ESP32<br>
 Partition Scheme: With FAT<br>
 <strong> Pin Numbering: By GPIO number (legacy)  !! change this </strong><br>
