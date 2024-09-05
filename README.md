@@ -8,7 +8,6 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 It will keep its time within the second correct with the internet NTP time and a time zone selection.<br>
 If no internet is available a DS3231 RTC module can be attached to get an accurate time. With a rotary or membrane pad the time can be set.<br>
 A LDR is used to give the LED an optimal brightness.<br>
-A DCF77 time receiver can be attached to receive the time from the air in the EU.<br>
 
 A PCB with shift registers for white LED clocks and for use with RGB(W) LED strips [with the Arduino Nano ESP32 here.](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock)
 
