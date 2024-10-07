@@ -65,6 +65,9 @@ The lesson of this story is that you can connect the SK6812 RGBW strip with a 47
 An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips with shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
+![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
+A minumum PCB for small spaces in this repository
+
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are aable to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
 If powered via the VIN pin VBUS it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board. 
@@ -86,6 +89,7 @@ If the Nano ESP32 is connected via the USB-C port then the yellow connection mus
 After connections are made the PCB and hardware looks like this:
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/86c688e0-8006-4042-880a-40064a4d8949)
+![NanoESP32-V04-3D](https://github.com/user-attachments/assets/e717d61f-7953-4e35-80c1-278ca05a10df)
 
 
 # Software
