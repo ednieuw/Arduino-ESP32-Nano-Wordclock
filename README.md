@@ -117,14 +117,23 @@ Board: Arduino Nano ESP32<br>
 Partition Scheme: With FAT<br>
 <strong> Pin Numbering: By GPIO number (legacy)  !! change this </strong><br>
 The LEDs will probably not turn on when you use the "Arduino default pin settings" due to a bug in the Adafruit Neopixel library.<br>
-But this bug can be resolved in due time.
+
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
+
+Or install ESP32 boards from Espressif version 3.0.5 or newer.
+
+Board: Arduino Nano ESP32 (almost at the bottom of the long list)<br>
+Partition Scheme: With FAT<br>
+Pin Numbering: By Arduino pin (default)
+
+Instead of the Neopixel library my own EdSoftLED library is used. https://github.com/ednieuw/EdSoftLED <br> 
+It uses the ESP32 V3 RMT drivers and is compatible with the Neopixel library functions that are needed for my software.
 
 # Before starting
 
 The clock receives time from the internet if a DS3231 time module is not installed. 
 
-When a DS3231 time module is attached to the circuit board an internet connection is not obliged.
+When a DS3231 time module is attached to the circuit board an internet connection is not obliged. Select in the menu that the DS3231 is used instead of the NTP time. (J Toggle use DS3231 RTC module)
 
 To connect to the internet the name of the WIFI station and its password must be entered in the clock software to be able to connect to a WIFI router.
 
