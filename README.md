@@ -258,6 +258,16 @@ As mentioned before the clock can be controlled with the WIFI webpage or BLE UAR
 When the clock is connected to WIFI the IP-address is displayed in the Digital display. <br>
 Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
 your internet addresses (URL). 
+Or in version V056 or higher
+
+Enter 'edsoft.local' as URL in the browser.
+ if this does not work:
+  - Install host software:
+  - For Linux, install Avahi (http://avahi.org/).
+  - For Windows, install Bonjour (http://www.apple.com/support/bonjour/).
+  - For Mac OSX and iOS support is built in through Bonjour already.
+
+  - Point your browser to http://edsoft.local, you should see a response.
 
 Or 
 Open the BLE terminal app. Look for the WordClock to connect to and connect.
