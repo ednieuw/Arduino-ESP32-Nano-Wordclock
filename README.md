@@ -98,9 +98,10 @@ The ESP32Arduino_WordClockVxxx.ino  turns the Nano ESP32 and SK6812 or WS2812 LE
 
 The software can be controlled via Bluetooth on your Android or iPhone/iPad/iMac.
 
-There are for the 144 LED clock four languages to select from or make a four-language clock that displays four languages at once with it 625 LEDs. 
+There are for the single language 144 LED clock four languages to select from or make a four-language clock that displays four languages at once with it 625 LEDs. 
 
-If you have a word plate ofcourse. [Word clock with SK6812 LEDs in NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
+If you have a word plate ofcourse.<br>
+[4-language word clock with SK6812 LEDs in UK, NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
 
 The software can be used with SK6812 or WS2812 LED-strips.<br>
