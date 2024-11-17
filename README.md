@@ -66,7 +66,7 @@ An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips 
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
-A minumum PCB for small spaces in this repository
+A minimum PCB for small spaces in this repository
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are aable to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
@@ -412,7 +412,7 @@ state is printed.<br />
 </tr>
 </table>
 
-# Z Fast BLE
+# + Fast BLE
 
 The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
 The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />With most apps you will see these will truncate the long strings of the menu.<br>
