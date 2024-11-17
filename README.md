@@ -167,16 +167,13 @@ I use the Arduino IDE or <a href="https://www.compuphase.com/software_termite.ht
 Sending the character 'I' for information will display the menu followed with the actual settings of several preferences. 
 
 <table style="width: 51%"><tr>
-<td style="width: 342px">
-<img alt="Menu on iPhone" src="Pics/menuphone.jpg" width="350"  /></td>
-<td style="width: 415px">
-<img alt="Termite terminal" src="Pics/Termite.jpg" width="400"  /></td>
+<td style="width: 342px"><img alt="Menu on iPhone" src="Pics/menuphone.jpg" width="350"  /></td>
+<td style="width: 415px"><img alt="Termite terminal" src="Pics/Termite.jpg" width="400"  /></td>
 </tr>
 
 <tr>
-<td style="width: 342px" >HTML page on iPhone.</td>
-<td style="width: 415px"><br>
- Termite Terminal on a PC </td>
+<td style="width: 342px">HTML page on iPhone.</td>
+<td style="width: 415px">Termite terminal on a PC. </td>
 </tr>
 </table>
 <br>
@@ -212,56 +209,60 @@ To set a time zone. Send the time zone string between the quotes prefixed with t
 See the time zones at the bottom of this page. <br>
 For example; if you live in Australia/Sydney send the string: eAEST-10AEDT,M10.1.0,M4.1.0/3 
 
-<pre>______________________________
+<pre>
+___________________________________
 A SSID B Password C BLE beacon name
 D Date (D15012021) T Time (T132145)
 E Timezone  (E<-02>2 or E<+01>-1)
 F Own colour  (Hex FWWRRGGBB)
+G Scan WIFI networks
+H Toggle use rotary encoder
 I To print this Info menu
 J Toggle use DS3231 RTC module
 K LDR reads/sec toggle On/Off
 N Display off between Nhhhh (N2208)
 O Display toggle On/Off
 P Status LED toggle On/Off
-Q Display colour choice      (Q0-7)
-  Q0 Yellow  Q1 hourly
-  Q2 White   Q3 All Own
-  Q4 Own     Q5 Wheel
+Q Display colour choice
+  Q0 Yellow  Q1 Hourly  Q2 White
+  Q3 All Own Q4 Own     Q5 Wheel
+  Q6 Digital
 R Reset settings @ = Reset MCU
+U Demo mode (msec) (M200)
 --Light intensity settings (1-250)--
-S=Slope V=Min  U=Max   (S80 V5 U200)
-W=WIFI  X=NTP& Y=BLE  Z=Fast BLE
-Ed Nieuwenhuys Juni 2024
+S Slope, L Min, M Max  (S80 L5 M200)
+W WIFI, X NTP&, CCC BLE, + Fast BLE
+# Self test, ! See RTC, & Update RTC
+Ed Nieuwenhuys November 2024
 ___________________________________
 Display off between: 23h - 08h
-Display choice: Wheel
-Slope: 20     Min: 5     Max: 255 
+Display choice: Yellow  
+Slope: 10     Min: 5     Max: 255 
 SSID: FRITZ!Box
-BLE name: NanoESP32Clock
-IP-address: 192.168.178.34 (/update)
+BLE name: wordclock
+IP-address: 192.168.178.141 (/update)
 Timezone:CET-1CEST,M3.5.0,M10.5.0/3
-WIFI=On NTP=On BLE=On FastBLE=On
-Language choice: NL
+WIFI=On NTP=On BLE=On FastBLE=Off
 LED strip: WS2812 (Send % to switch)
-Software: ESP32Arduino_WordClockV026.ino
-______________________________________________________________________
+Software: ESP32Arduino_WordClockV056.ino
+ESP32 Arduino core version: 2.0.17
+17/11/2024 16:01:22 
+___________________________________
 </pre>
 
 Menu shown in serial output.
 
-If no WIFI is not used check at the bottom of the menu if WIFI is OFF.<br>
-The clock will start much quicker because it will not try to connect. <br>
-<img alt="menu bottom" src="Pics/MenuBottom.gif" />
-
 As mentioned before the clock can be controlled with the WIFI webpage or BLE UART terminal app. <br>
-When the clock is connected to WIFI the IP-address is displayed in the Digital display. <br>
+When the clock is connected to WIFI the IP-address is displayed in the menu<br>
+
 Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
 your internet addresses (URL). 
-Or in version V056 or higher
 
-Enter 'wordclock.local' as URL in the browser.
- if this does not work:
-  - Install host software:
+Or in version V056 or higher the name of the BLE beacon can be used followed with .local
+
+If the name of your BLE beacon is wordclock ( see in the menu -> BLE name: wordclock)
+Enter 'wordclock.local' as URL in the browser. 
+ if this does not work install host software:
   - For Linux, install Avahi (http://avahi.org/).
   - For Windows, install Bonjour (http://www.apple.com/support/bonjour/).
   - For Mac OSX and iOS support is built in through Bonjour already.
@@ -277,14 +278,12 @@ For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsem
 &nbsp;nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
 Serial Bluetooth terminal</a>. <br />
 Unfortunately these Android apps can not read strings longer than 20 characters. <br>
-If you see a garbled menu enter and send the character 'Z' to select the slower transmission mode. 
+If you see a garbled menu enter and send the character '+' to select the slower transmission mode. 
  
-Settings are set by entering the first character of a command following by parameters if necessary. <br />
+Settings are set by entering the first character of a command following by parameters if necessary.<br />
 For example to set the colours of the characters in the display to white enter: Q2 <br>
 <br>
- To shown random all four languages every minute send L4. <br>
-<br>
- Set the time by entering T130245. (130245 will also work) <br>
+ Set time by entering T130245. (130245 will also work) <br>
 <br>
  Turn off WIFI by sending a W. 
 <p >Reset the MCU with the character @.<br>
@@ -305,74 +304,45 @@ Reset to default setting by send R.<br><br>
 </table>
 
 # Detailed description
-<pre>______________________________
-A SSID B Password C BLE beacon name
-D Date (D15012021) T Time (T132145)
-E Timezone  (E<-02>2 or E<+01>-1)
-F Own colour  (Hex FWWRRGGBB)
-I To print this Info menu
-J Toggle use DS3231 RTC module
-K LDR reads/sec toggle On/Off
-N Display off between Nhhhh (N2208)
-O Display toggle On/Off
-P Status LED toggle On/Off
-Q Display colour choice      (Q0-7)
-  Q0 Yellow  Q1 hourly
-  Q2 White   Q3 All Own
-  Q4 Own     Q5 Wheel
-R Reset settings @ = Reset MCU
---Light intensity settings (1-250)--
-S=Slope V=Min  U=Max   (S80 V5 U200)
-W=WIFI  X=NTP& Y=BLE  Z=Fast BLE
-Ed Nieuwenhuys Juni 2024
-___________________________________
-Display off between: 23h - 08h
-Display choice: Wheel
-Slope: 20     Min: 5     Max: 255 
-SSID: FRITZ!Box
-BLE name: NanoESP32Clock
-IP-address: 192.168.178.34 (/update)
-Timezone:CET-1CEST,M3.5.0,M10.5.0/3
-WIFI=On NTP=On BLE=On FastBLE=On
-Language choice: NL
-LED strip: WS2812 (Send % to switch)
-Software: ESP32Arduino_WordClockV026.ino
-___________________________________</pre>
+<pre>
+	
+</pre>
 
- With the menu many preferences can be set. <br />
-These preferences are permanently stored in the ESP32-S3 SPIFFS-storage space. 
+With the menu many preferences can be set. <br />
+These preferences are permanently stored in the Arduino Nano ESP32 storage space. 
 
 Enter the first character in the menu of the item to be changed followed with the parameter. <br>
 For most entries upper and lower case are identical. 
 
 # A SSID B Password C BLE beacon name<br>
 Change the name of the SSID of the router to be connected to.<br>
-aFRITZ!BoxEd or AFRITZ!BoxEd <br>
+aFRITZ!Box or AFRITZ!Box<br>
 Then enter the password. For example: BSecret_pass <br>
+and cWordclock as a name of the BLE beacon that will be shown in your phone
 Restart the MCU by sending @. <br>
-Entering a single 'b' will show the used password. This Easter egg can can used to check if a valid password was entered.
 
 # D Set Date and T Set Time <br>
-If you are not connected to WIFI you have to set the time and date by hand. <br>
+If you are not connected to WIFI and have a RTC DS3231 attached you can set time and date by hand.<br>
 For example enter: D06112022 to set the date to 6 November 2022.  <br>
 Enter for example T132145 (or 132145 , or t132145)&nbsp; to set the time to 45 seconds and 21 minutes past one o'clock.
 
 # E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
-At the bottom of this page you can find the time zones used in 2022.  <br>
+At the bottom of this page you can find the time zones used in 2022. <br>
 It is a rather complicated string and it is therefore wise to copy it. <br>
 Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
 # F Own colour  (Hex FWWRRGGBB <br>
-ou can set the colours of the highlighted and dimmed characters and&nbsp;the background. <br>
-ime is shown with the colour defined when Display choice Q3 or Q4 is chosen and the rest of the not highlighted characters are coloured ith the settings from Dimmed font. <br>
-The format to be entered is hexadecimal. 0123456789ABCDEF are the character that can be used. <br>
-The command is 2 digits for Red followed with&nbsp;two digits for Green and ending with two digits for Blue.<br>
-To colour the characters intense red enter FF0000 prefixed with the character F, G or H. <br>
-To set the background to intense blue enter: H0000FF <br>
-To set the dimmed character to dark gray enter for example: G191919. <br>
+In option Q3 and Q4 from the menu you can set your own colours for the clock to display
+The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
+The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
+To colour the characters intense red enter FF0000 prefixed with the character F. <br>
+To set intense blue enter: F0000FF or FFF. (<br>
+To set the dimmed character to dark gray enter for example: F191919. <br>
 You get gray if red, green and blue has the same intensity.
+With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
+For example: F8800FF00 is 50% white with 100% green.
 
 # I To print this Info menu<br>
 Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
@@ -392,9 +362,8 @@ Q0 will show the time with yellow words. <br>
 Q1 will show every hour another colour. <br>
 Q2 shows all the texts white. <br>
 Q3 and Q4 uses you own defined colours. <br>
-Q5 will follow rainbow colours every minute. <br>
-Q6 is the digital display with the IP-address and date until seconds are 00. <br>
-The selected choice is displayed at the bottom of the menu. <br>
+Q5 will follow rainbow colours every hour. <br>
+Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock <br>
 Send an 'I' to display the latest's settings 
 
 # R Reset settings <br>
@@ -439,16 +408,18 @@ state is printed.<br />
 	</tr>
 	<tr>
 		<td colspan="2">
+</td>
+</tr>
+</table>
 
-# Z Fast BLE<br>
+# Z Fast BLE
+
 The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
 The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />With most apps you will see these will truncate the long strings of the menu.<br>
 Then turn off Fast BLE. <br>
 Option Z toggles between the long and short packages.&nbsp; 
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
-</td>
-</tr>
-</table>
+
 
 # Compilation and uploading
 
@@ -462,20 +433,28 @@ Remember to install the ESP32 boards as explained above in the chapter Materials
 <br>
 <pre>// ESP32-S3 Includes defines and initialisations 
 
-#include <NimBLEDevice.h>        // For BLE communication  https://github.com/h2zero/NimBLE-Arduino
-#include <ESPNtpClient.h>        // https://github.com/gmag11/ESPNtpClient
-#include <WiFi.h>                // Used for web page 
-#include <AsyncTCP.h>            // Used for webpage   https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ESPAsyncWebServer.h>   // Used for webpage   https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ElegantOTA.h>          // Used for OTA new version
 #include <Preferences.h>
-#include "Colors.h"
-#include <Adafruit_NeoPixel.h>   // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#include "EdSoftLED.h"         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
+                      #else
+#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+                      #endif
+#include <NimBLEDevice.h>      // For BLE communication  https://github.com/h2zero/NimBLE-Arduino
+#include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+#include <WiFi.h>              // Used for web page 
+#include <AsyncTCP.h>          // Used for webpage  https://github.com/dvarrel/AsyncTCP 
+#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer 
+#include <ElegantOTA.h>        // If a large bunch of compile error see here :https://docs.elegantota.pro/async-mode
+                               // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
+                               // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
+#include <ESPmDNS.h>
+#include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
+#include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
+#include <Encoder.h>
 </pre>
- Colors.h is included in the program as a TAB in the IDE. It contains color names and it associated RGB values <br>
- The other TAB is the web page to display in the browser.<br />
-The&nbsp;#include "Webpage.h" to load the webpage is a few lines further in the code <br>
- <br />
+
+Webpage.h is included in the program as a TAB in the IDE. It contains the web page to display in the browser.<br />
+
 I made the web page in the free 'Microsoft Expression Web 4'. It is not maintained anymore but has more than enough functionalities for our purposes.<br />
 <br />
 To copy the code from the MS-Expression: <br>
@@ -495,8 +474,7 @@ MSexpression Code area and redesign the page as you like
  A long list if definitions and initialisations follows. <br>
  I am not a fan of passing all the variables to and from functions and like to 
 keep them global in one program list. <br>
- If you write a program with other people it is good practice not to use 
-too many globals 
+ If you write a program with other people it is good practice not to use too many globals 
 but this program is in one large listing, for the same reason to keep it simple. <br>
  I grouped all the variables per application to keep track where they are used. <br>
  With a simple find it is easy in this one great listing to find the back.<br />
@@ -571,33 +549,27 @@ EverySecondCheck();
 }  </pre>
  The following routines check if 
 something must happen every second, minute, hour and day.<br />
-This flow handling of the program keeps the processor for 99% free for other 
-uses.<br />
-In this program that is almost nothing but for other purposes this can be 
-needed.<br />
-Use delays very sparsely. <br />
+This flow handling of the program keeps the processor for 99% free for other uses.<br />
+In this program that is almost nothing but for other purposes this can be needed.<br />
+In the serial monitor the loops per second are printed. this can be handy to check if the program spends too much time elsewhere in the program. At the moment (V056) of writing it is around 216,000 l/s.
+
 In the Bluetooth and Serial communication functions some short delays are used 
 that are essential <br />
-here but the program only runs here when there is an actual&nbsp; communication.<br />
-(An alternative method could have been the use of an interrupt every second and 
-an empty loop)<br />
+here but the program only runs here when there is an actual communication.<br />
+(An alternative method could have been the use of an interrupt every second and an empty loop)<br />
 <br />
-Writing or reading to ports consumes a lot of processor time<br />
-To let the LEDs flash like a heartbeat.<br />
-With %100==0 the port is written every 100 msec.<br />
-The LEDs are very bright therefore only a maximum of 12 bits of the 255 are send 
-to the LED. 
 
 <pre>//-------------------------------------------- 
 // CLOCK Update routine done every second 
 //-------------------------------------------- 
 void EverySecondCheck(void) 
 {
-static int lumi=0;
-(msLeap&gt;500?lumi=(1000-msLeap)/40:lumi=msLeap/40);                       
-if (msLeap%100==0){ SetStatusLED(-1,-1,12-lumi,lumi*WIFIConnected,-1); }  
+ static int Toggle = 0;
+ uint32_t msLeap = millis() - msTick; 
+ if (msLeap >999)                                              // Every second enter the loop
+ {  
 ...  
-if (timeinfo.tm_min != lastminute) EveryMinuteUpdate(); // Enter the every minute routine after one minute 
+if (timeinfo.tm_min != lastminute) EveryMinuteUpdate();        // Enter the every minute routine after one minute 
 ... 
 }
 //-------------------------------------------- 
@@ -625,8 +597,31 @@ void EveryDayUpdate(void)
 ... 
 }</pre>
 <br>
- Check for serial input from the serial monitor and 
-pass the command to ReworkInputString()&nbsp;  
+
+Update the LEDs on the Nano and the PCB. 
+On the Nano analogWrite(LED_RED,   512); is OFF
+and analogWrite(LED_RED, 0); is ON
+```
+//--------------------------------------------                                                //
+// COMMON Update routine for the status LEDs
+//-------------------------------------------- 
+void UpdateStatusLEDs(int Toggle)
+{
+ if(Mem.StatusLEDOn)   
+   {
+...
+void SetStatusLED(int Red, int Green, int Blue)
+{
+ analogWrite(LED_RED,   512 - Red);                                                                 // !Red (not Red) because 1 or HIGH is LED off
+ analogWrite(LED_GREEN, 512 - Green);
+ analogWrite(LED_BLUE,  512 - Blue);
+}
+
+```
+************* tot hier corrected
+
+
+ Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
 <pre>//-------------------------------------------- 
 // Common check for serial input 
 //-------------------------------------------- 
