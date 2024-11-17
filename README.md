@@ -168,7 +168,7 @@ Sending the character 'I' for information will display the menu followed with th
 
 <table style="width: 51%"><tr>
 <td style="width: 342px">
-<img alt="Menu on iPhone" src="Pics/phonemenu.jpg" width="350"  /></td>
+<img alt="Menu on iPhone" src="Pics/menuphone.jpg" width="350"  /></td>
 <td style="width: 415px">
 <img alt="Termite terminal" src="Pics/Termite.jpg" width="400"  /></td>
 </tr>
