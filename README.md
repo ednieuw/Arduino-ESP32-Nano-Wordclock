@@ -59,15 +59,27 @@ After connections are made the PCB and hardware looks like this:
 The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
 
 The software can be controlled via Bluetooth on your PC or mobile Android or iPhone/iPad/iMac.
-Several designs can be selected before compiling if you have a word plate ofcourse. Use the one from this repository or use your own and adapt the position of the LEDs in the software<br>.
+Several designs can be selected before compiling if you have a word plate ofcourse. 
+Use a word plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software<br>.
 
-![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
+![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
 
-- A 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines
-- A 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design.
-[Build instruction for the clock in Dutch and English](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
-or in this repository as pdf  
-- 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
+Select one of the three word clocks
+```
+//#define FOURLANGUAGECLOCK
+#define NL144CLOCK
+//#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up for Ulrich
+
+```
+
+- #define NL144CLOCK -> a 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines.<br>
+ [Build instruction for the clock in Dutch and English](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
+or [here in this repository](Manual-Instructions)
+
+- #define NLM1M2M3M4L94 -> a 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design
+
+
+- #define FOURLANGUAGECLOCK-> a 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
 [Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
 
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
@@ -86,9 +98,11 @@ But... this board has to use the Adafruit Neopixel library. This library uses ma
                       #endif
 
 ```
+![image](https://github.com/user-attachments/assets/1f4eeec5-ebc5-47fb-b513-2514f5ff6ecd)
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.<br>
-At he moment (Nov 2024) This code must be compiled with GPIO numbering selected!! If  LEDs do not turn on properly check this GPIO numbering setting.
+At the moment (Nov 2024) this code must be compiled with GPIO numbering selected!! <br>
+If LEDs do not turn on properly check this GPIO numbering setting.<br>
 When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board 'GPIO numbering' must be selected in the compiler.
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
@@ -199,7 +213,7 @@ Q Display colour choice
   Q3 All Own Q4 Own     Q5 Wheel
   Q6 Digital
 R Reset settings @ = Reset MCU
-U Demo mode (msec) (M200)
+U Demo mode (msec) (U200)
 --Light intensity settings (1-250)--
 S Slope, L Min, M Max  (S80 L5 M200)
 W WIFI, X NTP&, CCC BLE, + Fast BLE
