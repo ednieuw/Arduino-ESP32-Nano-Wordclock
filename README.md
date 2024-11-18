@@ -309,7 +309,7 @@ Restart the MCU by sending @. <br>
 ## D Set Date and T Set Time <br>
 If you are not connected to WIFI and have a RTC DS3231 attached you can set time and date by hand.<br>
 For example enter: D06112022 to set the date to 6 November 2022.  <br>
-Enter for example T132145 (or 132145 , or t132145)&nbsp; to set the time to 45 seconds and 21 minutes past one o'clock.
+Enter for example T132145 (or 132145 , or t132145) to set time to 45 seconds and 21 minutes past one o'clock.
 
 ## E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
 At the bottom of this page you can find the time zones used in 2022. <br>
@@ -323,7 +323,7 @@ In option Q3 and Q4 from the menu you can set your own colours for the clock to 
 The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
 The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
 To colour the characters intense red enter FF0000 prefixed with the character F. <br>
-To set intense blue enter: F0000FF or FFF. (<br>
+To set intense blue enter: F0000FF or FFF.<br>
 To set the dimmed character to dark gray enter for example: F191919. <br>
 You get gray if red, green and blue has the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
@@ -353,6 +353,11 @@ Send an 'I' to display the latest's settings
 
 ## R Reset settings <br>
 R will set all preferences to default settings and clears the SSID and password. 
+
+## U Demo mode (msec) (U200)
+Enter U followed with the duration of a second in milli seconds. 
+M200 (200 milli second) will speed up the clock 5 times.  
+Sending an U will turn off the demo mode.
 
 ## Light intensity (1-250)
 S=Slope V=Min&nbsp; U=Max (S100 L5 M200)
@@ -404,6 +409,32 @@ The IOS BLEserial app, and maybe others too, is able to receive packets of 80 by
 Then turn off Fast BLE. <br>
 Option Z toggles between the long and short packages.&nbsp; 
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
+
+## ! = Show NTP, RTC and DS3231 time
+!  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and being used to show a realistic time.
+Same as & option but this option will not update from the internet NTP server but only shows the time.
+
+## = Selftest
+Sending a # will start the clock self test. This is convenient to check if all the words in the clock a functioning. 
+
+## % = Switch between SK6812 and WS2812 LED strip
+With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
+A Reset of all settings by sending a R in the menu will not change the LED strip selection.
+
+## @ = Reset MCU
+@ will restart the MCU. This is handy when the SSID, et cetera are changed and the program must be restarted. Settings will not be deleted.
+
+## & = Get and stores NTP time in RTC and DS3231 time
+&  will get the NTP time immediately from the internet and stores it in the RTC clocks. This option is convenient to force the clock to get the proper NTP time. 
+In other cases the program will check the time running in the clock and on the NTP server so now and then and update the RTC clocks.
+The DS3231 time module must be installed and being used to show a realistic time.
+
+## 123456 Set time in RTC module
+Enter the time as 152300 hhmmss. Same as T152300
+Changing date and time only works when a DS3231 RTC module is attached.
+
+
+
 
 
 ## Compilation and uploading
