@@ -34,7 +34,7 @@ An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips 
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
-A minimum PCB for small spaces in this repository.
+The design of a minimum PCB for small spaces can also be found in this repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are aable to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
@@ -56,18 +56,19 @@ After connections are made the PCB and hardware looks like this:
 
 # Software
 
-The ESP32Arduino_WordClockVxxx.ino  turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
+The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
 
-The software can be controlled via Bluetooth on your Android or iPhone/iPad/iMac.
+The software can be controlled via Bluetooth on your PC or mobile Android or iPhone/iPad/iMac.
+Several designs can be selected before compiling if you have a word plate ofcourse. Use the one from this repository or use your own and adapt the position of the LEDs in the software<br>.
 
-There are for the single language 144 LED clock four languages to select from or make a four-language clock that displays four languages at once with it 625 LEDs. 
-
-If you have a word plate ofcourse.<br>
-[4-language word clock with SK6812 LEDs in UK, NL, DE, FR.](https://github.com/ednieuw/FourLanguageClock)
 ![Clockoptions](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/f094e08d-e4f9-4a94-b4c3-6fea4be256ee)
 
-The software can be used with SK6812 or WS2812 LED-strips.<br>
-With a little programming experience it is not difficult to change the clock to a single French, German or English design.
+- A 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines
+- A 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design.
+[Build instruction for the clock in Dutch](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
+or in this repository as pdf 
+- 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
+[Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
 
 Or a [single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
