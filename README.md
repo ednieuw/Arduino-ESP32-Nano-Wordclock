@@ -65,29 +65,33 @@ Several designs can be selected before compiling if you have a word plate ofcour
 
 - A 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines
 - A 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design.
-[Build instruction for the clock in Dutch](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
-or in this repository as pdf 
+[Build instruction for the clock in Dutch and English](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
+or in this repository as pdf  
 - 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
 [Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
-
-Or a [single language clock](https://github.com/ednieuw/Woordklok-witte-LEDs)
 
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
 Download the program folder and compile for Arduino Nano ESP32<br>
 
 # How to compile: 
-At the moment of writing the Espressif ESP32 board V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. 
-Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with version 2.0.18 also compiles without errors.
-But... 
+At the moment of writing the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. 
+Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.18 also compiles without errors.
+But... this board has to use the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work with the new V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver. 
+
+```
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+#include "EdSoftLED.h"         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
+                      #else
+#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+                      #endif
+
+```
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.<br>
-This code must be compiled with GPIO numbering selected. If the LEDs do not turn on check this GPIO numbering setting.
-![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/0343f067-5690-4cb2-a720-78c113c53e2a)
-
+At he moment (Nov 2024) This code must be compiled with GPIO numbering selected!! If  LEDs do not turn on properly check this GPIO numbering setting.
 When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board 'GPIO numbering' must be selected in the compiler.
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
-
 
 Install Arduino Nano ESP32 board<br>
 Board: Arduino Nano ESP32<br>
@@ -96,15 +100,6 @@ Partition Scheme: With FAT<br>
 The LEDs will probably not turn on when you use the "Arduino default pin settings" due to a bug in the Adafruit Neopixel library.<br>
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
-
-Or install ESP32 boards from Espressif version 3.0.5 or newer.
-
-Board: Arduino Nano ESP32 (almost at the bottom of the long list)<br>
-Partition Scheme: With FAT<br>
-Pin Numbering: By Arduino pin (default)
-
-Instead of the Neopixel library my own EdSoftLED library is used. https://github.com/ednieuw/EdSoftLED <br> 
-It uses the ESP32 V3 RMT drivers and is compatible with the Neopixel library functions that are needed for my software.
 
 # Before starting
 
@@ -279,7 +274,7 @@ Reset to default setting by send R.<br><br>
 </tr>
 </table>
 
-# Detailed description
+## Detailed description
 <pre>
 	
 </pre>
@@ -290,26 +285,26 @@ These preferences are permanently stored in the Arduino Nano ESP32 storage space
 Enter the first character in the menu of the item to be changed followed with the parameter. <br>
 For most entries upper and lower case are identical. 
 
-# A SSID B Password C BLE beacon name<br>
+## A SSID B Password C BLE beacon name<br>
 Change the name of the SSID of the router to be connected to.<br>
 aFRITZ!Box or AFRITZ!Box<br>
 Then enter the password. For example: BSecret_pass <br>
 and cWordclock as a name of the BLE beacon that will be shown in your phone
 Restart the MCU by sending @. <br>
 
-# D Set Date and T Set Time <br>
+## D Set Date and T Set Time <br>
 If you are not connected to WIFI and have a RTC DS3231 attached you can set time and date by hand.<br>
 For example enter: D06112022 to set the date to 6 November 2022.  <br>
 Enter for example T132145 (or 132145 , or t132145)&nbsp; to set the time to 45 seconds and 21 minutes past one o'clock.
 
-# E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
+## E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
 At the bottom of this page you can find the time zones used in 2022. <br>
 It is a rather complicated string and it is therefore wise to copy it. <br>
 Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
-# F Own colour  (Hex FWWRRGGBB <br>
+## F Own colour  (Hex FWWRRGGBB <br>
 In option Q3 and Q4 from the menu you can set your own colours for the clock to display
 The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
 The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
@@ -320,19 +315,19 @@ You get gray if red, green and blue has the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
 For example: F8800FF00 is 50% white with 100% green.
 
-# I To print this Info menu<br>
+## I To print this Info menu<br>
 Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
 
-# K LDR reads/sec toggle On/Off<br />
+## K LDR reads/sec toggle On/Off<br />
 Prints the LDR-readings and the calculated intensity output.
 
-# N Display off between Nhhhh (N2208)<br>
+## N Display off between Nhhhh (N2208)<br>
 With N2208 the display will be turned off between 22:00 and 08:00. 
 
-# O Display toggle On/Off<br>
+## O Display toggle On/Off<br>
  O toggles the display off and on.
  
-#  Q Display colour choice (Q0-6)<br>
+##  Q Display colour choice (Q0-6)<br>
 Q0 Yellow Q1 hourly Q2 White Q3 All Own Q4 Own Q5 Wheel Q6 Digital display <br>
 Q0 will show the time with yellow words. <br>
 Q1 will show every hour another colour. <br>
@@ -342,10 +337,10 @@ Q5 will follow rainbow colours every hour. <br>
 Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock <br>
 Send an 'I' to display the latest's settings 
 
-# R Reset settings <br>
+## R Reset settings <br>
 R will set all preferences to default settings and clears the SSID and password. 
 
-# Light intensity (1-250)
+## Light intensity (1-250)
 S=Slope V=Min&nbsp; U=Max (S100 L5 M200)
 
 <table style="width: 100%">
@@ -388,7 +383,7 @@ state is printed.<br />
 </tr>
 </table>
 
-# + Fast BLE
+## + Fast BLE
 
 The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
 The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />With most apps you will see these will truncate the long strings of the menu.<br>
@@ -397,7 +392,7 @@ Option Z toggles between the long and short packages.&nbsp;
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 
 
-# Compilation and uploading
+## Compilation and uploading
 
 The settings of the Arduino Nano ESP32 board is as follows.<br />
 Remember to install the ESP32 boards as explained above in the chapter Materials<br />
