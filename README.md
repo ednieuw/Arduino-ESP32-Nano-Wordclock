@@ -303,11 +303,14 @@ For most entries upper and lower case are identical.
 Change the name of the SSID of the router to be connected to.<br>
 aFRITZ!Box or AFRITZ!Box<br>
 Then enter the password. For example: BSecret_pass <br>
-and cWordclock as a name of the BLE beacon that will be shown in your phone
+and cMywordclock as a name of the BLE beacon that will be shown in your phone. (default after a reset:  wordclock )
+
 Restart the MCU by sending @. <br>
+## CCC  
+Entering CCC or ccc will toggle BLE on or off. Be careful turning it off. When BLE is off the clock can only be controlled with WIFI or the USB serial port.
 
 ## D Set Date and T Set Time <br>
-If you are not connected to WIFI and have a RTC DS3231 attached you can set time and date by hand.<br>
+If not connected to WIFI time and a RTC DS3231 is attached date must be set by hand.<br>
 For example enter: D06112022 to set the date to 6 November 2022.  <br>
 Enter for example T132145 (or 132145 , or t132145) to set time to 45 seconds and 21 minutes past one o'clock.
 
@@ -319,7 +322,7 @@ Copy the string between the " " 's and send it starting with an 'E' or 'e' in fr
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
 ## F Own colour  (Hex FWWRRGGBB <br>
-In option Q3 and Q4 from the menu you can set your own colours for the clock to display
+With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
 The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
 The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
 To colour the characters intense red enter FF0000 prefixed with the character F. <br>
@@ -360,7 +363,7 @@ M200 (200 milli second) will speed up the clock 5 times.
 Sending an U will turn off the demo mode.
 
 ## Light intensity (1-250)
-S=Slope V=Min&nbsp; U=Max (S100 L5 M200)
+S=Slope L=Min M=Max (S100 L5 M200)
 
 <table style="width: 100%">
 <tr>
@@ -381,24 +384,18 @@ or display. </td>
 </table>
 
 <table style="width: 100%">
-	<tr>
-		<td> 
-		# @ = Restart MCU<br>
-		@ will restart the MCU. This is handy when the SSID, password, et cetera are 
-changed and the program must be restarted.# <br />
-		<br />
-		W=WIFI, X=NTP, Y=BLE<br />
-		Toggle WIFI, NTP and BLE on and off.<br />
-		Sending the character will toggle it on or off. <br />
-		At the bottom of the menu the 
-state is printed.<br />
-		 </td>
-		<td>
+<tr>
+<td> 
+# @ = Restart MCU<br>
+@ will restart the MCU. This is handy when the SSID, password, et cetera are changed and the program must be restarted.<br>
+<br>
+W=WIFI, X=NTP, Y=BLE<br>
+Toggle WIFI, NTP and BLE on and off.<br>
+Sending the character will toggle it on or off. <br>
+At the bottom of the menu the state is printed.<br>
+ </td>
+<td>
 <img alt="Bottom menu" class="auto-style4" src="Pics/BottomMenu.gif" /></td>
-	</tr>
-	<tr>
-		<td colspan="2">
-</td>
 </tr>
 </table>
 
@@ -414,12 +411,12 @@ Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and being used to show a realistic time.
 Same as & option but this option will not update from the internet NTP server but only shows the time.
 
-## = Selftest
+## #= Selftest
 Sending a # will start the clock self test. This is convenient to check if all the words in the clock a functioning. 
 
 ## % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
-A Reset of all settings by sending a R in the menu will not change the LED strip selection.
+A Reset of all settings by sending a R in the menu will not change this LED strip selection.
 
 ## @ = Reset MCU
 @ will restart the MCU. This is handy when the SSID, et cetera are changed and the program must be restarted. Settings will not be deleted.
@@ -433,21 +430,17 @@ The DS3231 time module must be installed and being used to show a realistic time
 Enter the time as 152300 hhmmss. Same as T152300
 Changing date and time only works when a DS3231 RTC module is attached.
 
+# Compilation and uploading
 
-
-
-
-## Compilation and uploading
-
-The settings of the Arduino Nano ESP32 board is as follows.<br />
-Remember to install the ESP32 boards as explained above in the chapter Materials<br />
+The settings of the Arduino Nano ESP32 board is as follows.<br>
+Remember to install the ESP32 boards as explained above.<br>
 
 <img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" />
-<p >&nbsp;
-<p ># Program explanation
+<p>
+<p># Program explanation
  The program uses the following standard libraries.   
 <br>
-<pre>// ESP32-S3 Includes defines and initialisations 
+<pre>// Includes defines and initialisations 
 
 #include <Preferences.h>
                       #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
@@ -474,7 +467,7 @@ Webpage.h is included in the program as a TAB in the IDE. It contains the web pa
 I made the web page in the free 'Microsoft Expression Web 4'. It is not maintained anymore but has more than enough functionalities for our purposes.<br />
 <br />
 To copy the code from the MS-Expression: <br>
- In the bottom line of the window of MS-Expression click&nbsp;'Split'.<br />
+At the bottom line of the window of MS-Expression click 'Split'.<br />
 In the upper half the raw HTML Code is displayed and in the bottom half the 
 Design window.<br />
 Copy in the Code window all the HTML code <br />
@@ -503,7 +496,7 @@ English(void) et cetera it becomes clear why these defines are so useful and
 handy.&nbsp;  
 
 <pre> ...   
- #define PRECIES ColorLeds("precies", 16, 22, LetterColor);
+#define PRECIES ColorLeds("precies", 16, 22, LetterColor);
 #define MTIEN   ColorLeds("tien", 25, 28, LetterColor); 
 #define KWART   ColorLeds("kwart", 32, 36, LetterColor); 
 #define VOOR    ColorLeds("voor", 38, 41, LetterColor); 
