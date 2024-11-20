@@ -3,12 +3,15 @@
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
+[Use the word clock selector page for instructions to make several clocks.](https://github.com/ednieuw/WordclockSelector).<br>
+
 You can control the clock with an app on your phone, a web page or with a serial cable connected to your PC.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 It will keep its time within the second correct with the internet NTP time with time zone and day light saving corrections.<br>
+
 If no internet is available a DS3231 RTC module can be attached to get an accurate time. With a rotary or membrane pad the time can be set.<br>
-A LDR is used to give the LED an optimal brightness.<br>
-The Arduino Nano ESP32 receives time with NTP/WIFI from the internet. The software and the PCB support an external very accurate DS3231 RTC when nio WIFI is available.<br>
+A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
+The Arduino Nano ESP32 receives time with NTP/WIFI from the internet. The software and the PCB support an external very accurate DS3231 RTC when WIFI is unavailable.<br>
 
 The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
 That means you have to use a different BLE service for the serial communication. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software. Depending on the app you use you probably must specify which protocol to use.<br>
@@ -17,6 +20,7 @@ See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nR
 # Hardware
 For my projects I use a [Fritzing software](https://fritzing.org/) designed PCB. This program easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
+
 The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
 The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
