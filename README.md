@@ -5,7 +5,7 @@
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
 [Use the word clock selector page for instructions to make several clocks.](https://github.com/ednieuw/WordclockSelector).<br>
 
-You can control the clock with an app on your phone, a web page or with a serial cable connected to your PC.<br>
+The clock is controlled with an app on your phone, a web page or with a serial cable connected to your PC.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 It will keep its time within the second correct with the internet NTP time with time zone and day light saving corrections.<br>
 
