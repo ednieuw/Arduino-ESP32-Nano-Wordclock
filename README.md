@@ -3,7 +3,7 @@
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
-[Use the word clock selector page for instructions to make several clocks.](https://github.com/ednieuw/WordclockSelector).<br>
+[Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector).<br>
 
 The clock is controlled with an app on your phone, a web page or with a serial cable connected to your PC.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
