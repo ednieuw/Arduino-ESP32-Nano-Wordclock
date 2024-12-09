@@ -9,7 +9,7 @@ The clock is controlled with an app on your phone, a web page in a browser or wi
 Software updates can be uploaded with OTA (Over the Air).<br>
 It will keep its time within the second correct with the internet NTP time with time zone and day light saving corrections.<br>
 
-If no internet is available a DS3231 RTC module can be attached to get an accurate time. With a rotary or membrane pad the time can be set.<br>
+If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary or membrane pad time can be set.<br>
 A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
 The Arduino Nano ESP32 receives time with NTP/WIFI from the internet. The software and the PCB support an external very accurate DS3231 RTC when WIFI is unavailable.<br>
 
@@ -18,7 +18,7 @@ That means you have to use a different BLE service for the serial communication.
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
 # Hardware
-For my projects I use a [Fritzing software](https://fritzing.org/) designed PCB. This program easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
+For my projects I use a [Fritzing software](https://fritzing.org/) designed PCB. This program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
 The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
