@@ -65,23 +65,24 @@ After connections are made the PCB and hardware looks like this:
 The distance between the LEDs on the strip is suitable for making a clock of 25 x 25 cm (60 LEDs/m) or 50 x 50 cm (30 LEDs/m).<br> 
 You can choose to stick the 144 LEDs of the clock in 12 rows of 12 LEDs or only behind the letter that should light up.<br>
 The advantage of the latter is that fewer LEDs are needed and that you have to drill fewer holes in the spacer plate.<br>
-There are many more soldering points, each of which can cause malfunctions.<br>  
-My experience is that imperfect soldering on the strip sometimes loosens over time. 
+But there are many more soldering points, each of which can cause malfunctions.<br>  
+My experience is that imperfect soldering on the strip may loosens over time causing malfuncions. 
 
-The software also has a digital time display that you cannot use if you do not install all 144 LEDs.<br>
-You can also choose to cut out the light-up words in a 1 cm thick MDF board with a jigsaw.<br>
+The software has a digital time display option you cannot use if you do not install all 144 LEDs.<br>
+You can choose to cut out the words like IT WAS FIVE and so on in a 1 cm thick MDF board with a jigsaw.<br>
 Be sure to paint the insides bright white, otherwise the white light will become dingy.<br> 
-It is better to use foamed PVC white 10 MM RAL 9003. Then it cuts easily, is white and does not discolour. (Often paint does discolors)
+It is better to use foamed PVC white 10 MM RAL 9003. It cuts easily, is white and does not discolour. (Often paint does discolours)
  
-Stick the strips from left to right on the odd lines and from right to left on the even lines. <br>
+Stick/glue the strips starting from left to right on the odd lines and from right to left on the even lines. <br>
 ### Follow the arrows on the strip.<br> 
 (You have to turn the strip upside down every second row!)<br>
 This avoids long data lines going from the right end of the strip to the left end on the next row of a LED strip.<br>
-
+And the software does not have to be corrected for the new postions.
 
 ![IMG_5384](https://github.com/user-attachments/assets/945ba89a-6fda-43fe-b16b-52f5babf0584)
 
-I find it useful to use tinned copper wire. For example, you solder all 5V connections to the left side of the strip and all GND to the right side of the strip
+I find it useful to use tinned copper wire.<br> 
+For example, you solder all 5V connections to the left side of the strip and all GND to the right side of the strip.
 To do this, drill a small hole through the plate next to all 5V connections on the left side of the strip and to the GND on the right side
 
 Bend a 90 degree angle, put the wire through the hole and solder the wire to the LED strip.
@@ -96,8 +97,8 @@ Place the spacer plate over de LEDs, then a sheet of white paper and finally the
 
 The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
 
-The software can be controlled via Bluetooth on your PC or mobile Android or iPhone/iPad/iMac.
-Several designs can be selected before compiling if you have a word plate ofcourse. 
+The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.
+Several designs can be selected before compiling.  (If you have a word plate ofcourse.)
 Use a word plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software<br>.
 
 ![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
@@ -106,7 +107,7 @@ Select one of the three word clocks
 ```
 //#define FOURLANGUAGECLOCK
 #define NL144CLOCK
-//#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up for Ulrich
+//#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up
 
 ```
 
@@ -116,12 +117,17 @@ or [here in this repository](Manual-Instructions)
 
 - #define NLM1M2M3M4L94 -> a 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design
 
-
 - #define FOURLANGUAGECLOCK-> a 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
 [Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
 
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
 Download the program folder and compile for Arduino Nano ESP32<br>
+
+An alternative id to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE. <br>
+Upload it in the Nano ESP32 and note the IP-addres that is printed in the Serial monitor of the Arduino IDE.
+Type this IP-address URL in a browser and enter admin/admin as user and password<br>
+Then upload the .bin file
+
 
 # How to compile: 
 At the moment of writing the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. 
