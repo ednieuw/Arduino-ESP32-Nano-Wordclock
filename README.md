@@ -121,18 +121,18 @@ or [here in this repository](Manual-Instructions)
 [Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
 
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
-Download the program folder and compile for Arduino Nano ESP32<br>
+Download the program folder and compile for Arduino Nano ESP32.<br>
+Libraries update constantly what may result in incompatibilty with this source code after a few years. Therefore these libraries are included.
 
-An alternative id to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE. <br>
+An alternative is to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE.<br>
 Upload it in the Nano ESP32 and note the IP-addres that is printed in the Serial monitor of the Arduino IDE.
-Type this IP-address URL in a browser and enter admin/admin as user and password<br>
-Then upload the .bin file
-
+Type this IP-address URL in a browser and enter admin/admin as user and password.<br>
+Then upload the .bin file from this repository.<br>
 
 # How to compile: 
 At the moment of writing the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. 
 Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.18 also compiles without errors.
-But... this board has to use the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work with the new V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver. 
+This 2.0.18 board uses the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work (in dec 2024) with the new V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
 
 ```
                       #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
