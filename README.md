@@ -78,7 +78,6 @@ Stick the strips from left to right on the odd lines and from right to left on t
 (You have to turn the strip upside down every second row!)<br>
 This avoids long data lines going from the right end of the strip to the left end on the next row of a LED strip.<br>
 
- 
 
 ![IMG_5384](https://github.com/user-attachments/assets/945ba89a-6fda-43fe-b16b-52f5babf0584)
 
@@ -90,7 +89,8 @@ Bend a 90 degree angle, put the wire through the hole and solder the wire to the
 ![IMG_5467](https://github.com/user-attachments/assets/cb3148c9-6efb-4a4c-b04a-4ceb46584de6)
 
 ![IMG_1471](https://github.com/user-attachments/assets/fccbe36d-321e-4bd3-af34-782082c0a97e)
-Place the spacer plate over de LEDs, the a sheet of white paper and finally the word plate.
+
+Place the spacer plate over de LEDs, then a sheet of white paper and finally the word plate.
 
 # Software
 
