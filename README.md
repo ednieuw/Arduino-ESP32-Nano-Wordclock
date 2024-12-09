@@ -58,6 +58,40 @@ After connections are made the PCB and hardware looks like this:
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/86c688e0-8006-4042-880a-40064a4d8949)
 ![NanoESP32-V04-3D](https://github.com/user-attachments/assets/e717d61f-7953-4e35-80c1-278ca05a10df)
 
+# The LED plate
+
+![IMG_1469](https://github.com/user-attachments/assets/a6a80ac1-4cb6-47b2-a496-f9645e8795c1)
+
+The distance between the LEDs on the strip is suitable for making a clock of 25 x 25 cm (60 LEDs/m) or 50 x 50 cm (30 LEDs/m).<br> 
+You can choose to stick the 144 LEDs of the clock in 12 rows of 12 LEDs or only behind the letter that should light up.<br>
+The advantage of the latter is that fewer LEDs are needed and that you have to drill fewer holes in the spacer plate.<br>
+There are many more soldering points, each of which can cause malfunctions.<br>  
+My experience is that imperfect soldering on the strip sometimes loosens over time. 
+
+The software also has a digital time display that you cannot use if you do not install all 144 LEDs.<br>
+You can also choose to cut out the light-up words in a 1 cm thick MDF board with a jigsaw.<br>
+Be sure to paint the insides bright white, otherwise the white light will become dingy.<br> 
+It is better to use foamed PVC white 10 MM RAL 9003. Then it cuts easily, is white and does not discolour. (Often paint does discolors)
+ 
+Stick the strips from left to right on the odd lines and from right to left on the even lines. <br>
+### Follow the arrows on the strip.<br> 
+(You have to turn the strip upside down every second row!)<br>
+This avoids long data lines going from the right end of the strip to the left end on the next row of a LED strip.<br>
+
+ 
+
+![IMG_5384](https://github.com/user-attachments/assets/945ba89a-6fda-43fe-b16b-52f5babf0584)
+
+I find it useful to use tinned copper wire. For example, you solder all 5V connections to the left side of the strip and all GND to the right side of the strip
+To do this, drill a small hole through the plate next to all 5V connections on the left side of the strip and to the GND on the right side
+
+Bend a 90 degree angle, put the wire through the hole and solder the wire to the LED strip.
+
+![IMG_5467](https://github.com/user-attachments/assets/cb3148c9-6efb-4a4c-b04a-4ceb46584de6)
+
+![IMG_1471](https://github.com/user-attachments/assets/fccbe36d-321e-4bd3-af34-782082c0a97e)
+Place the spacer plate over de LEDs, the a sheet of white paper and finally the word plate.
+
 # Software
 
 The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
