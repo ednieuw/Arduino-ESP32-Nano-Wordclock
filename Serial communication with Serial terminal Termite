@@ -1,0 +1,12 @@
+Serial communication with Serial terminal Termite
+
+I use the simple Windows Serial terminal Termite beside the serial monitor in the IDE.
+IDE 2 has the Serial terminal window at the bottom of the windows only showing a few lines at the cost of the programming area.
+Therefore Termite is very handy to enter command and receive results in a separate window (Like in the IDE1)
+With ESP-C3 and ESP-S3 MCU's one has to set
+
+esp32s3.serial.disableDTR=false
+esp32s3.serial.disableRTS=false
+
+in boards.txt to TRUE to get Termite communication working.
+
