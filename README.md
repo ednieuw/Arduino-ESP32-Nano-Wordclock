@@ -58,7 +58,7 @@ After connections are made the PCB and hardware looks like this:
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/86c688e0-8006-4042-880a-40064a4d8949)
 ![NanoESP32-V04-3D](https://github.com/user-attachments/assets/e717d61f-7953-4e35-80c1-278ca05a10df)
 
- ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/Pics/Nano-ESP32-V04.jpg)
+![image](https://github.com/user-attachments/assets/77fc651e-cfd6-4681-83e5-53c4f6bcfb55)
 
 
 # Connections
