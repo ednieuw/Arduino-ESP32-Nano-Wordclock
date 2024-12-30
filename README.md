@@ -58,8 +58,14 @@ After connections are made the PCB and hardware looks like this:
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/86c688e0-8006-4042-880a-40064a4d8949)
 ![NanoESP32-V04-3D](https://github.com/user-attachments/assets/e717d61f-7953-4e35-80c1-278ca05a10df)
 
+ ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/Pics/Nano-ESP32-V04.jpg)
+
+
 # Connections
+
+
 The large PCB has connections to: (from top right clock wise)
+- 6-21V power input to Vin on Nano ESP32
 - DCF to pin D2, 3V3 and GND
 - LDR to pin A2 and 3V3
 - RTC-clock to pin  GND, 3V3, A4 and A5
@@ -67,13 +73,26 @@ The large PCB has connections to: (from top right clock wise)
 - LEDs to pin D10 and D9
 - Connector to pin D12, D11, D10 and D9
 - D7 with 5V via 3V3 -> 5V level switcher
-- Conector with GND and 3V3
+- Connector with GND and 3V3
 - Connector for AMS1117 5V -> 3V3 1A voltage regulator.
 - D6 with 5V via 3V3 -> 5V level switcher
 - Connector for LED-strip SK6812/WS2812 to 5V, D5 and GND
 - D3 with 3V3 to D3 and GND
+- 5V power input to 5V-USB or Vin on ESP32 and to LED-strip  
 - 5V and GND connector and connector to Vin and 5V-USB on Arduino Nano ESP32
-- Connector to GND, RX and TX  
+- Connector to GND, RX and TX 
+
+The small PCB has connections to: (from top left clock wise)
+
+- LDR to pin A2 and 3V3
+- 5V power input to to 5V-USB on ESP32 and to LED-strip
+- Connector for LED-strip SK6812/WS2812 to 5V, D5 and GND
+- Rotary encoder or 3-button switch to pin D8, D3, D4 3V3 and GND
+- RTC-clock to pin  GND, 3V3, A4 and A5
+
+
+ ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/Pics/SmallPCB-V03.jpg)
+ 
 
 # The LED plate
 
