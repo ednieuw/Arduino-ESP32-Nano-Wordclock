@@ -90,9 +90,7 @@ The small PCB has connections to: (from top left clock wise)
 - Rotary encoder or 3-button switch to pin D8, D3, D4 3V3 and GND
 - RTC-clock to pin  GND, 3V3, A4 and A5
 
-
- ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/Pics/SmallPCB-V03.jpg)
- 
+![image](https://github.com/user-attachments/assets/f2919fb4-b571-4a1d-8264-4e227d4b104e) 
 
 # The LED plate
 
