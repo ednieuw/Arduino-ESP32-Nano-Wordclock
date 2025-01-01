@@ -21,6 +21,9 @@ Not with characteristic FFE0 but 6e400001-b5a3-... et cetera in your serial term
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
+![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
+Clock with corten steel face
+
 # Hardware
 For my projects I design the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
 
