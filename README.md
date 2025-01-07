@@ -13,19 +13,28 @@ If no internet is available a DS3231 RTC-module can be attached to the PCB to ge
 A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
 The Arduino Nano ESP32 receives time with NTP/WIFI from the internet. The software and the PCB support an external very accurate DS3231 RTC when WIFI is unavailable.<br>
 
-The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used. The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
-That means you have to use a different BLE service for the serial communication. Not FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software. Depending on the app you use you probably must specify which protocol to use.<br>
+The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used.
+
+The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
+That means you have to use a different BLE service for the serial communication. 
+Not with characteristic FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that is used to communicate with the settings of the clock software.<br>
+
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
+![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
+Clock with corten steel face
+
 # Hardware
-For my projects I use a [Fritzing software](https://fritzing.org/) designed PCB. This program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
+For my projects I design the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
+
+This program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
-The PCB design file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
+The PCB design .FZZ-file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
-The PCB can connect to a rotary encoder, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
+The PCB can connect to a rotary encoder or three button membrane switch, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
-The SK6812 RGBW LED-strip operates at 5V. De data signal from the Nano is 3.3V.<br> 
+The SK6812 RGBW LED-strip operates at 5V. Nut the data signal from the Nano is only 3.3V.<br> 
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
@@ -41,8 +50,8 @@ This PCB, with one Arduino source code, will support the colour LED clocks and t
 The design of a minimum PCB for small spaces can also be found in this repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
-VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are aable to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
-If powered via the VIN pin VBUS it is disabled. This means that while powering the board through the VIN pin, you can't get 5V from the board. 
+VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
+If powered via the VIN pin VBUS it is disabled. This means that while powering the board through the VIN pin, you can't get 5V power from the board. 
 
 The PCB can use different power connection options.
 A 5V, >1A power supply can be attached at the 5V power connection on the top left of the PCB.<br>
@@ -61,8 +70,7 @@ After connections are made the PCB and hardware looks like this:
 ![image](https://github.com/user-attachments/assets/77fc651e-cfd6-4681-83e5-53c4f6bcfb55)
 
 
-# Connections
-
+# PCB Connections
 
 The large PCB has connections to: (from top right clock wise)
 - 6-21V power input to Vin on Nano ESP32
@@ -92,7 +100,7 @@ The small PCB has connections to: (from top left clock wise)
 
 ![image](https://github.com/user-attachments/assets/f2919fb4-b571-4a1d-8264-4e227d4b104e) 
 
-# The LED plate
+# The LED ground plate
 
 ![IMG_1469](https://github.com/user-attachments/assets/a6a80ac1-4cb6-47b2-a496-f9645e8795c1)
 
@@ -164,9 +172,9 @@ Type this IP-address URL in a browser and enter admin/admin as user and password
 Then upload the .bin file from this repository.<br>
 
 # How to compile: 
-At the moment of writing the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. 
-Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.18 also compiles without errors.
-This 2.0.18 board uses the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work (in dec 2024) with the new V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
+At the moment of writing (1 jan 2025) the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. V3.1.0 does crash when WIFI is connected. 
+Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.17 or 2.0.18, compiles without errors and is advised to use.
+This 2.0.18 core uses the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work (in dec 2024) with the new core V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
 
 ```
                       #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
@@ -225,7 +233,7 @@ To connect to a WIFI network a SSID and password must be entered.
 There are a few methods: <br>
 1. Connect the MCU with a serial cable to a PC and use a serial terminal.
 
-I use the Arduino IDE or <a href="https://www.compuphase.com/software_termite.htm"> Termite</a> as serial terminal. 
+I use the Arduino IDE as serial terminal. 
 
 Sending the character 'I' for information will display the menu followed with the actual settings of several preferences. 
 
