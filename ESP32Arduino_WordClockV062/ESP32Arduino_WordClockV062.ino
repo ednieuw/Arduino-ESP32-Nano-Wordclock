@@ -24,13 +24,14 @@
                 void onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo& connInfo) override  
                 added: pAdvertising->setName(BLEbroadcastName);   after pAdvertising->addServiceUUID(SERVICE_UUID); 
  Changes V061: Added  NLM1M2M3M4L256. Added DS3231 OnOff in menu.
- Changes V062: Self test in msec possible 
-
+ Changes V062: Selftest(msec). NTP library https://github.com/gmag11/ESPNtpClient crashes with core 3.1.0
+               R reset does not erase SSID and PWD but command RRR does erase SSID and PWD
+               Removes extra CR, LF etc in ReworkInputString
 //ToDo
 - Port to ESP32 V3.1.0
 - Check SK6812 on V3.1. Flickers in 3.0.7
 - Replace? NimBLE https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ble.html
-- Add classical bluetooth https://docs.espressif.com/projects/arduino-esp32/en/latest/api/bluetooth.html
+- 
 
 
 How to compile: 
@@ -50,8 +51,8 @@ Select below, with only one #define selected, the clock type
 // =============================================================================================================================
 // ------------------>   Define only one clock type
 //#define FOURLANGUAGECLOCK
-#define NL144CLOCK
-//#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
+//#define NL144CLOCK
+#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L256         // NL clock with four extra LEDs for the minutes to light up for Ulrich 
 //--------------------------------------------
 // ESP32 Definition of installed modules
@@ -867,16 +868,19 @@ void Reset(void)
  MaxPhotocell         = Previous_LDR_read;                                                    // Stores maximum reading of photocell;                                            
  TestLDR              = 0;                                                                    // If true LDR display is printed every second
 // WIFIwasConnected     = false;
- strcpy(Mem.SSID,"");                                                                         // Default SSID
- strcpy(Mem.Password,"");                                                                     // Default password
- strcpy(Mem.BLEbroadcastName,"wordclock");
- strcpy(Mem.Timezone,"CET-1CEST,M3.5.0,M10.5.0/3");                                           // Central Europe, Amsterdam, Berlin etc.                                                         // WIFI On  
-
  Tekstprintln("**** Reset of preferences ****"); 
  StoreStructInFlashMemory();                                                                  // Update Mem struct       
  GetTijd(false);                                                                                  // Get the time and store it in the proper variables
  SWversion();                                                                                 // Display the version number of the software
  Displaytime();
+}
+
+void ResetAll(void)
+{
+ strcpy(Mem.SSID,"");                                                                         // Default SSID
+ strcpy(Mem.Password,"");                                                                     // Default password
+ strcpy(Mem.BLEbroadcastName,"wordclock");
+ strcpy(Mem.Timezone,"CET-1CEST,M3.5.0,M10.5.0/3");                                           // Central Europe, Amsterdam, Berlin etc.                                                         // WIFI On  
 }
 //--------------------------------------------                                                //
 // COMMON common print routines
@@ -1010,10 +1014,8 @@ void PrintLine(byte Lengte)
 void ReworkInputString(String InputString)
 {
  if(InputString.length()> 40){Serial.printf("Input string too long (max40)\n"); return;}      // If garbage return
- for (int n=0; n<InputString.length()+1; n++)                                                 // remove CR and LF
-       if (InputString[n] == 10 || InputString[n]==13) InputString.remove(n,1);
- sptext[0] = 0;                                                                               // Empty the sptext string
- 
+ InputString.trim();                                                                           // remove CR, LF etc.
+ sptext[0] = 0;             
  if(InputString[0] > 31 && InputString[0] <127)                                               // Does the string start with a letter?
   { 
   switch (InputString[0])
@@ -1221,10 +1223,20 @@ void ReworkInputString(String InputString)
     case 'R':                                                                                 // Reset to default settings 
     case 'r':
              sprintf(sptext,"**** Length fault R. ****");       
+             if (InputString.equals("RRR"))                                                   // 
+               { 
+                ResetAll();  
+                Reset();              
+                sprintf(sptext,"\nFactory reset to default values: Done");
+                lastminute = 99;                                                              // Force a minute update
+                Displaytime();                                                                // Turn on the display with proper time
+                break;
+               } 
              if (InputString.length() == 1)
                {   
                 Reset();
                 sprintf(sptext,"\nReset to default values: Done");
+                lastminute = 99;                                                              // Force a minute update
                 Displaytime();                                                                // Turn on the display with proper time
                }                                
              break;     
@@ -2966,7 +2978,7 @@ void WiFiEvent(WiFiEvent_t event)
             break;
         case ARDUINO_EVENT_ETH_GOT_IP:
             Tekstprintln("Obtained IP address");
-            WiFiGotIP(event,info);
+//            WiFiGotIP(event,info);
             break;
         default: break;
     }
@@ -3172,15 +3184,14 @@ void StartWIFI_NTP(void)
 if ( !WIFIwasConnected) return;                                                                  // If WIFI connection fails -> returm
 //  sprintf(sptext, "IP Address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );  Tekstprintln(sptext); 
 ElegantOTA.begin(&server);                                                                    // Start ElegantOTA  new version in 2023  
-       // if compile error see here :https://docs.elegantota.pro/async-mode/  // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
-                                                                                              // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1    
+       // if compile error see here :https://docs.elegantota.pro/async-mode/  // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:                                                                                        // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1    
                                                                                               // Save the changes to the ElegantOTA.h file.   
 if(Mem.NTPOn )
-  {
+  { 
    NTP.setTimeZone(Mem.Timezone);                                                             // TZ_Europe_Amsterdam); //\TZ_Etc_GMTp1); // TZ_Etc_UTC 
-   NTP.begin();                                                                               // https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
+   NTP.begin();  // crashes core 3.1 here ****                                                                           // https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
    NTP.onNTPSyncEvent([](NTPEvent_t event){ntpEvent=event; syncEventTriggered=true;});
-   Tekstprintln("NTP is On"); 
+   Tekstprintln("NTP is On");
    }   
  if(Mem.WIFIOn) WebPage();                                                                    // Show the web page if WIFI is on
  Tekstprint("Web page started\n");
