@@ -5,13 +5,12 @@
 Built your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector).<br>
 
-The clock is controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC.<br>
+The clock can be controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
-It will keep its time within the second correct with the internet NTP time with time zone and day light saving corrections.<br>
+It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and day light saving corrections.<br>
 
 If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary or membrane pad time can be set.<br>
 A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
-The Arduino Nano ESP32 receives time with NTP/WIFI from the internet. The software and the PCB support an external very accurate DS3231 RTC when WIFI is unavailable.<br>
 
 The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI has the disadvantage that only WIFI or BLE could be used.
 
@@ -25,9 +24,9 @@ See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nR
 Clock with corten steel face
 
 # Hardware
-For my projects I design the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
+For my projects I designed the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
 
-This program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
+This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
 The PCB design .FZZ-file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
@@ -209,8 +208,16 @@ When a DS3231 time module is attached to the circuit board an internet connectio
 
 To connect to the internet the name of the WIFI station and its password must be entered in the clock software to be able to connect to a WIFI router.
 
+### Connect to WIFI
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
 
+If the clocksoftware is started without a SSID it will start a WIFI station you can connect to. 
+- Open in your phone, tablet or PC the WIFI connections. In the list of WIFI stations there will be one named: StartWordClock. 
+- Connect to it and enter the password: 12345678
+- Enter the SSID and password of your WIFI router. You can find these credentials ofter at the bottom of your router.
+- When Submit is pressed the clock will restart and connect to the internet
+
+### Connect via Bluetooth
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec)
  	 	 
@@ -223,6 +230,14 @@ Tip: Turn on Fast BLE with option + in the menu for a faster transmission.
 
 - For Android use: [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal). <br />
 Do not turn on Fast BLE in the menu. (Off = default)
+
+Enter the SSID name and password of your router prefixed with A for the SSID and with an B for the password.
+- aSSIDname and press Send
+- bPassword and press send
+Optionally
+- cClockname and press send. 
+Clockname is the name of the clock displayed in the WIFI-router in the the list of bluetooth devices in the BLE serial terminal app
+
 
 # Control of the clock
 If the clock is connected to the internet it will seek contact with a time server. (NTP connection can be turned off in the menu).
