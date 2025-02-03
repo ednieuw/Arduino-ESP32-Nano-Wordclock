@@ -46,7 +46,7 @@ An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips 
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
-The design of a minimum PCB for small spaces can also be found in this repository.
+The design of a [minimum PCB for small spaces](/PCB-small) can also be found in this repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
