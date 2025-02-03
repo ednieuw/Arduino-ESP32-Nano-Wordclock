@@ -29,7 +29,7 @@ For my projects I designed the printed circuit board (PCB) with [Fritzing softwa
 This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCB's for $5. With +/-$25 shipping and custom charges this is very cheap. The PCB were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
-The PCB design .FZZ-file can be found in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
+The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
 The PCB can connect to a rotary encoder or three button membrane switch, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
@@ -46,7 +46,7 @@ An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips 
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
-The design of a [minimum PCB for small spaces](/PCB-small) can also be found in this repository.
+The design of a [minimum PCB for small spaces](/PCB-small) can also be found in the folder PCB-small inthis repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
