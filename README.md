@@ -21,7 +21,7 @@ Not with characteristic FFE0 but 6e400001-b5a3-... et cetera in your serial term
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
-Clock with corten steel face
+Clock with Corten steel face
 
 # Hardware
 For my projects I designed the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
@@ -46,7 +46,7 @@ An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips 
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ES32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
-The design of a [minimum PCB for small spaces](/PCB-small) can also be found in the folder PCB-small inthis repository.
+The design of a [minimum PCB for small spaces](/PCB-small) can also be found in the folder PCB-small in this repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
 VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
@@ -107,7 +107,7 @@ The distance between the LEDs on the strip is suitable for making a clock of 25 
 You can choose to stick the 144 LEDs of the clock in 12 rows of 12 LEDs or only behind the letter that should light up.<br>
 The advantage of the latter is that fewer LEDs are needed and that you have to drill fewer holes in the spacer plate.<br>
 But there are many more soldering points, each of which can cause malfunctions.<br>  
-My experience is that imperfect soldering on the strip may loosens over time causing malfuncions. 
+My experience is that imperfect soldering on the strip may loosens over time causing malfunctions. 
 
 The software has a digital time display option you cannot use if you do not install all 144 LEDs.<br>
 You can choose to cut out the words like IT WAS FIVE and so on in a 1 cm thick MDF board with a jigsaw.<br>
@@ -139,7 +139,7 @@ Place the spacer plate over de LEDs, then a sheet of white paper and finally the
 The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
 
 The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.
-Several designs can be selected before compiling.  (If you have a word plate ofcourse.)
+Several designs can be selected before compiling.  (If you have a word plate of course.)
 Use a word plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software<br>.
 
 ![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
@@ -163,10 +163,10 @@ or [here in this repository](Manual-Instructions)
 
 In the libraries.zip are the libraries to compile the software. Unpack them in you libraries folder.<br>
 Download the program folder and compile for Arduino Nano ESP32.<br>
-Libraries update constantly what may result in incompatibilty with this source code after a few years. Therefore these libraries are included.
+Libraries update constantly what may result in incompatibility with this source code after a few years. Therefore these libraries are included.
 
 An alternative is to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE.<br>
-Upload it in the Nano ESP32 and note the IP-addres that is printed in the Serial monitor of the Arduino IDE.
+Upload it in the Nano ESP32 and note the IP-address that is printed in the Serial monitor of the Arduino IDE.
 Type this IP-address URL in a browser and enter admin/admin as user and password.<br>
 Then upload the .bin file from this repository.<br>
 
@@ -211,7 +211,7 @@ To connect to the internet the name of the WIFI station and its password must be
 ### Connect to WIFI
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
 
-If the clocksoftware is started without a SSID it will start a WIFI station you can connect to. 
+If the clock software is started without a SSID it will start a WIFI station you can connect to. 
 - Open in your phone, tablet or PC the WIFI connections. In the list of WIFI stations there will be one named: StartWordClock. 
 - Connect to it and enter the password: 12345678
 - Enter the SSID and password of your WIFI router. You can find these credentials ofter at the bottom of your router.
@@ -224,11 +224,11 @@ To make life easy it is preferred to use a phone or tablet and a Bluetooth commu
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 - Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
 
-- For IOS iPhone or iPad: [BLE Serial Pro](https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en). <br />
+- For IOS iPhone or iPad: [BLE Serial Pro](https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en). <br>
 Or the free less sophisticated app: [BLE serial nRF](https://apps.apple.com/nl/app/bleserial-nrf/id1632235163?l).<br>
 Tip: Turn on Fast BLE with option + in the menu for a faster transmission.
 
-- For Android use: [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal). <br />
+- For Android use: [Serial Bluetooth terminal](https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal). <br>
 Do not turn on Fast BLE in the menu. (Off = default)
 
 Enter the SSID name and password of your router prefixed with A for the SSID and with an B for the password.
@@ -266,11 +266,11 @@ Sending the character 'I' for information will display the menu followed with th
 
 2. USE the BLE nRF connection with an UART serial terminal app to control it with your mobile phone or tablet. 
 
-Use the IOS app for iPhone or iPad: <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br />
+Use the IOS app for iPhone or iPad: <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">BLE Serial Pro</a>. <br>
 or the free app BLEserial nRF: https://apps.apple.com/nl/app/bleserial-nrf/id1632235163?l=en-GB
 Turn on Fast BLE with option Z in the menu. 
 
-For Android use:<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">Serial Bluetooth terminal</a>. <br />
+For Android use:<a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">Serial Bluetooth terminal</a>. <br>
 Turn off (default) Fast BLE in the menu. 
 
 Start the app and find the MCU in the list of devices and connect to it. You can change it's beacon name in the menu with option C. 
@@ -361,12 +361,12 @@ Open the BLE terminal app. Look for the WordClock to connect to and connect.
 for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.home.xs4all.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
 
 For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
-&nbsp;nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
-Serial Bluetooth terminal</a>. <br />
+nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
+Serial Bluetooth terminal</a>. <br>
 Unfortunately these Android apps can not read strings longer than 20 characters. <br>
 If you see a garbled menu enter and send the character '+' to select the slower transmission mode. 
  
-Settings are set by entering the first character of a command following by parameters if necessary.<br />
+Settings are set by entering the first character of a command following by parameters if necessary.<br>
 For example to set the colours of the characters in the display to white enter: Q2 <br>
 <br>
  Set time by entering T130245. (130245 will also work) <br>
@@ -394,7 +394,7 @@ Reset to default setting by send R.<br><br>
 	
 </pre>
 
-With the menu many preferences can be set. <br />
+With the menu many preferences can be set. <br>
 These preferences are permanently stored in the Arduino Nano ESP32 storage space. 
 
 Enter the first character in the menu of the item to be changed followed with the parameter. <br>
@@ -436,7 +436,7 @@ For example: F8800FF00 is 50% white with 100% green.
 ## I To print this Info menu<br>
 Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
 
-## K LDR reads/sec toggle On/Off<br />
+## K LDR reads/sec toggle On/Off<br>
 Prints the LDR-readings and the calculated intensity output.
 
 ## N Display off between Nhhhh (N2208)<br>
@@ -456,12 +456,17 @@ Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock <br>
 Send an 'I' to display the latest's settings 
 
 ## R Reset settings <br>
-R will set all preferences to default settings and clears the SSID and password. 
+R will set all preferences to default settings. The SSID and password, timezone, the LED-strip type and use a rotary will be kept.<br>
+RRR will clear SSID, password, set Time zone to Amsterdam (CET-1) and turn WIFI, NTP and BLE on.<br>
+RRRRR is a total reset
 
 ## U Demo mode (msec) (U200)
 Enter U followed with the duration of a second in milli seconds. 
 M200 (200 milli second) will speed up the clock 5 times.  
 Sending an U will turn off the demo mode.
+
+## Y Play lights
+To test the functionality of the LEDs
 
 ## Light intensity (1-250)
 S=Slope L=Min M=Max (S100 L5 M200)
@@ -470,15 +475,15 @@ S=Slope L=Min M=Max (S100 L5 M200)
 <tr>
 <td> To control the light intensity three parameters can be set. <br>
 The values ranges between 0 and 255. <br>
-The minimal light intensity is to avoid that the display turns completely off when it is dark. <br />
+The minimal light intensity is to avoid that the display turns completely off when it is dark. <br>
 It also prevents flickering when the input value are very low, like 2 and 3 bits. <br>
-Values ranging between 5 and 20 are suggested. When no LDR is attached the Min value can be set to 255.<br />
+Values ranging between 5 and 20 are suggested. When no LDR is attached the Min value can be set to 255.<br>
 The maximum light intensity is 255 bits for 100% intensity.  <br>
-The Slope (sensitivity) controls the speed at with the maximum value is reached. <br />
-It multiplies the reading as a percentage. So, entering 100 is a multiplication by one. <br />
+The Slope (sensitivity) controls the speed at with the maximum value is reached. <br>
+It multiplies the reading as a percentage. So, entering 100 is a multiplication by one. <br>
 The placement and sensitivity of your LDR can be adjusted with this parameter Slope. </td>
 <td> 
-<img alt="Min Max Slope" src="Pics/MinMaxSlope.jpg" /><br />
+<img alt="Min Max Slope" src="Pics/MinMaxSlope.jpg" /><br>
 The effect of the value of the slope on the light intensity of the LEDs 
 or display. </td>
 </tr>
@@ -487,6 +492,9 @@ or display. </td>
 <table style="width: 100%">
 <tr>
 <td> 
+
+
+
 # @ = Restart MCU<br>
 @ will restart the MCU. This is handy when the SSID, password, et cetera are changed and the program must be restarted.<br>
 <br>
@@ -502,18 +510,20 @@ At the bottom of the menu the state is printed.<br>
 
 ## + Fast BLE
 
-The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec <br>
-The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed. <br />With most apps you will see these will truncate the long strings of the menu.<br>
+The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec.<br>
+The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed.<br>With most apps you will see these will truncate the long strings of the menu.<br>
 Then turn off Fast BLE. <br>
-Option Z toggles between the long and short packages.&nbsp; 
+Option Z toggles between the long and short packages. 
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 
 ## ! = Show NTP, RTC and DS3231 time
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and being used to show a realistic time.
 Same as & option but this option will not update from the internet NTP server but only shows the time.
 
-## #= Selftest
-Sending a # will start the clock self test. This is convenient to check if all the words in the clock a functioning. 
+## #= Self test
+Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
+The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
+#nnnn were nnnn is the delay between minutes in milli seconds.  
 
 ## % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
@@ -538,6 +548,12 @@ Remember to install the ESP32 boards as explained above.<br>
 
 <img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" />
 <p>
+
+
+
+
+
+
 <p># Program explanation
  The program uses the following standard libraries.   
 <br>
@@ -545,56 +561,54 @@ Remember to install the ESP32 boards as explained above.<br>
 
 #include <Preferences.h>
                       #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-#include "EdSoftLED.h"         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
+#include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
                       #else
 #include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
                       #endif
-#include <NimBLEDevice.h>      // For BLE communication  https://github.com/h2zero/NimBLE-Arduino
+#include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
 #include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
 #include <WiFi.h>              // Used for web page 
-#include <AsyncTCP.h>          // Used for webpage  https://github.com/dvarrel/AsyncTCP 
-#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer 
+#include <AsyncTCP.h>          // Used for webpage                                                         old https://github.com/me-no-dev/ESPAsyncWebServer
+#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer     Old original one https://github.com/me-no-dev/ESPAsyncWebServer
 #include <ElegantOTA.h>        // If a large bunch of compile error see here :https://docs.elegantota.pro/async-mode
                                // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
                                // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
-#include <ESPmDNS.h>
+#include <ESPmDNS.h>           // To show BLEname in router
+#include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
 #include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
 #include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
-#include <Encoder.h>
+#include <Encoder.h>           // For rotary encoder
+#include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
+
 </pre>
 
-Webpage.h is included in the program as a TAB in the IDE. It contains the web page to display in the browser.<br />
+Webpage.h is included in the program as a TAB in the IDE. It contains the web page to display in the browser.<br>
 
-I made the web page in the free 'Microsoft Expression Web 4'. It is not maintained anymore but has more than enough functionalities for our purposes.<br />
-<br />
+I made the web page in the free 'Microsoft Expression Web 4'. It is not maintained anymore but has more than enough functionalities for our purposes.<br>
+<br>
 To copy the code from the MS-Expression: <br>
-At the bottom line of the window of MS-Expression click 'Split'.<br />
+At the bottom line of the window of MS-Expression click 'Split'.<br>
 In the upper half the raw HTML Code is displayed and in the bottom half the 
-Design window.<br />
-Copy in the Code window all the HTML code <br />
-Go to the Arduino IDE and paste it in the webpage.h TAB between: <br />
-R"rawliteral(   &nbsp;... and ...&nbsp;
- )rawliteral";<br />
-<br />
+Design window.<br>
+Copy in the Code window all the HTML code <br>
+Go to the Arduino IDE and paste it in the webpage.h TAB between: <br>
+R"rawliteral(   ... and ...
+ )rawliteral";<br>
+<br>
   Or copy the the code from the webpage.h into 
 MSexpression Code area and redesign the page as you like 
 
 <img alt="MS expression" class="auto-style4" src="Pics/MSExpression.jpg" /><br>
- &nbsp; 
- A long list if definitions and initialisations follows. <br>
- I am not a fan of passing all the variables to and from functions and like to 
-keep them global in one program list. <br>
- If you write a program with other people it is good practice not to use too many globals 
-but this program is in one large listing, for the same reason to keep it simple. <br>
- I grouped all the variables per application to keep track where they are used. <br>
- With a simple find it is easy in this one great listing to find the back.<br />
-<br />
-To print the time as text and colour with the proper LEDs or characters, the 
-words and its position in a string of LEDs or text are defined. <br />
-The defines executes the function ColorLeds with its proper parameters.<br />
-Further in the program&nbsp; in the function void Dutch(void), void 
-English(void) et cetera it becomes clear why these defines are so useful and 
-handy.&nbsp;  
+
+A long list if definitions and initialisations follows. <br>
+I am not a fan of passing all the variables to and from functions and like to keep them global in one program list.<br>
+If you write a program with other people it is good practice not to use too many globals but this program is in one large listing, for the same reason to keep it simple.<br>
+I grouped all the variables per application to keep track where they are used.<br>
+With a simple find it is easy in this one great listing to find the back.<br>
+<br>
+To print the time as text and colour with the proper LEDs or characters, the words and its position in a string of LEDs or text are defined. <br>
+The defines executes the function ColorLeds with its proper parameters.<br>
+Further in the program in the function void Dutch(void), void English(void) et cetera it becomes clear why these defines are so useful and handy.  
 
 <pre> ...   
 #define PRECIES ColorLeds("precies", 16, 22, LetterColor);
@@ -603,31 +617,32 @@ handy.&nbsp;
 #define VOOR    ColorLeds("voor", 38, 41, LetterColor); 
 ... 
 </pre>
- This is the initialisation of the storage area to 
-store the struct EEPROMstorage.<br />
+This is the initialisation of the storage area to store the struct EEPROMstorage.<br>
 The Struct with all its settings is saved in one command to permanent memory or SD <br>
-Preferences FLASHSTOR; <br />
-<br />
+Preferences FLASHSTOR; <br>
+<br>
+<pre> ...  
+struct EEPROMstorage { // Data storage in EEPROM to maintain them after power loss <br>
+byte DisplayChoice = 0; <br>
+... <br>
+char BLEbroadcastName[30]; // Name of the BLE beacon <br>
+char Timezone[50]; <br>
+int Checksum = 0; <br>
+} Mem; <br>
+... 
+</pre>
+<br>
+The variables are addressed with a short name Mem.<br> 
+For example Mem.DisplayChoice = 3; <br>
+<br>
+The Struct EEPROMstorage is stored in the function StoreStructInFlashMemory and retrieved in the function GetStructFromFlashMemory <br>
+<br>
+<br><br>
+The menu displayed in the serial monitor and BLE app is defined here.<br>
+Strings may not be longer than 40 characters what can be checked with the 'ruler' string. <br>
 
-struct EEPROMstorage { // Data storage in EEPROM to maintain them after power loss <br />
-byte DisplayChoice = 0; <br />
-... <br />
-char BLEbroadcastName[30]; // Name of the BLE beacon <br />
-char Timezone[50]; <br />
-int Checksum = 0; <br />
-} Mem; <br />
-<br /><br />
-<br /> The variables are adressed with a short name Mem.
- <br /> For example Mem.DisplayChoice = 3; <br />
-<br />
- The Struct EEPROMstorage<br />
- is stored in the function StoreStructInFlashMemory <br />and retrieved in the function GetStructFromFlashMemory <br />
-<br />
-<br /><br />
- The menu displayed in the serial monitor and BLE app is defined here.<br />String may not be longer than 40 characters what can be checked with the 'ruler'
-<br />
-string. <br>
-<pre>// Menu 
+<pre>
+// Menu 
 //0        1         2         3         4 
 //1234567890123456789012345678901234567890  
 char menu[][40] = { 
@@ -636,40 +651,59 @@ char menu[][40] = {
 ... 
 "W=WIFI, X=NTP, Y=BLE, Z=Fast BLE",  
 "Nov 2022" }; </pre>
- The Setup happens here: <pre>//-------------------------------------------- 
-// ESP32-C3 Setup 
+ The Setup happens here: 
+<pre>
+//-------------------------------------------- 
+// ARDUINO Setup
 //-------------------------------------------- 
 void setup()  
 {
 Serial.begin(115200); Tekstprintln("Serial started"); // Setup the serial port to 115200 baud // 
 ...
 ... 
-msTick = LastButtonTime = millis();  
-}</pre>
- <br />
-The loop is kept almost empty and the program starts 
-in Every SeccondCheck.<br />
-There is nothing in this program that should be executes every millisecond or 
-less <pre>//-------------------------------------------- 
-// ESP32-C3 Loop 
+msTick = millis();  
+}
+</pre>
+
+The loop is kept almost empty and the program starts in Every SecondCheck.<br>
+There is nothing in this program that should be executes every millisecond or less
+ 
+<pre>
 //-------------------------------------------- 
-void loop()  
+// ARDUINO Loop
+//-------------------------------------------- 
+void loop() 
 {
-EverySecondCheck();
-}  </pre>
- The following routines check if 
-something must happen every second, minute, hour and day.<br />
-This flow handling of the program keeps the processor for 99% free for other uses.<br />
-In this program that is almost nothing but for other purposes this can be needed.<br />
+ Loopcounter++;
+ if (Demo)         Demomode();
+ else              EverySecondCheck();                 // Let the second led tick and run the clock program
+ CheckDevices();
+} 
+</pre>
+
+The following routines check if something must happen every second, minute, hour and day.<br>
+This flow handling of the program keeps the processor for 99% free for other uses.<br>
+In this program that is almost nothing but for other purposes this can be needed.<br>
 In the serial monitor the loops per second are printed. this can be handy to check if the program spends too much time elsewhere in the program. At the moment (V056) of writing it is around 216,000 l/s.
 
-In the Bluetooth and Serial communication functions some short delays are used 
-that are essential <br />
-here but the program only runs here when there is an actual communication.<br />
-(An alternative method could have been the use of an interrupt every second and an empty loop)<br />
-<br />
+In the Bluetooth and Serial communication functions some short delays are used that are essential here but the program only runs here when there is an actual communication.<br>
+(An alternative method could have been the use of an interrupt every second and an empty loop)<br>
+<br>
 
-<pre>//-------------------------------------------- 
+<pre>
+//--------------------------------------------                //
+// COMMON Check connected input devices
+//--------------------------------------------
+void CheckDevices(void)
+{
+ CheckBLE();                                                  // Something with BLE to do?
+ SerialCheck();                                               // Check serial port every second 
+ NTPsyncEvent();                                              // Check for NTP events
+ ElegantOTA.loop();                                           // For Over The Air updates
+ if (Mem.UseRotary==1) RotaryEncoderCheck(); 
+ if (Mem.UseRotary==2) Keypad3x1Check();
+}
+//-------------------------------------------- 
 // CLOCK Update routine done every second 
 //-------------------------------------------- 
 void EverySecondCheck(void) 
@@ -709,8 +743,7 @@ void EveryDayUpdate(void)
 <br>
 
 Update the LEDs on the Nano and the PCB. 
-On the Nano analogWrite(LED_RED,   512); is OFF
-and analogWrite(LED_RED, 0); is ON
+On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON
 ```
 //--------------------------------------------                                                //
 // COMMON Update routine for the status LEDs
@@ -728,11 +761,11 @@ void SetStatusLED(int Red, int Green, int Blue)
 }
 
 ```
-************* tot hier corrected
+</pre>
 
-
- Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
-<pre>//-------------------------------------------- 
+Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
+<pre>
+//-------------------------------------------- 
 // Common check for serial input 
 //-------------------------------------------- 
 void SerialCheck(void) 
@@ -740,9 +773,12 @@ void SerialCheck(void)
 ... 
 ReworkInputString(SerialString+"\n"); // Rework ReworkInputString(); 
 ... 
-}</pre>
-<br> Restore all the default 
-values. <pre>//------------------------------------------------------------------------------ 
+}
+</pre>
+
+Restore all the default values. 
+<pre>
+//------------------------------------------------------------------------------ 
 // Common Reset to default settings 
 //------------------------------------------------------------------------------ 
 void Reset(void) 
@@ -750,10 +786,14 @@ void Reset(void)
 Mem.Checksum = 25065;
 ...
  }</pre>
- Common common print routines.<br />
+
+Common print routines.<br>
+
 To keep all the print commands in one places it is easy to change these routines 
 for other boards with a different 'slang'. <br>
-<pre>//-------------------------------------------- 
+<pre>
+
+//-------------------------------------------- 
 // Common common print routines 
 //-------------------------------------------- 
 void Tekstprint(char const tekst[]) { if(Serial) Serial.print(tekst); SendMessageBLE(tekst);sptext[0]=0; }  
@@ -766,18 +806,23 @@ void TekstSprintln(char const tekst[]){ sprintf(sptext,"%s\n",tekst); TekstSprin
 //------------------------------------------------------------------------------ 
 int SConstrainInt(String s,byte first,byte last,int low,int up){return constrain(s.substring(first, last).toInt(), low, up);} 
 int SConstrainInt(String s,byte first, int low,int up){return constrain(s.substring(first).toInt(), low, up);} 
-
 </pre>
- The setup of storage space and control of the 
-validity of the settings.<br />
-In the checksum is invalid a reset() will restore the default settings <pre>//-------------------------------------------- 
+
+The setup of storage space and control of the validity of the settings.<br>
+In the checksum is invalid a reset() will restore the default settings 
+
+<pre>
+//-------------------------------------------- 
 // Common Init and check contents of EEPROM 
 //-------------------------------------------- 
-void InitStorage(void) </pre>
- Store and retrieve the settings from SPIFFS or SD or 
-EEPROM<br />
-the several possibilities are store here. EEPROM becomes outdated but still 
-works. <pre>-------------------------------------------- 
+void InitStorage(void) 
+</pre>
+
+Store and retrieve the settings from SPIFFS or SD or EEPROM.
+The several possibilities are stored here. EEPROM becomes outdated but still works. 
+
+<pre>
+-------------------------------------------- 
 // COMMON Store mem.struct in FlashStorage or SD 
 //-------------------------------------------- 
 void StoreStructInFlashMemory(void) 
@@ -788,112 +833,16 @@ void StoreStructInFlashMemory(void)
 //-------------------------------------------- 
 void GetStructFromFlashMemory(void) 
 {
-}</pre>
- Get the commands from the strings entered in the 
-serial monitor, Bluetooth or the webpage<br />
-and perform the command in an action.<br />
-The menu letters are almost used but it possible to distinguish between lower 
-and uppercase when more commands are needed.<br />
-(That is why there is no conversion to UpperCase or LowerCase). <pre>/-------------------------------------------- 
-// CLOCK Input from Bluetooth or Serial 
-//-------------------------------------------- 
-void ReworkInputString(String InputString) 
-{
-....  
-switch (InputString[0]) 
-{
-case 'A': 
-case 'a':  
-if (InputString.length() &gt;5 ) 
-... </pre>
- Read the LDR and divide it with 16 to get the values 
-from 0 - 4096 between 0 and 255.<br />
-Not all boards has a 12 bit AD converter like.  
-<pre>//-------------------------------------------- 
-// LDR reading are between 0 and 255.  
-// ESP32 analogue read is between 0 - 4096 --   is: 4096 / 8 
-//-------------------------------------------- 
-int ReadLDR(void) {  return analogRead(PhotoCellPin)/16;} </pre>
-<br />
- Control the color and intensity of the LED on the 
-boards in one command <br>
-<pre>//--------------------------------------------
-// CLOCK Control the LEDs on the ESP32 
-// 0 Low is LED off. Therefore the value is inversed with the ! Not 
-//-------------------------------------------- 
-void SetStatusLED(bool Red, bool Green, bool Blue) 
-{</pre>
-<br />
- This function reads the analog port and calculates an 
-output intensity to a 
-display or LED-strip<br />
-The readings are squared to get a hyperbolic curve that resembles you eye 
-correction for dark and light better than a linear range<br />
-It works wonderfully well.<br />
- <br>
-<pre>//--------------------------------------------  
-// LED Dim the leds measured by the LDR and print values  
-// LDR reading are between 0 and 255. The Brightness send to the LEDs is between 0 and 255  
-//--------------------------------------------  
-void DimLeds(bool print) { ... } </pre>
-  <br />
-Here we print and colour the characters in the 
-display or light up to proper LEDs in a String of RGB(W) LEDs.<br />
-The #define executes this functions with the proper parameters for every 
-language and prints the texts in the serial connections. <br />
-#define QUARTER ColorLeds("quarter", 32, 38, 
-LetterColor);
-  
-<br />
-<pre>//--------------------------------------------    / 
- / LED Set color for LED. 
-//--------------------------------------------   
-void ColorLeds(char const *Texkst, int FirstLed, int LastLed, uint32_t RGBColor)  
-{  } </pre>
-<br />
-To convert all characters to uppercase in a character array.<pre>//-------------------------------------------- 
-// COMMON String upper 
-//-------------------------------------------- 
-void to_upper(char* string) </pre>
-<pre>
-Every display or strip uses other commands to regulate the brightness
-Therefore for all LED/Display commands a function </pre>
-<pre>//------------------------------------------------------------------------------ 
-// LED Set brightness of backlight 
-//------------------------------------------------------------------------------ 
-void SetBrightnessLeds(byte Bright) 
-{ 
- SetBackLight(Bright); // Set brightness of LEDs 
-} 
+}
 </pre>
-<br />
-A place to turn off all LEDs or clear the display<br />
-<pre>/-------------------------------------------- 
-// LED Clear the character string 
-//-------------------------------------------- 
-void LedsOff(void)  
-</pre>
-<br>
-<br>
-Here are all the colours are set for the characters are set.<br />
-The function has changed often and it's name describes it's original purpose<br />
-For backward compatibility it's name is unchanged.<br />
- /--------------------------------------------  <br  />
-// LED Set second color <br  />
-//-------------------------------------------- <br  />
-void SetSecondColour(void) <br  />
-{ &nbsp;switch (Mem.DisplayChoice) &nbsp; { &nbsp;case 
-DEFAULTCOLOUR: LetterColor = C_YELLOW;  
-<br  />
-... <br />
-<br />
-<br />
-SWversion() prints the menu and the settings of sevaral preferences<br />
-The function has changed often and it's name describes it's original purpose<br />
-For backward compatibility it's name is unchanged.<br />
+
+SWversion() prints the menu and the settings of several preferences.<br>
+
 PrintLine() prints the horizontal lines in the menu.<br>
-<pre>//-------------------------------------------- 
-// CLOCK Version and preferences info 
+
+<pre>
+//-------------------------------------------- 
+// COMMON Version info
 //-------------------------------------------- 
 void SWversion(void)  
 {  
@@ -905,30 +854,188 @@ PrintLine(35);
 }
 
 void PrintLine(byte Lengte) 
-{... } </pre>
-<br>
-Displaytime() prints the time to the serial monitor as text and control wiich 
-language is printed.<br />
-It also sends the appropriate sequence of colour and intensities to a RGB(W) LED 
-strip. <pre>//--------------------------------------------  
-// CLOCK Say the time and load the LEDs  
-// with the proper colour and intensity 
+{... } 
+</pre>
+
+
+Get the commands from the strings entered in the serial monitor, Bluetooth or the webpage and perform the command in an action.<br>
+The menu letters are almost used but it possible to distinguish between lower and uppercase when more commands are needed.<br>
+(That is why there is no conversion to UpperCase or LowerCase). 
+
+<pre>
+/-------------------------------------------- 
+//  COMMON Input from Bluetooth or Serial
+//--------------------------------------------
+void ReworkInputString(String InputString) 
+{
+....  
+switch (InputString[0]) 
+{
+case 'A': 
+case 'a':  
+if (InputString.length() >5 ) 
+... 
+</pre>
+
+Read the LDR and divide it with 16 to get the values from 0 - 4096 between 0 and 255.<br>
+Not all boards has a 12 bit AD converter like.  
+
+<pre>
 //-------------------------------------------- 
+// LDR reading are between 0 and 255.  
+// ESP32 analogue read is between 0 - 4096 --   is: 4096 / 8 
+//-------------------------------------------- 
+int ReadLDR(void) {  return analogRead(PhotoCellPin)/16;} 
+</pre>
+
+Control the color and intensity of the LED on the boards in one command <br>
+<pre>//
+--------------------------------------------
+// CLOCK Control the LEDs on the ESP32 
+// 0 Low is LED off. Therefore the value is inversed with the ! Not 
+//-------------------------------------------- 
+void SetStatusLED(bool Red, bool Green, bool Blue) 
+{
+</pre>
+
+Here we print and colour the characters in the display or light up to proper LEDs in a String of RGB(W) LEDs.<br>
+The #define executes this functions with the proper parameters for every language and prints the texts in the serial connections.<br>
+#define QUARTER ColorLeds("quarter", 32, 38, LetterColor);
+
+<pre>
+//--------------------------------------------    / 
+ / LED Set color for LED. 
+//--------------------------------------------   
+void ColorLeds(char const *Texkst, int FirstLed, int LastLed, uint32_t RGBColor)  
+{  } 
+</pre>
+
+Every display or strip uses other commands to regulate the brightness. Therefore for all LED/Display commands a function.
+<pre>
+//------------------------------------------------------------------------------ 
+// LED Set brightness of backlight 
+//------------------------------------------------------------------------------ 
+void SetBrightnessLeds(byte Bright) 
+{ 
+ SetBackLight(Bright);                        // Set brightness of LEDs 
+} 
+</pre>
+
+A place to turn off all LEDs or clear the display<br>
+<pre>
+/-------------------------------------------- 
+// LED Clear the character string 
+//-------------------------------------------- 
+void LedsOff(void)  
+</pre>
+
+Here the colours are set for the characters.<br>
+It is also used to change the colours of HET IS WAS used in some display choices
+
+<pre>
+//--------------------------------------------  <br>
+// LED Set second color <br>
+//-------------------------------------------- <br>
+void SetSecondColour(void) <br>
+{ 
+...
+ MINColor = FuncCRGBW(15 + timeinfo.tm_min * 4, 255 - timeinfo.tm_min * 4, 0, 0); 
+ SECColor = FuncCRGBW(15 + timeinfo.tm_sec * 4, 255 - timeinfo.tm_sec * 4, 0, 0 );   
+                                                                                              // Light up  IS or WAS with the proper colour  
+switch (Mem.DisplayChoice) 
+  {
+    case DEFAULTCOLOUR: LetterColor = C_YELLOW;  
+<br>
+... 
+</pre>
+
+
+Subroutine for the Self test of the clock. Default there is a 900 ms delay.
+<pre>
+//------------------------------------------------------------------------------
+// CLOCK Self test sequence
+//------------------------------------------------------------------------------
+void Selftest(void){Selftest(900);}
+void Selftest(int Delayms)
+{ 
+ GetTijd(true);                                                                                  // Prints time in Serial monitor
+ LedsOff(); 
+...
+}
+</pre>
+
+Displaytime() prints the time to the serial monitor as text and control which language is printed.<br>
+It also sends the appropriate sequence of colour and intensities to a RGB(W) LED strip. 
+<pre>
+//--------------------------------------------  
+// CLOCK Say the time and load the LEDs 
+// with the proper colour and intensity
+//--------------------------------------------
 void Displaytime(void) 
 {  
-.. 
-switch(Language) // Print all the character in the backgound color, a sort of ClearScreen 
+LedsOff();                                                                                  // Start by clearing the display to a known state   
+ if( Mem.DisplayChoice == DIGITAL ) { TimePlaceDigit(timeinfo.tm_hour,timeinfo.tm_min); }
+ else                                                                                        // If not a digital display 
+   {
+                     #ifdef NL144CLOCK
+    Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
+                     #endif  //NL144CLOCK
+...
+                     #ifdef FOURLANGUAGECLOCK
+    SetColours();                                                                            // Set the colours for the chosen palette   
+    Dutch();
+    English();
+    German();
+    French();
+                     #endif  //FOURLANGUAGECLOCK       
+   }  
+ ShowLeds();                                                                                  // And turn on the LEDs
+}
+</pre>
+
+DimLeds() reads the analog port and calculates an output intensity to a display or LED-strip.<br>
+The readings are squared to get a hyperbolic curve that resembles you eye correction for dark and light better than a linear range.<br>
+It works wonderfully well.<br>
+
+<pre>
+//--------------------------------------------  
+// LED Dim the LEDs measured by the LDR and print values  
+// LDR reading are between 0 and 255. The Brightness send to the LEDs is between 0 and 255  
+//--------------------------------------------  
+void DimLeds(bool print) { ... } 
+</pre>
+
+
+A list of subroutine follows used for several LED operations follows including the initialisations of the WS2812 or SK6812 LED-strip
+The SK6812 LED-strip also has a white LED whicht intensity is controlled with the highest bytes (WW) in the 32-bit integer (0XWWRRGGBB)
+
+<pre>
+//--------------------------------------------                                                //
+//  LED Start LEDs
+//--------------------------------------------
+void StartLeds(void) 
 {
-case 0:  
-strncpy(Template,"HETVISOWASOVIJFQPRECIESZSTIENKPFKWARTSVOORSOVERAHALFSMIDDERTVIJFATWEESOEENOXVIERELFQTIENKTWAALFBHDRIECNEGENACHTFZESVZEVENOENVUUR",129);  
-ColorLeds(Template,0,127, Mem.DimmedLetter); 
-Dutch(); Print_tijd(); break; 
-case 1:  
-... 
-}</pre>
-<br />
-A series of functions to get and store time.<br />
-The NTP time server puts the retrieved time in the standard C time structures.<br />
+ switch (Mem.LEDstrip)
+    {
+      case 0: LEDstrip = LED6812strip; 
+              white  = 0xFF000000; 
+              lgray  = 0x66000000;  
+              gray   = 0x33000000;                                                            // The SK6812 LED has a white LED that is pure white
+              dgray  = 0x22000000;
+              wgray  = 0xAA000000; 
+
+      break;
+      case 1: LEDstrip = LED2812strip; 
+              white  = 0xFFFFFF;
+              lgray  = 0x666666;                                                              // R, G and B on together gives white light
+...
+}
+
+</pre>
+ 
+
+A series of functions to get and store time.<br>
+The NTP time server puts the retrieved time in the standard C time structures.<br>
 <pre>/--------------------------- Time functions -------------------------- 
 
 void GetTijd(byte printit) 
@@ -939,41 +1046,64 @@ void Print_tijd(void)
 void SetRTCTime(void) 
 
 </pre>
-Convert a HEX string to a unsigned 32-bits integer<br />
-<pre>/--------------------------------------------
- // CLOCK Convert Hex to uint32 
- //-------------------------------------------- 
- uint32_t HexToDec(String hexString)  </pre>
+
+Convert a HEX string to a unsigned 32-bits integer<br>
+
+<pre>
+//--------------------------------------------
+// CLOCK Convert Hex to uint32 
+//-------------------------------------------- 
+uint32_t HexToDec(String hexString)  </pre>
+
+
 <h2>Functions to let the clocks speak the time in four languages</h2>
-There is also a lot of slang in languages. <br />
-'Half nine' sometimes means 8:30 but can also be 9:30. (-:<br />
-<br />
- /--------------------------------------------  <br  />
-// CLOCK Dutch clock display <br  />
-//-------------------------------------------- <br  />
-void Dutch(void) <br  />
-{<br  />
-HET; // HET is always on <br  />
-switch (timeinfo.tm_min) <br  />
-{<br  />
-case 0: IS; PRECIES; break; <br  />
-case 1: IS; break; <br  />
-case 2:   <br  />
-case 3: WAS; break; <br  />
-case 4:   <br  />
-case 5:   <br  />
-... <br  />
-<br  />
-void English(void) <br  />
-void German(void) <br  />
-void French(void) <br>
+There is also a lot of slang in languages. <br>
+'Half nine' sometimes means 8:30 but can also be 9:30. (-:<br>
 <br>
-<br />
-The Bluetooth Low Energy Nordic nRF.. functions.<br />
+
+<pre>
+//--------------------------------------------                                                //
+//  CLOCK Dutch clock display
+//--------------------------------------------
+                      #if defined(NL) || defined(NL144CLOCK)  
+void Dutch(void)
+{
+HET;                                                                                          // HET  is always on
+ if (timeinfo.tm_hour == 12 && timeinfo.tm_min == 0 && random(2)==0) { IS; NOEN; return; }
+ if (timeinfo.tm_hour == 00 && timeinfo.tm_min == 0 && random(2)==0) { IS; MIDDER; NACHT; return; } 
+switch (timeinfo.tm_min)
+ {
+  case  0: IS;  PRECIES; break;
+  case  1: IS;  break;
+  case  2: 
+  case  3: WAS; break;
+  case  4: 
+  case  5: 
+  case  6: IS;  MVIJF; OVER; break;
+  case  7: 
+  case  8: WAS; MVIJF; OVER; break;
+  case  9: 
+  case 10: 
+  case 11: IS;  MTIEN; OVER; break;
+  case 12: 
+  case 13: WAS; MTIEN; OVER; break;
+  case 14: 
+  case 15: 
+...
+
+
+
+</pre>
+
+<br>
+
+The Bluetooth Low Energy Nordic nRF.. functions.<br>
 They are different from the Texas instrument CC2540/CC2541 that is used in other 
-chipsets like the HM-10, HM16, JDY-08 et cetera.<br />
-<a href="https://www.instructables.com/Communicate-Using-CC254x-or-NRF-BLE-With-Arduino-a/">More here on Instructables</a><br />
-<br />
+chipsets like the HM-10, HM16, JDY-08 et cetera.<br>
+<a href="https://www.instructables.com/Communicate-Using-CC254x-or-NRF-BLE-With-Arduino-a/">More here on Instructables</a><br>
+<br>
+
+
 <pre>/----------------------------- 
 // BLE SendMessage by BLE Slow in packets of 20 chars 
 //------------------------------ 
@@ -994,8 +1124,8 @@ void StartBLEService(void)
 //------------------------------ 
 void CheckBLE(void) </pre>
 <br>
-Functions to start a WIFI connection and use the webpage<br />
-<br />
+Functions to start a WIFI connection and use the webpage<br>
+<br>
 <pre>/-------------------------------------------- 
 // WIFI WEBPAGE  
 //-------------------------------------------- 
@@ -1011,10 +1141,10 @@ void WebPage(void)
 //-------------------------------------------- 
 void notFound(AsyncWebServerRequest *request) 
 </pre>
-<br />
-<br />
-<p >@Ed Nieuwenhuys, May 2023&nbsp;
-<p >&nbsp;
+<br>
+
+
+
 #Time zones
  
 <br>
