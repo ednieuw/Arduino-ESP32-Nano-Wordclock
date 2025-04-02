@@ -33,7 +33,7 @@ The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB 
 
 The PCB can connect to a rotary encoder or three button membrane switch, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
-The SK6812 RGBW LED-strip operates at 5V. Nut the data signal from the Nano is only 3.3V.<br> 
+The SK6812 RGBW LED-strip operates at 5V. But the data signal from the Nano is only 3.3V.<br> 
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
@@ -173,7 +173,8 @@ Then upload the .bin file from this repository.<br>
 # How to compile: 
 At the moment of writing (1 jan 2025) the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. V3.1.0 does crash when WIFI is connected. 
 Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.17 or 2.0.18, compiles without errors and is advised to use.
-This 2.0.18 core uses the Adafruit Neopixel library. This library uses machine code to control the LED-strips and does not work (in dec 2024) with the new core V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
+This 2.0.18 core uses the Adafruit Neopixel library. This Neopixel library uses machine code to control the LED-strips and does not work (in dec 2024) with the new core V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
+
 
 ```
                       #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
