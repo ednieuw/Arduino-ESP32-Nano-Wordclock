@@ -36,11 +36,19 @@
  Changes V069: Added Mem.WIFIcredentials to test if the SSID/PWD were set in AP-mode but were wrong. 
                After ESP32 restart the StartWordclock WIFI station will be restarted.
                Wire.begin(); // Keep Wire.begin close to the first I2C start to avoid WireTimeout()
+ Changes V070: Added M1M2M3M4 in NL144. Added Option Q9 HET IS WAS on or Off
+ Changes V071: Removed #include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+ Changes V072: German lay-out for single language clock
+ Changes V073: Turned off WIFIevents
+ Changes V074: ESP32 V3.2.0 and ADAfruit Neopixel 1.12.5 works.
+ Changes V075: Added WPS (Option Z in menu) and added "remove WIFI Eventhandler" to stop the WIFI events WiFi.removeEvent(wifiEventHandler);
+  
+
+
 
 //ToDo
-- implement ChangeNTP_RTC
-- Port to ESP32 V3.1.0
-- Check SK6812 on V3.1. Flickers in 3.0.7
+  ToDo remove ElegantOTA 
+- implement Change NTP_RTC in rotary
 - Replace? NimBLE https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ble.html
 - 
 
@@ -62,6 +70,7 @@ Select below, with only one #define selected, the clock type
 // ------------------>   Define only one clock type
 //#define FOURLANGUAGECLOCK
 #define NL144CLOCK
+//#define DE144CLOCK              // German display for 12 x 12 Front
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
@@ -76,15 +85,19 @@ Select below, with only one #define selected, the clock type
 //--------------------------------------------
 
 #include <Preferences.h>
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(99, 0, 0) //Use EdSoftLED with ESP32 compiler until V3.2.0. Neopixel crashes>
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
                       #else
 #include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
                       #endif
 #include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
-#include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+// #include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+
+
 #include <WiFi.h>              // Used for web page 
-#include <AsyncTCP.h>          // Used for webpage  https://github.com/dvarrel/AsyncTCP                    old https://github.com/me-no-dev/ESPAsyncWebServer
+#include <AsyncTCP.h>          // Used for webpage  
+#include "esp_sntp.h"          // for NTP
+#include "esp_wps.h"           // For WPS
 #include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer     Old original one https://github.com/me-no-dev/ESPAsyncWebServer
 #include <ElegantOTA.h>        // If a large bunch of compile error see here :https://docs.elegantota.pro/async-mode
                                // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
@@ -108,7 +121,7 @@ Select below, with only one #define selected, the clock type
                      #endif //FOURLANGUAGECLOCK
 
                      #ifdef NL144CLOCK
-const uint32_t NUM_LEDS  =  144;                                      // How many leds in  strip? + 4 for the minutes
+const uint32_t NUM_LEDS  =  144+4;                                    // How many leds in  strip? + 4 for the minutes
 const byte MATRIX_WIDTH  =  12;                                       // Grid size For digital display mode.  
 const byte MATRIX_HEIGHT =  12;                                       // Grid size For digital display mode.
 // const uint32_t NUM_LEDS  =  256;   // Temporary for 16x16LED WS2812. To clear all LEDs. During uploading LEDs get randomly On and Off
@@ -142,12 +155,50 @@ const byte MATRIX_HEIGHT =  12;                                       // Grid si
 #define NOEN    ColorLeds("noen",   139,142, LetterColor);
 #define UUR     ColorLeds("uur",    134,136, LetterColor);
 #define EDSOFT  ColorLeds("EdSoft", 132,132, LetterColor);
+#define MIN1    ColorLeds("M1",     144,144, LetterColor); 
+#define MIN2    ColorLeds("M2",     145,145, LetterColor);                                   // MINColor); 
+#define MIN3    ColorLeds("M3",     146,146, LetterColor);
+#define MIN4    ColorLeds("M4",     147,147, LetterColor);  
 #define X_OFF   ColorLeds("",         0,  2, 0);
 #define X_ON    ColorLeds("",         0,  2, LetterColor);
 #define NTPT    ColorLed(139, orange);  ColorLed(137, orange);  ColorLed(117, orange);         // NTP
 #define RTCT    ColorLed( 22, green);   ColorLed(  2, green);   ColorLed( 20, green);          // RTC
 #define BLEONOFF ColorLed( 16, blue);   ColorLed( 81, blue);    ColorLed( 61, blue);           // BLE
                      #endif //NL144CLOCK
+                     #ifdef DE144CLOCK
+const uint32_t NUM_LEDS  =  144;                                    // How many leds in  strip? 
+const byte MATRIX_WIDTH  =  12;                                       // Grid size For digital display mode.  
+const byte MATRIX_HEIGHT =  12;                                       // Grid size For digital display mode.
+#define ES      ColorLeds("Es",       1,   2, LetterColor);   
+#define IST     ColorLeds("ist",      4,   6, LetterColor);  ColorLeds("", 8, 10, 0); Is = true;
+#define WAR     ColorLeds("war",      8,  10, LetterColor);  ColorLeds("", 4,  6, 0); Is = false;
+#define GENAU   ColorLeds("genau",   18,  22, LetterColor);
+#define MZEHN   ColorLeds("zehn",    13,  16, LetterColor);
+#define MFUNF   ColorLeds("funf",   383, 386, LetterColor);
+#define VIERTEL ColorLeds("viertel",375, 381, LetterColor);
+#define ZWANZIG ColorLeds("zwanzig",413, 419, LetterColor);
+#define KURZ    ColorLeds("kurz",   421, 424, LetterColor);
+#define VOR     ColorLeds("vor",    433, 435, LetterColor);
+#define NACH    ColorLeds("nach",   427, 430, LetterColor);
+#define HALB    ColorLeds("halb",   465, 468, LetterColor);
+#define FUNF    ColorLeds("funf",   471, 474, LetterColor);
+#define EINS    ColorLeds("eins",   483, 486, LetterColor);
+#define VIERDE  ColorLeds("vier",   478, 481, LetterColor);
+#define ZEHN    ColorLeds("zehn",   514, 517, LetterColor);
+#define ZWOLF   ColorLeds("zwolf",  520, 524, LetterColor);
+#define DREI    ColorLeds("drei",   532, 535, LetterColor);
+#define NEUN    ColorLeds("neun",   526, 529, LetterColor);
+#define ACHTDE  ColorLeds("acht",   565, 568, LetterColor);
+#define SECHS   ColorLeds("sechs",  570, 574, LetterColor);
+#define SIEBEN  ColorLeds("sieben", 580, 585, LetterColor);
+#define ZWEI    ColorLeds("zwei",   575, 578, LetterColor);
+#define ELFDE   ColorLeds("elf",    614, 616, LetterColor);
+#define UHR     ColorLeds("uhr",    621, 623, LetterColor);
+// Future use of characters to blink when a setting is choosen with the rotary encode 
+#define NTPT    ColorLed(139, orange);  ColorLed(137, orange);  ColorLed(117, orange);         // NTP
+#define RTCT    ColorLed( 22, green);   ColorLed(  2, green);   ColorLed( 20, green);          // RTC
+#define BLEONOFF ColorLed( 16, blue);   ColorLed( 81, blue);    ColorLed( 61, blue);           // BLE
+                     #endif //DE144CLOCK
 
                      #ifdef NLM1M2M3M4L114 
 const uint32_t NUM_LEDS  =  114;                                                               // How many leds in  strip? + 4 for the minutes
@@ -444,8 +495,8 @@ const uint32_t greenblue= 0x00F2A0, hotmagenta    = 0xFF00BF, dodgerblue = 0x007
 //------------------------------------------------------------------------------
 // 
 
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-EdSoftLED LEDstrip ;//    = EdSoftLED();                                                         // Use EdSoftLED with ESP32 compiler V3.x.x. Neopixel crashes
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(99, 0, 0)
+EdSoftLED LEDstrip ;//    = EdSoftLED();                                                         // Use EdSoftLED with ESP32 compiler until V3.2.0. Neopixel crashes>
 EdSoftLED LED6812strip = EdSoftLED(NUM_LEDS, LED_PIN, SK6812WRGB);
 EdSoftLED LED2812strip = EdSoftLED(NUM_LEDS, LED_PIN, WS2812RGB);
                       #else
@@ -589,6 +640,7 @@ std::string ReceivedMessageBLE;
 #define SET           1
 #define SET_AND_OK    2
 #define IN_AP_NOT_SET 3
+WiFiEventId_t wifiEventHandler;                                                               // To stop the interrupts or callbacks triggered by WiFi.onEvent(WiFiEvent);, you need to deregister the event handler.
 bool SSIDandNetworkfound = false;                                                             // True if Mem.SSID and a found WIFI.scan'ed network are identical
 bool WIFIwasConnected = false;                                                                // Is WIFI connected?
 bool apMode = false;
@@ -599,11 +651,26 @@ AsyncWebServer server(80);                                                      
 DNSServer dnsServer;
 #include "Webpage.h"                                                                          // The Clock web page
 #include "SoftAP.h"                                                                           // The web page to enter SSID and password of the WIFI router 
-//--------------------------------------------                                                //
+
+//----------------------------------------                                                //
 // NTP
 //----------------------------------------
-boolean syncEventTriggered = false;                                                           // True if a time even has been triggered
-NTPEvent_t ntpEvent;                                                                          // Last triggered event
+boolean SNTPtimeValid = false;                                                               // True if a sntp time has been received
+//NTPEvent_t ntpEvent;      
+
+//----------------------------------------                                                //
+// WPS
+//----------------------------------------
+
+#define ESP_WPS_MODE      WPS_TYPE_PBC
+#define ESP_MANUFACTURER  "ESPRESSIF"
+#define ESP_MODEL_NUMBER  "ESP32"
+#define ESP_MODEL_NAME    "ESPRESSIF IOT"
+#define ESP_DEVICE_NAME   "ESP STATION"
+
+static esp_wps_config_t config;
+
+                                                                  // Last triggered event
 //----------------------------------------
 // Common
 //----------------------------------------
@@ -640,7 +707,10 @@ struct    EEPROMstorage {                                                       
   int  WIFIcredentials  = 0;                                                                  // Status of the WIFI connection. SSID&PWD set or in AP mode
   int  IntFuture2       = 0;                                                                  // For future use
   int  IntFuture3       = 0;                                                                  // For future use
-  int  IntFuture4       = 0;                                                                  // For future use   
+  byte HetIsWasOff      = 0;                                                                  // Turn On or Off HET IS WAS   
+  byte ByteFuture2      = 0;                                                                  // For future use   
+  byte ByteFuture3      = 0;                                                                  // For future use   
+  byte ByteFuture4      = 0;                                                                  // For future use   
   byte UseBLELongString = 0;                                                                  // Send strings longer than 20 bytes per message. Possible in IOS app BLEserial Pro 
   uint32_t OwnColour    = 0;                                                                  // Self defined colour for clock display
   uint32_t DimmedLetter = 0;
@@ -673,7 +743,7 @@ struct    EEPROMstorage {                                                       
  "P Status LED toggle On/Off", 
  "Q Display colour choice",
  "  Q0 Yellow  Q1 Hourly  Q2 White",
-                      #ifdef NL144CLOCK
+                      #if defined NL144CLOCK || defined DE144CLOCK
  "  Q3 All Own Q4 Own Q5 Wheel Q6 Dig",
                       #else
  "  Q3 All Own Q4 Own     Q5 Wheel",
@@ -684,7 +754,7 @@ struct    EEPROMstorage {                                                       
  "S Slope, L Min, M Max  (S50 L5 M200)",
  "W WIFI, X NTP&, CCC BLE, + Fast BLE",
  "#nnn Selftest, RTC: ! See, & Update",
- "Ed Nieuwenhuys january 2025" };
+ "Ed Nieuwenhuys April 2025" };
  
 //  -------------------------------------   End Definitions  ---------------------------------------
 
@@ -745,7 +815,7 @@ void CheckDevices(void)
 {
  CheckBLE();                                                                                  // Something with BLE to do?
  SerialCheck();                                                                               // Check serial port every second 
- NTPsyncEvent();                                                                              // Check for NTP events
+ //NTPsyncEvent();                                                                              // Check for NTP events
  ElegantOTA.loop();                                                                           // For Over The Air updates This loop block is necessary for ElegantOTA to handle reboot after OTA update.
  if (Mem.UseRotary==1) RotaryEncoderCheck(); 
  if (Mem.UseRotary==2) Keypad3x1Check();
@@ -914,6 +984,7 @@ void Reset(void)
  Mem.LowerBrightness  = LOWBRIGHTNESS;                                                        // Lower limit of Brightness in bits ( 0 - 255)
  Mem.TurnOffLEDsAtHH  = 0;                                                                    // Display Off at nn hour
  Mem.TurnOnLEDsAtHH   = 0;                                                                    // Display On at nn hour Not Used
+ Mem.HetIsWasOff      = 0;                                                                    // Turn On or Off HET IS WAS   
  Mem.BLEOn            = 1;                                                                    // default BLE On
  Mem.UseBLELongString = 0;                                                                    // Default off. works only with iPhone/iPad with BLEserial app
  Mem.NTPOn            = 0;                                                                    // NTP default off
@@ -1280,28 +1351,37 @@ void ReworkInputString(String InputString)
              sprintf(sptext,"**** Length fault Q. ****"); 
              if (InputString.length() == 1 )
                {
-             Tekstprintln("  Q0= Default colour");
-             Tekstprintln("  Q1= Hourly colour");
-             Tekstprintln("  Q2= All white");
-             Tekstprintln("  Q3= All Own colour");
-             Tekstprintln("  Q4= Own colour, HETISWAS changing");
-             Tekstprint(  "  Q5= Wheel colour");
-             Tekstprint(  "  Q6= Digital display");
-             sptext[0]=0;
+                Tekstprintln("  Q0= Default colour");
+                Tekstprintln("  Q1= Hourly colour");
+                Tekstprintln("  Q2= All white");
+                Tekstprintln("  Q3= All Own colour");
+                Tekstprintln("  Q4= Own colour, HETISWAS changing");
+                Tekstprintln("  Q5= Wheel colour");
+                Tekstprintln("  Q6= Digital display");
+                Tekstprintln("  Q9= Toggle HET IS WAS on/off");
+                sptext[0]=0;
                }
              if (InputString.length() == 2 )
                {
-                Mem.DisplayChoice = (byte) InputString.substring(1,2).toInt(); 
-                if (Mem.DisplayChoice>6) Mem.DisplayChoice = 0;
-                sprintf(sptext,"Display choice: Q%d", Mem.DisplayChoice);
-                lastminute = 99;                                                              // Force a minute update
+                if (InputString.equalsIgnoreCase("Q9"))                                       // 
+                  { 
+                   Mem.HetIsWasOff = 1 - Mem.HetIsWasOff;
+                   sprintf(sptext,"HET IS WAS is %s",Mem.HetIsWasOff? "OFF" : "ON"); 
+                  }
+                else
+                  {
+                   Mem.DisplayChoice = (byte) InputString.substring(1,2).toInt(); 
+                   if (Mem.DisplayChoice>6) Mem.DisplayChoice = 0;
+                   sprintf(sptext,"Display choice: Q%d", Mem.DisplayChoice);
+                  } 
                }    
-             Displaytime();   
+             lastminute = 99;                                                                 // Force a minute update
+   //          Displaytime();   
              break;
     case 'R':                                                                                 // Reset to default settings 
     case 'r':
              sprintf(sptext,"**** Length fault R. ****");       
-             if (InputString.equals("RRRRR"))                                                   // 
+             if (InputString.equals("RRRRR"))                                                 // 
                { 
                 ResetCredentials();  
                 Reset();              
@@ -1395,7 +1475,12 @@ void ReworkInputString(String InputString)
              break;  
     case 'Z':
     case 'z':
-             sprintf(sptext,"**** No operation");     
+             sprintf(sptext,"**** Start WPS on your router");   
+             WiFi.onEvent(WiFiEvent);
+             WiFi.mode(WIFI_STA);
+             Serial.println("Starting WPS");
+             wpsInitConfig();  
+             wpsStart();
              break;  
 //--------------------------------------------                                                //        
      case '!':                                                                                // Print the NTP, RTC and DS3231 time
@@ -1457,7 +1542,7 @@ void ReworkInputString(String InputString)
              sprintf(sptext,"**** Length fault &. ****");                                     // Forced get NTP time and update the DS32RTC module
              if (InputString.length() == 1)
               {
-               NTP.getTime();                                                                 // Force a NTP time update  
+//               NTP.getTime();                                                                 // Force a NTP time update  
                SetDS3231Time();
                SetRTCTime();    
                PrintAllClockTimes();
@@ -1489,9 +1574,9 @@ void ReworkInputString(String InputString)
                } 
     default: break;
     }
+   Tekstprintln(sptext); 
+   StoreStructInFlashMemory();                                                                  // Update EEPROM                                     
   }  
- Tekstprintln(sptext); 
- StoreStructInFlashMemory();                                                                  // Update EEPROM                                     
  InputString = "";
 }
 
@@ -1636,10 +1721,16 @@ void SetSecondColour(void)
    case WHEELCOLOR   : LetterColor = MINColor = SECColor = Wheel((timeinfo.tm_min*4)); break; // Colour of all letters changes per minute
    case DIGITAL      : MINColor = SECColor = 0;                                        break; // Digital display of time. No IS WAS turn color off in display
   }
-
+ if(Mem.HetIsWasOff){MINColor = SECColor = 0;}                                                 // If HET IS WAS is turned off in menu with Q9
  NoTextInLeds  = true;                                                                        // Flag to control printing of the text IS en WAS in serial
+                    #ifdef DE144CLOCK  
+ if(Is) {IST;} 
+ else {WAR;}                      
+                    #endif  //DE144CLOCK                      
+                    #ifdef NL144CLOCK
  if(Is) {IS;} 
  else {WAS;} 
+                    #endif  //NL144CLOCK
  NoTextInLeds  = false;                                                                       // Flag to control printing of the text IS en WAS in serial
  ShowLeds();                                                                                  // Updating IS and WAS with ShowLeds is done here to avoid updating all letters every second with Displaytime function
 //    Serial.print("SecColor: ");    Serial.println(SECColor,HEX);  
@@ -1704,6 +1795,13 @@ void Selftest(int Delayms)
  NEGEN; Laatzien(Delayms); NACHT; Laatzien(Delayms); ACHT;   Laatzien(Delayms); ZES;     Laatzien(Delayms); ZEVEN;  Laatzien(Delayms);  ELF;   Laatzien(Delayms); 
  NOEN;  Laatzien(Delayms); UUR;   Laatzien(Delayms); EDSOFT; Laatzien(Delayms);
                       #endif  //NL144CLOCK
+                      #ifdef DE144CLOCK                    
+ ES;   Laatzien(Delayms);    IST;    Laatzien(Delayms);   WAR;    Laatzien(Delayms); GENAU; Laatzien(Delayms); MZEHN;  Laatzien(Delayms);  MFUNF; Laatzien(Delayms);    
+ VIERTEL; Laatzien(Delayms); ZWANZIG; Laatzien(Delayms); KURZ;   Laatzien(Delayms); VOR;    Laatzien(Delayms); NACH; Laatzien(Delayms);  HALB;  Laatzien(Delayms);
+ FUNF;  Laatzien(Delayms);   EINS;   Laatzien(Delayms);   VIERDE;   Laatzien(Delayms); ZEHN;    Laatzien(Delayms); ZWOLF; Laatzien(Delayms);  DREI;  Laatzien(Delayms);
+ NEUN; Laatzien(Delayms);   ACHTDE; Laatzien(Delayms);    SECHS;   Laatzien(Delayms); SIEBEN;     Laatzien(Delayms); ZWEI;  Laatzien(Delayms);  ELFDE;   Laatzien(Delayms); 
+ UHR;   Laatzien(Delayms); 
+                      #endif  //DE144CLOCK                      
  Tekstprintln("*");      
 //  Zelftest = false; 
 //  Displaytime();                                                                               // Turn on the LEDs with proper time
@@ -1723,6 +1821,9 @@ void Displaytime()
                      #ifdef NL144CLOCK
     Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
                      #endif  //NL144CLOCK
+                     #ifdef DE144CLOCK
+    German();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
+                     #endif  //DE144CLOCK
                      #if defined NLM1M2M3M4L114  || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L144)
     Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
                      #endif  //NLM1M2M3M4
@@ -1776,6 +1877,7 @@ void Play_Lights()
  WhiteOverRainbow(5, 5, 5 );  // wait, whiteSpeed, whiteLength
  LedsOff();
 }
+                     #ifdef NL144CLOCK
 //--------------------------------------------
 //  LED Blink UUR
 //--------------------------------------------
@@ -1797,6 +1899,31 @@ void BlinkTWAALF(int NoofBlinks, int Delayms)
 {
 for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); TWAALF; Laatzien(Delayms); } 
 }
+                       #endif //NL144CLOCK
+                             
+                       #ifdef DE144CLOCK                                        
+//--------------------------------------------
+//  LED Blink UUR
+//--------------------------------------------
+void BlinkUUR(int NoofBlinks, int Delayms)
+{
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  UHR; Laatzien(Delayms); } 
+}
+//--------------------------------------------                                                //
+//  LED Blink HET IS WAS
+//--------------------------------------------
+void BlinkHETISWAS (int NoofBlinks, int Delayms)
+{ 
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  ES; IST; WAR; Laatzien(Delayms); } 
+}
+//--------------------------------------------                                                //
+//  LED Blink PRECIES
+//--------------------------------------------
+void BlinkTWAALF(int NoofBlinks, int Delayms)
+{
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); ZWOLF; Laatzien(Delayms); } 
+}
+                     #endif //DE144CLOCK
 //--------------------------------------------                                                //
 //  LED Blink BLE 
 //--------------------------------------------
@@ -2002,7 +2129,9 @@ time_t GetTijd(bool printit)
 //--------------------------------------------
 void GetNTPtime(bool printit)
 {
- NTP.getTime();                                                                               // Force a NTP time update 
+ // NTP.getTime();  
+  wait4SNTP();
+                                                                              // Force a NTP time update 
  if(printit) PrintNTPtime();
 }
 //--------------------------------------------                                                //
@@ -2010,8 +2139,11 @@ void GetNTPtime(bool printit)
 //--------------------------------------------
 void PrintNTPtime(void)
 {
- sprintf(sptext,"%s  ", NTP.getTimeDateString());  
- Tekstprint(sptext);              // 17/10/2022 16:08:15
+  getLocalTime(&timeinfo); //   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  PrintRTCTime(); 
+
+//  sprintf(sptext,"%s  ", NTP.getTimeDateString());  
+//  Tekstprint(sptext);              // 17/10/2022 16:08:15
 }
 
 //--------------------------------------------                                                //
@@ -2028,6 +2160,7 @@ void PrintUTCtime(void)
      UTCtime->tm_mday,UTCtime->tm_mon+1,UTCtime->tm_year+1900);
  Tekstprint(sptext);   
 }
+
 //--------------------------------------------                                                //
 // Rotary encoder Init 
 //--------------------------------------------
@@ -2050,6 +2183,8 @@ void PrintUTCtime(void)
  sprintf(sptext,"3*1 keypad %s used", Mem.UseRotary==2?"IS":"NOT");
  Tekstprintln(sptext);
  }
+
+ //--------------------------- Time functions --------------------------
 //--------------------------------------------                                                //
 // DS3231 Init module
 //--------------------------------------------
@@ -2171,10 +2306,10 @@ void PrintTimeHMS(byte format)
 void SetRTCTime(void) 
 { 
  time_t t = mktime(&timeinfo);                                                                // t= unixtime
- setRTCTime(t);
+ SetRTCTime(t);
 }  
 
-void setRTCTime(time_t t)
+void SetRTCTime(time_t t)
 { 
  // time_t t = mktime(&timeinfo);  // t= unixtime
  sprintf(sptext, "Setting time: %s", asctime(&timeinfo));    Tekstprintln(sptext);
@@ -2359,7 +2494,6 @@ switch (sayhour)
   case  2: 
   case  3: UUR;  break; 
  }
-/*
   switch (timeinfo.tm_min % 5)                                                                // The minutes modulo 5
  {
   case  0: break;
@@ -2368,12 +2502,10 @@ switch (sayhour)
   case  3: MIN1; MIN2; MIN3; break;
   case  4: MIN1; MIN2; MIN3; MIN4;  
  }  
-*/
-
 }
                                     #endif //NL144CLOCK
 
-                                    #if (defined NLM1M2M3M4L114) || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L144)
+                                    #if defined NLM1M2M3M4L114 || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L144)
 void Dutch(void)
 {
 HET;                                                                                          // HET  is always on
@@ -2608,7 +2740,7 @@ switch (sayhour)
  }
 }
                      #endif //UK
-                     #ifdef DE
+                     #if defined DE || defined DE144CLOCK
 //--------------------------------------------                                                //
 //  CLOCK German clock display
 //--------------------------------------------
@@ -2864,9 +2996,9 @@ void SendMessageBLE(std::string Message)
 class MyServerCallbacks: public NimBLEServerCallbacks 
 {
  void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override 
-    {deviceConnected = true; Serial.println("Connected" ); };
+    {deviceConnected = true; Serial.println("BLE Connected" ); };
  void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override 
-    {deviceConnected = false; Serial.println("NOT Connected" );}
+    {deviceConnected = false; Serial.println("BLE NOT Connected" );}
 };
   
 class MyCallbacks: public NimBLECharacteristicCallbacks 
@@ -2956,7 +3088,7 @@ void WiFiEvent(WiFiEvent_t event)
 {
   sprintf(sptext,"[WiFi-event] event: %d  : ", event); 
   Tekstprint(sptext);
- // WiFiEventInfo_t info;
+  WiFiEventInfo_t info;
     switch (event) 
      {
         case ARDUINO_EVENT_WIFI_READY: 
@@ -2977,42 +3109,47 @@ void WiFiEvent(WiFiEvent_t event)
        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
             sprintf(sptext,"WiFi lost connection.");                                          // Reason: %d",info.wifi_sta_disconnected.reason); 
             Tekstprintln(sptext);
-              // WiFi.disconnect();
-              // WIFIwasConnected = false; 
-//            WiFi.reconnect();
+ //           WiFi.reconnect(); is checked in EveryMinuteUpdate()
             break;
         case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
             Tekstprintln("Authentication mode of access point has changed");
             break;
         case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-            sprintf(sptext, "Obtained IP address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+//            sprintf(sptext,"Connected to : %s %s",WiFi.SSID().c_str(), WiFi.psk().c_str()  );
+            sprintf(sptext,"Connected to : %s",WiFi.SSID().c_str());
             Tekstprintln(sptext);
+            sprintf(sptext, "Obtained IP address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+            Tekstprintln(sptext);         
+            strcpy(Mem.SSID,      WiFi.SSID().c_str());
+            strcpy(Mem.Password , WiFi.psk().c_str());                                         // Store SSID and password
+            Mem.NTPOn        = 1;                                                              // NTP On
+            Mem.WIFIOn       = 1;                                                              // WIFI On  
+            StoreStructInFlashMemory();  
             break;
         case ARDUINO_EVENT_WIFI_STA_LOST_IP:
             Tekstprintln("Lost IP address and IP address is reset to 0");
             break;
         case ARDUINO_EVENT_WPS_ER_SUCCESS:
-     //      txtstr = WiFi.SSID().c_str();
-           sprintf(sptext, "WPS Successfull, stopping WPS and connecting to: %s: ", WiFi.SSID().c_str());
-           Tekstprintln(sptext);
-//            wpsStop();
-//            delay(10);
-//            WiFi.begin();
+            wpsStop();
+            delay(100);
+            WiFi.begin();
+            delay(200);
+             sprintf(sptext, "WPS Successfull, stopping WPS and connecting to: %s: ", WiFi.SSID().c_str());
+            Tekstprintln(sptext);       
             break;
         case ARDUINO_EVENT_WPS_ER_FAILED:
             Tekstprintln("WPS Failed, retrying");
-//            wpsStop();
-//            wpsStart();
+            wpsStop();
+            wpsStart();
             break;
         case ARDUINO_EVENT_WPS_ER_TIMEOUT:
-            Tekstprintln("WPS Timedout, retrying");
-//            wpsStop();
-//            wpsStart();
+            Tekstprintln("WPS Timedout, Start WPS again");
+            wpsStop();
+            // wpsStart();
             break;
         case ARDUINO_EVENT_WPS_ER_PIN:
- //           txtstr = wpspin2string(info.wps_er_pin.pin_code).c_str();
-//            sprintf(sptext,"WPS_PIN = %s",txtstr);
-//            Tekstprintln(sptext);
+            sprintf(sptext,"WPS_PIN = %s",wpspin2string(info.wps_er_pin.pin_code).c_str());
+            Tekstprintln(sptext);
             break;
         case ARDUINO_EVENT_WIFI_AP_START:
             Tekstprintln("WiFi access point started");
@@ -3060,35 +3197,35 @@ void WiFiEvent(WiFiEvent_t event)
         default: break;
     }
 }
-//--------------------------------------------                                                //
-// NTP Check NTP SyncEvent 
-//--------------------------------------------
-void NTPsyncEvent(void)
-{
-    if (syncEventTriggered) 
-    {
-      syncEventTriggered = false;
-      processSyncEvent (ntpEvent);
-    }
-}
-//--------------------------------------------                                                //
-// NTP processSyncEvent 
-//--------------------------------------------
-void processSyncEvent (NTPEvent_t ntpEvent) 
-{
- switch (ntpEvent.event) 
-    {
-        case timeSyncd:
-        case partlySync:
-        case syncNotNeeded:
-        case accuracyError:
-            sprintf(sptext,"[NTP-event] %s", NTP.ntpEvent2str (ntpEvent));
-            Tekstprintln(sptext);
-            break;
-        default:
-            break;
-    }
-}
+// //--------------------------------------------                                                //
+// // NTP Check NTP SyncEvent 
+// //--------------------------------------------
+// void NTPsyncEvent(void)
+// {
+//     if (syncEventTriggered) 
+//     {
+//       syncEventTriggered = false;
+//       processSyncEvent (ntpEvent);
+//     }
+// }
+// //--------------------------------------------                                                //
+// // NTP processSyncEvent 
+// //--------------------------------------------
+// void processSyncEvent (NTPEvent_t ntpEvent) 
+// {
+//  switch (ntpEvent.event) 
+//     {
+//         case timeSyncd:
+//         case partlySync:
+//         case syncNotNeeded:
+//         case accuracyError:
+//             sprintf(sptext,"[NTP-event] %s", NTP.ntpEvent2str (ntpEvent));
+//             Tekstprintln(sptext);
+//             break;
+//         default:
+//             break;
+//     }
+// }
 
 
 //--------------------------------------------                                                //
@@ -3101,9 +3238,9 @@ void processSyncEvent (NTPEvent_t ntpEvent)
   WiFi.mode(WIFI_STA);                                                                         // Set WiFi to station mode and disconnect from an AP if it was previously connected.
   WiFi.disconnect(); 
   WIFIwasConnected = false;
+  Tekstprintln("Scanning for networks");
   int n = WiFi.scanNetworks();                                                                // WiFi.scanNetworks will return the number of networks found
   SSIDandNetworkfound = false;
-  Tekstprintln("Scanning for networks");
   if (n == 0) { Tekstprintln("no networks found"); return false;} 
   else 
     { 
@@ -3210,7 +3347,7 @@ void StartWIFI_NTP(void)
  WiFi.mode(WIFI_STA);  
  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
  WIFIwasConnected = false;
- WiFi.onEvent(WiFiEvent);                                                                     // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
+ wifiEventHandler = WiFi.onEvent(WiFiEvent);                                                  //                   // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
  WiFi.begin(Mem.SSID, Mem.Password);
  MDNS.begin(Mem.BLEbroadcastName);                                                            // After reset http://wordclock.local 
  int tryDelay = 5000;                                                                         // Will try for about 50 seconds (20x 10,000ms)
@@ -3240,7 +3377,7 @@ void StartWIFI_NTP(void)
      case WL_CONNECTED:
           sprintf(sptext, "IP Address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
           Tekstprintln(sptext); 
-          WIFIwasConnected = true;
+          WIFIwasConnected = true;                                                            // No we know the SSID ans password are correct and we can reconnect
           Mem.WIFIcredentials = SET_AND_OK;
           break;
      default:
@@ -3289,14 +3426,53 @@ ElegantOTA.begin(&server);                                                      
                                                                                                 // Save the changes to the ElegantOTA.h file.   
 if(Mem.NTPOn )
   { 
-   NTP.setTimeZone(Mem.Timezone);                                                             // TZ_Europe_Amsterdam); //\TZ_Etc_GMTp1); // TZ_Etc_UTC 
-   NTP.begin();  // crashes core 3.1 here ****                                                                           // https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
-   NTP.onNTPSyncEvent([](NTPEvent_t event){ntpEvent=event; syncEventTriggered=true;});
-   Tekstprintln("NTP is On");
+  initSNTP();
+  if(wait4SNTP())  Tekstprintln("NTP is On and synced");
+  else             Tekstprintln("NTP is On but NOT synced");
+  //  NTP.setTimeZone(Mem.Timezone);                                                             // TZ_Europe_Amsterdam); //\TZ_Etc_GMTp1); // TZ_Etc_UTC 
+  //  NTP.begin();  // crashes core 3.1 here ****                                                                           // https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
+  //  NTP.onNTPSyncEvent([](NTPEvent_t event){ntpEvent=event; syncEventTriggered=true;});
+  // Tekstprintln("NTP is On");
    }   
  if(Mem.WIFIOn) WebPage();                                                                    // Show the web page if WIFI is on
  Tekstprint("Web page started\n");
+ WiFi.removeEvent(wifiEventHandler);                                                          // Remove the WIFI event handler
 }
+
+//--------------------------------------------                                                //
+// NTP 
+//--------------------------------------------
+void NTPnotify(struct timeval* t) 
+{  
+  Tekstprintln("*** NTP time synchronized ***");
+  
+}
+
+void initSNTP() {  
+  sntp_set_sync_interval(1 * 60 * 60 * 1000UL);  // 1 hour
+  sntp_set_time_sync_notification_cb(NTPnotify);
+  esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+  esp_sntp_setservername(0, "pool.ntp.org");
+  esp_sntp_init();
+  setTimezone();
+}
+
+bool wait4SNTP() 
+{
+ int32_t Tick = millis(); 
+ SNTPtimeValid = true;
+ while (sntp_get_sync_status() != SNTP_SYNC_STATUS_COMPLETED) 
+  { if ((millis() - Tick) >5000) {SNTPtimeValid = false; break;}   }                          // Wait max 5 seconds 
+return  SNTPtimeValid;
+}
+
+void setTimezone() 
+{  
+  setenv("TZ", Mem.Timezone, 1);
+  tzset();
+}
+
+
 
 //--------------------------------------------                                                //
 // WIFI WEBPAGE 
@@ -3383,6 +3559,41 @@ void StartAPMode(void)
  Serial.print("AP SSID: ");       Serial.println(AP_SSID);
  Serial.print("AP IP Address: "); Serial.println(WiFi.softAPIP());       
 }
+
+//--------------------------------------------                                                //
+// WIFI WPS functions
+//--------------------------------------------
+void wpsInitConfig()
+{
+  config.wps_type = ESP_WPS_MODE;
+  strcpy(config.factory_info.manufacturer, ESP_MANUFACTURER);
+  strcpy(config.factory_info.model_number, ESP_MODEL_NUMBER);
+  strcpy(config.factory_info.model_name, ESP_MODEL_NAME);
+  strcpy(config.factory_info.device_name, ESP_DEVICE_NAME);
+}
+
+void wpsStart()
+{
+ if(esp_wifi_wps_enable(&config))  Serial.println("WPS Enable Failed");
+ else if(esp_wifi_wps_start(0)) 	 Serial.println("WPS Start Failed");
+}
+
+void wpsStop()
+{
+ if(esp_wifi_wps_disable()) 	     Serial.println("WPS Disable Failed");
+}
+
+String wpspin2string(uint8_t a[])
+{
+ char wps_pin[9];
+ for(int i=0;i<8;i++){ wps_pin[i] = a[i]; }
+ wps_pin[8] = '\0';
+ return (String)wps_pin;
+}
+//--------------------------------------------                                                //
+// End WPS
+//--------------------------------------------
+
 
                                   #ifdef ONEWIREKEYPAD3x4
 //--------------------------------------------                                                //
