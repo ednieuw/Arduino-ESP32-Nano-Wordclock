@@ -37,34 +37,51 @@
                After ESP32 restart the StartWordclock WIFI station will be restarted.
                Wire.begin(); // Keep Wire.begin close to the first I2C start to avoid WireTimeout()
  Changes V070: Added M1M2M3M4 in NL144. Added Option Q9 HET IS WAS on or Off
-
-//ToDo
-- implement ChangeNTP_RTC
-- Port to ESP32 V3.1.0
-- Check SK6812 on V3.1. Flickers in 3.0.7
-- Replace? NimBLE https://docs.espressif.com/projects/arduino-esp32/en/latest/api/ble.html
-- 
+ Changes V071: Removed #include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+ Changes V072: German lay-out for single language clock
+ Changes V073: Turned off WIFIevents
+ Changes V074: ESP32 V3.2.0 and ADAfruit Neopixel 1.12.5 works.
+ Changes V075: Added WPS (Option Z in menu) and added "remove WIFI Eventhandler" to stop the WIFI events WiFi.removeEvent(wifiEventHandler);
+ Changes V076: Added Fire
+ Changes V077: Own OTA added. Removed <ElegantOTA.h>
+ Changes V078: WprintTekstln optimized
+ Changes V079: OTA restart after update and back to Menu-html page
+ Changes V080: cleanup
+ Changes V081: Added 92 LEDs NL design. Minor changes in the menu. 
+ Changes V082: Date-time in header HTML-page 
+ Changes V083: Mem.PreExtraLEDs
+ Changes V084: Removed Mem.PreExtraLEDs. Repaired RotaryEncoder. Must use GPIO ports for encoder library and rewrote rotary coding.
+ Changes V085: Minor changes
+ Changes V086: Semaphore test - failed
+ Changes V087: Semaphore test - failed 
+ Changes V088: Use of rotary and DS3231 usage optimized in menu. NTP off when DS3231 and rotary on. 
+ Changes V089: In webpage last input removed from url
+ Changes V090: Added LEDstrip update semaphore mutex
+ Changes V091: Replaced AsyncWebserver en AsyncTCP with standard ESP32 Webserver library. This app does not need Async. 
+               (NB loop counts drops from 210000 to 1000 loops/sec)
+ Changes V092: Compiles with ESP32 core 3.2.0 and Adafruit NeoPixel at version 1.13.0. Removed EdSoftLED.h
+ Changes V093: Added small menu
+ Changes V094: Replaced NIMBLE with ESP32 BLE
+ Changes V095: Cleanup code. New function LEDstartup
+ Changes V096: Removed ESP32 BLE. Caused restarts in ESP32 3.2.0. NimBLE works fine and probably better.
 
 How to compile: 
-
-Check if ELEGANTOTA_USE_ASYNC_WEBSERVER 1 in ElegantOTA.h stored in the libraries folder
-// Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
-// #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
-
-
 Install ESP32 boards
 Board: Arduino Nano ESP32
 Partition Scheme: With FAT
-Pin Numbering: By GPIO number (legacy). Not  By Arduino pin (default)
+Pin Numbering: By GPIO number (legacy). Not 'By Arduino pin (default)'
+
 Select below, with only one #define selected, the clock type
 
 */
 // =============================================================================================================================
 // ------------------>   Define only one clock type
 //#define FOURLANGUAGECLOCK
-#define NL144CLOCK
+//#define NL144CLOCK              // Dutch display for 12 x 12 Front
+//#define NL92CLOCK               // Dutch display for one LED behind every character
+//#define DE144CLOCK              // German display for 12 x 12 Front
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
-//#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
+#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
 //--------------------------------------------
 // ESP32 Definition of installed modules
@@ -77,26 +94,19 @@ Select below, with only one #define selected, the clock type
 //--------------------------------------------
 
 #include <Preferences.h>
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-#include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
-                      #else
 #include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
-                      #endif
 #include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
-#include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
 #include <WiFi.h>              // Used for web page 
-#include <AsyncTCP.h>          // Used for webpage                                                         old https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer     Old original one https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ElegantOTA.h>        // If a large bunch of compile error see here :https://docs.elegantota.pro/async-mode
-                               // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
-                               // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
+#include <WebServer.h>         // Used for web page 
+#include "esp_sntp.h"          // for NTP
+#include "esp_wps.h"           // For WPS
+#include <Update.h>            // For Over-the-Air (OTA)
 #include <ESPmDNS.h>           // To show BLEname in router
 #include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
 #include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
 #include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
 #include <Encoder.h>           // For rotary encoder
 #include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
-
 
 //------------------------------------------------------------------------------
 // ARDUINO Definition of installed language word clock
@@ -107,7 +117,6 @@ Select below, with only one #define selected, the clock type
 #define DE
 #define FR    
                      #endif //FOURLANGUAGECLOCK
-
                      #ifdef NL144CLOCK
 const uint32_t NUM_LEDS  =  144+4;                                    // How many leds in  strip? + 4 for the minutes
 const byte MATRIX_WIDTH  =  12;                                       // Grid size For digital display mode.  
@@ -142,24 +151,90 @@ const byte MATRIX_HEIGHT =  12;                                       // Grid si
 #define ELF     ColorLeds("elf",    128,130, LetterColor);
 #define NOEN    ColorLeds("noen",   139,142, LetterColor);
 #define UUR     ColorLeds("uur",    134,136, LetterColor);
-#define EDSOFT  ColorLeds("EdSoft", 132,132, LetterColor);
+#define EDSOFT  ColorLeds("EdSoft", 148,148, LetterColor);
 #define MIN1    ColorLeds("M1",     144,144, LetterColor); 
-#define MIN2    ColorLeds("M2",     145,145, LetterColor);                                   // MINColor); 
+#define MIN2    ColorLeds("M2",     145,145, LetterColor);                                    // MINColor); 
 #define MIN3    ColorLeds("M3",     146,146, LetterColor);
 #define MIN4    ColorLeds("M4",     147,147, LetterColor);  
 #define X_OFF   ColorLeds("",         0,  2, 0);
 #define X_ON    ColorLeds("",         0,  2, LetterColor);
-#define NTPT    ColorLed(139, orange);  ColorLed(137, orange);  ColorLed(117, orange);         // NTP
-#define RTCT    ColorLed( 22, green);   ColorLed(  2, green);   ColorLed( 20, green);          // RTC
-#define BLEONOFF ColorLed( 16, blue);   ColorLed( 81, blue);    ColorLed( 61, blue);           // BLE
                      #endif //NL144CLOCK
+                     #ifdef NL92CLOCK
+const uint32_t NUM_LEDS  =  92;                                                               // How many leds in  strip?
+const byte MATRIX_WIDTH  =  10;                                                               // Grid size For digital display mode.  
+const byte MATRIX_HEIGHT =  10;                                                               // Grid size For digital display mode.
+
+#define HET     ColorLeds("Het",     0,   2, MINColor); 
+#define IS      ColorLeds("is",      3,   4, SECColor);  ColorLeds("", 5, 7, 0); Is = true;
+#define WAS     ColorLeds("was",     5,   7, SECColor);  ColorLeds("", 3, 4, 0); Is = false;
+#define MVIJF   ColorLeds("vijf",    12, 15, LetterColor); 
+#define MTIEN   ColorLeds("tien",    8,  11, LetterColor);
+#define KWART   ColorLeds("kwart",   16, 20, LetterColor);
+#define VOOR    ColorLeds("voor",    21, 24, LetterColor);
+#define OVER    ColorLeds("over",    32, 35, LetterColor);
+#define PRECIES ColorLeds("precies", 25, 31, LetterColor);
+#define HALF    ColorLeds("half",    36, 39, LetterColor);
+#define ELF     ColorLeds("elf",     40, 42, LetterColor);
+#define VIJF    ColorLeds("vijf",    47, 50, LetterColor);
+#define TWEE    ColorLeds("twee",    43, 46, LetterColor);
+#define EEN     ColorLeds("een",     51, 53, LetterColor);
+#define VIER    ColorLeds("vier",    54, 57, LetterColor);
+#define TIEN    ColorLeds("tien",    64, 67, LetterColor);
+#define TWAALF  ColorLeds("twaalf",  58, 63, LetterColor);
+#define DRIE    ColorLeds("drie",    68, 71, LetterColor);
+#define NEGEN   ColorLeds("negen",   72, 76, LetterColor);
+#define ACHT    ColorLeds("acht",    80, 83, LetterColor);
+#define ZES     ColorLeds("zes",     77, 79, LetterColor);
+#define ZEVEN   ColorLeds("zeven",   84, 88, LetterColor);
+#define UUR     ColorLeds("uur",     89,91, LetterColor);
+#define EDSOFT  ColorLeds("EdSoft",  92,92, LetterColor);
+#define X_OFF   ColorLeds("",         0,  2, 0);
+#define X_ON    ColorLeds("",         0,  2, LetterColor);
+#define MIN1    ColorLeds("M1",     144,144, LetterColor); 
+#define MIN2    ColorLeds("M2",     145,145, LetterColor);                                    // MINColor); 
+#define MIN3    ColorLeds("M3",     146,146, LetterColor);
+#define MIN4    ColorLeds("M4",     147,147, LetterColor);  
+#define X_OFF   ColorLeds("",         0,  2, 0);
+#define X_ON    ColorLeds("",         0,  2, LetterColor);
+                     #endif //NL92CLOCK
+
+                     #ifdef DE144CLOCK
+const uint32_t NUM_LEDS  =  144;                                                              // How many leds in  strip? 
+const byte MATRIX_WIDTH  =  12;                                                               // Grid size For digital display mode.  
+const byte MATRIX_HEIGHT =  12;                                                               // Grid size For digital display mode.
+#define ES      ColorLeds("Es",       1,   2, LetterColor);   
+#define IST     ColorLeds("ist",      4,   6, LetterColor);  ColorLeds("", 8, 10, 0); Is = true;
+#define WAR     ColorLeds("war",      8,  10, LetterColor);  ColorLeds("", 4,  6, 0); Is = false;
+#define GENAU   ColorLeds("genau",   18,  22, LetterColor);
+#define MZEHN   ColorLeds("zehn",    13,  16, LetterColor);
+#define MFUNF   ColorLeds("funf",   383, 386, LetterColor);
+#define VIERTEL ColorLeds("viertel",375, 381, LetterColor);
+#define ZWANZIG ColorLeds("zwanzig",413, 419, LetterColor);
+#define KURZ    ColorLeds("kurz",   421, 424, LetterColor);
+#define VOR     ColorLeds("vor",    433, 435, LetterColor);
+#define NACH    ColorLeds("nach",   427, 430, LetterColor);
+#define HALB    ColorLeds("halb",   465, 468, LetterColor);
+#define FUNF    ColorLeds("funf",   471, 474, LetterColor);
+#define EINS    ColorLeds("eins",   483, 486, LetterColor);
+#define VIERDE  ColorLeds("vier",   478, 481, LetterColor);
+#define ZEHN    ColorLeds("zehn",   514, 517, LetterColor);
+#define ZWOLF   ColorLeds("zwolf",  520, 524, LetterColor);
+#define DREI    ColorLeds("drei",   532, 535, LetterColor);
+#define NEUN    ColorLeds("neun",   526, 529, LetterColor);
+#define ACHTDE  ColorLeds("acht",   565, 568, LetterColor);
+#define SECHS   ColorLeds("sechs",  570, 574, LetterColor);
+#define SIEBEN  ColorLeds("sieben", 580, 585, LetterColor);
+#define ZWEI    ColorLeds("zwei",   575, 578, LetterColor);
+#define ELFDE   ColorLeds("elf",    614, 616, LetterColor);
+#define UHR     ColorLeds("uhr",    621, 623, LetterColor);
+                     #endif //DE144CLOCK
 
                      #ifdef NLM1M2M3M4L114 
-const uint32_t NUM_LEDS  =  114;                                                               // How many leds in  strip? + 4 for the minutes
-const byte MATRIX_WIDTH  =  11;                                                                // NA Not used in this clock. 10 is fine 
-const byte MATRIX_HEIGHT =  10;                                                                // NA Not used in this clock. 10 is fine 
+const uint32_t NUM_LEDS  =  114;                                                              // How many leds in  strip? + 4 for the minutes
+const byte MATRIX_WIDTH  =  11;                                                               // NA Not used in this clock. 10 is fine 
+const byte MATRIX_HEIGHT =  10;                                                               // NA Not used in this clock. 10 is fine 
                    
-#define HET     ColorLeds("Het",      0,   2, MINColor);                                       // Special adapted clock face
+#define HET     ColorLeds("Het",      0,   2, MINColor);                                      // Special adapted clock face
 #define IS      ColorLeds("is",       4,   5, SECColor);     Is = true;    //ColorLeds("", 4, 5, 0); 
 #define WAS     ColorLeds("was",      4,   5, SECColor);     Is = false;  // ColorLeds("", 4, 5, 0); 
 #define MVIJF   ColorLeds("vijf",     7,  10, LetterColor); 
@@ -187,15 +262,13 @@ const byte MATRIX_HEIGHT =  10;                                                 
 #define MIN2    ColorLeds("M2",     111, 111, LetterColor);                                   // MINColor); 
 #define MIN3    ColorLeds("M3",     112, 112, LetterColor);
 #define MIN4    ColorLeds("M4",     113, 113, LetterColor);    
-#define NTPT    ColorLed( 96, orange);  ColorLed( 97, orange);  ColorLed( 98, orange);        // NTP
-#define RTCT    ColorLed( 22, green);   ColorLed( 23, green);   ColorLed( 24, green);         // RTC
-#define BLEONOFF ColorLed( 80, blue);   ColorLed( 81, blue);    ColorLed( 82, blue);          // BLE
+#define EDSOFT  ColorLeds("EdSoft", 114, 124, LetterColor);
                      #endif //NLM1M2M3M4L114
 
                      #ifdef NLM1M2M3M4L144
-const uint32_t NUM_LEDS  =  144;                                    // How many leds in  strip? + 4 for the minutes
-const byte MATRIX_WIDTH  =  12;                                    // NA Not used in this clock. 10 is fine 
-const byte MATRIX_HEIGHT =  12;                                    // NA Not used in this clock. 10 is fine 
+const uint32_t NUM_LEDS  =  144;                                                              // How many leds in  strip? + 4 for the minutes
+const byte MATRIX_WIDTH  =  12;                                                               // NA Not used in this clock. 10 is fine 
+const byte MATRIX_HEIGHT =  12;                                                               // NA Not used in this clock. 10 is fine 
                    
 #define HET     ColorLeds("Het",      0,   4, MINColor);           // Special adapted clock face
 #define IS      ColorLeds("is",       5,   7, SECColor);     Is = true;    //ColorLeds("", 4, 5, 0); 
@@ -225,9 +298,6 @@ const byte MATRIX_HEIGHT =  12;                                    // NA Not use
 #define MIN2    ColorLeds("M2",     141, 141, LetterColor);       //MINColor); 
 #define MIN3    ColorLeds("M3",     142, 142, LetterColor);
 #define MIN4    ColorLeds("M4",     143, 143, LetterColor);    
-#define NTPT    ColorLed(139, orange);  ColorLed(137, orange);  ColorLed(117, orange);         // NTP
-#define RTCT    ColorLed( 22, green);   ColorLed(  2, green);   ColorLed( 20, green);          // RTC
-#define BLEONOFF ColorLed( 16, blue);   ColorLed( 81, blue);    ColorLed( 61, blue);           // BLE
                      #endif //NLM1M2M3M4L144
 
                      #ifdef NLM1M2M3M4L256
@@ -263,9 +333,7 @@ const byte MATRIX_HEIGHT =  16;                                                 
 #define MIN2    ColorLeds("M2",      253, 253, LetterColor);       //MINColor); 
 #define MIN3    ColorLeds("M3",      254, 254, LetterColor);
 #define MIN4    ColorLeds("M4",      255, 255, LetterColor); 
-#define NTPT    ColorLed( 96, orange);  ColorLed( 97, orange);  ColorLed( 98, orange);        // NTP
-#define RTCT    ColorLed( 22, green);   ColorLed( 23, green);   ColorLed( 24, green);         // RTC
-#define BLEONOFF ColorLed( 80, blue);   ColorLed( 81, blue);    ColorLed( 82, blue);          // BLE
+#define EDSOFT  ColorLeds("EdSoft",  256, 256, LetterColor);
                      #endif //NLM1M2M3M4L256
                                              #ifdef FOURLANGUAGECLOCK                                             
 const uint32_t  NUM_LEDS = 625;                                                               // How many leds in  strip?
@@ -402,7 +470,7 @@ const byte OWNCOLOUR     = 3;
 const byte OWNHETISCLR   = 4;
 const byte WHEELCOLOR    = 5;
 const byte DIGITAL       = 6;
-const byte ANALOOG       = 7;
+const byte RANDOM        = 7;
 
 //------------------------------------------------------------------------------
 // PIN Assigments for Arduino Nano ESP32
@@ -411,10 +479,10 @@ const byte ANALOOG       = 7;
 enum DigitalPinAssignments {      // Digital hardware constants ATMEGA 328 ----
  SERRX        = D0,               // D1 Connects to Bluetooth TX
  SERTX        = D1,               // D0 Connects to Bluetooth RX
- encoderPinB  = D2,               // D8 left (labeled CLK on decoder)no interrupt pin   
- encoderPinA  = D3,               // D3 right (labeled DT on decoder)on interrupt  pin
- clearButton  = D4,               // D4 switch (labeled SW on decoder)
- LED_PIN      = D5,               // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
+ encoderPinB  = 5,                // D2 left (labeled CLK on decoder)no interrupt pin (Use GPIO pin numbering for rotary encoder lib)  
+ encoderPinA  = 6,                // D3 right (labeled DT on decoder)on interrupt pin
+ clearButton  = 7,                // D4 switch (labeled SW on decoder)
+ LED_PIN      = 8,                // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
  PCB_LED_D09  = D9,               // D9
  PCB_LED_D10  = D10,              // D10
  secondsPin   = 48,               // D13  GPIO48 (#ifdef LED_BUILTIN  #undef LED_BUILTIN #define LED_BUILTIN 48 #endif)
@@ -429,8 +497,6 @@ enum AnaloguePinAssignments {     // Analogue hardware constants ----
  SCL_pin      = A5,               // SCL pin
  EmptyA6     =  A6,               // Empty
  EmptyA7     =  A7};              // Empty
-
-byte ResetDisplayChoice  = DEFAULTCOLOUR; 
 
 //------------------------------------------------------------------------------
 const uint32_t black    = 0x000000, darkorange    = 0xFF8C00, red        = 0xFF0000, chartreuse   = 0x7FFF00;
@@ -448,17 +514,13 @@ const uint32_t greenblue= 0x00F2A0, hotmagenta    = 0xFF00BF, dodgerblue = 0x007
 // LED
 //------------------------------------------------------------------------------
 // 
+// Create a mutex (semaphore) to protect LED updates
+//SemaphoreHandle_t ledMutex;
 
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-EdSoftLED LEDstrip ;//    = EdSoftLED();                                                         // Use EdSoftLED with ESP32 compiler V3.x.x. Neopixel crashes
-EdSoftLED LED6812strip = EdSoftLED(NUM_LEDS, LED_PIN, SK6812WRGB);
-EdSoftLED LED2812strip = EdSoftLED(NUM_LEDS, LED_PIN, WS2812RGB);
-                      #else
-// LED_PIN = 8;  // bug in Neopixel library. Does not translate D5 to GPIO 8
 Adafruit_NeoPixel LEDstrip;
-Adafruit_NeoPixel LED6812strip = Adafruit_NeoPixel(NUM_LEDS, 8, NEO_GRBW + NEO_KHZ800); // NEO_RGBW
-Adafruit_NeoPixel LED2812strip = Adafruit_NeoPixel(NUM_LEDS, 8, NEO_GRB  + NEO_KHZ800); // NEO_RGB NEO_GRB
-                      #endif
+Adafruit_NeoPixel LED6812strip = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRBW + NEO_KHZ800); // NEO_RGBW
+Adafruit_NeoPixel LED2812strip = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB  + NEO_KHZ800); // NEO_RGB NEO_GRB
+
                       
 uint32_t MINColor      = chromeyellow;
 uint32_t SECColor      = chromeyellow;  
@@ -509,7 +571,6 @@ const byte PROGMEM Getal[10][3][5]  = {
 #define DS3231_TEMPERATURE_LSB      0x12
 
 RTC_DS3231 RTCklok; 
-DateTime Inow;
 bool DS3231Installed = false;                                                                     // True if the DS3231 is detected
 //------------------------------------------------------------------------------
 // KY-040 ROTARY
@@ -569,9 +630,9 @@ uint32_t   NoofLDRreadshour   = 0;
 static uint32_t msTick;                                                                       // Number of millisecond ticks since we last incremented the second counter
 byte      lastminute = 0, lasthour = 0, lastday = 0, sayhour = 0;
 bool      Demo                 = false;
+bool      FireDisplay          = false;
 bool      Zelftest             = false;
 bool      Is                   = true;                                                        // Toggle of displaying Is or Was
-bool      ZegUur               = true;                                                        // Say or not say Uur in NL clock
 struct    tm timeinfo;                                                                        // storage of time 
 
 //--------------------------------------------                                                //
@@ -581,7 +642,7 @@ BLEServer *pServer      = NULL;
 BLECharacteristic * pTxCharacteristic;
 bool deviceConnected    = false;
 bool oldDeviceConnected = false;
-std::string ReceivedMessageBLE;
+std::string ReceivedMessageBLE = "";
 
 #define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"                         // UART service UUID
 #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -594,35 +655,41 @@ std::string ReceivedMessageBLE;
 #define SET           1
 #define SET_AND_OK    2
 #define IN_AP_NOT_SET 3
-bool SSIDandNetworkfound = false;                                                             // True if Mem.SSID and a found WIFI.scan'ed network are identical
-bool WIFIwasConnected = false;                                                                // Is WIFI connected?
-bool apMode = false;
-bool apModeTrigger = false;
-const char* AP_SSID = "StartWordclock";
-const char* AP_PASSWORD = "wordclock";
-AsyncWebServer server(80);                                                                    // For OTA Over the air uploading
-DNSServer dnsServer;
 #include "Webpage.h"                                                                          // The Clock web page
 #include "SoftAP.h"                                                                           // The web page to enter SSID and password of the WIFI router 
-//--------------------------------------------                                                //
-// NTP
+#include "OTAhtml.h"                                                                          // OTA update page
+WiFiEventId_t wifiEventHandler;                                                               // To stop the interrupts or callbacks triggered by WiFi.onEvent(WiFiEvent);, you need to deregister the event handler.
+bool SSIDandNetworkfound   = false;                                                           // True if Mem.SSID and a found WIFI.scan'ed network are identical
+bool WIFIwasConnected      = false;                                                           // Is WIFI connected?
+bool apMode                = false;
+bool apModeTrigger         = false;
+const char* AP_SSID        = "StartWordclock";
+const char* AP_PASSWORD    = "wordclock";
+WebServer server(80);                                                                         // For OTA Over the air uploading
+DNSServer dnsServer;
+bool shouldReboot          = false;
+
+//----------------------------------------                                                    //
+// WPS
 //----------------------------------------
-boolean syncEventTriggered = false;                                                           // True if a time even has been triggered
-NTPEvent_t ntpEvent;                                                                          // Last triggered event
+#define ESP_WPS_MODE      WPS_TYPE_PBC
+#define ESP_MANUFACTURER  "ESPRESSIF"
+#define ESP_MODEL_NUMBER  "ESP32"
+#define ESP_MODEL_NAME    "ESPRESSIF IOT"
+#define ESP_DEVICE_NAME   "ESP STATION"
+static esp_wps_config_t config;
 //----------------------------------------
 // Common
 //----------------------------------------
- 
-#define   MAXTEXT 255
-char      sptext[MAXTEXT];                                                                   // For common print use 
+ #define   MAXTEXT 255
+char      sptext[MAXTEXT];                                                                    // For common print use 
 bool      LEDsAreOff        = false;                                                          // If true LEDs are off except time display
 bool      NoTextInLeds      = false;                                                          // Flag to control printing of the text in function ColorLeds()
 int       Previous_LDR_read = 512;                                                            // The actual reading from the LDR + 4x this value /5
-int       ProgressLedNr     = 0;                                                              // Startup Progress LED number
 bool      SerialConnected   = true;   
-uint16_t  MilliSecondValue  = 10;                                                            // The duration of a second  minus 1 ms. Used in Demo mode
+uint16_t  MilliSecondValue  = 10;                                                             // The duration of a second  minus 1 ms. Used in Demo mode
 uint64_t  Loopcounter       = 0;
-struct    EEPROMstorage {                                                                    // Data storage in EEPROM to maintain them after power loss
+struct    EEPROMstorage {                                                                     // Data storage in EEPROM to maintain them after power loss
   byte DisplayChoice    = 0;
   byte TurnOffLEDsAtHH  = 0;
   byte TurnOnLEDsAtHH   = 0;
@@ -646,8 +713,8 @@ struct    EEPROMstorage {                                                       
   int  IntFuture2       = 0;                                                                  // For future use
   int  IntFuture3       = 0;                                                                  // For future use
   byte HetIsWasOff      = 0;                                                                  // Turn On or Off HET IS WAS   
-  byte ByteFuture2      = 0;                                                                  // For future use   
-  byte ByteFuture3      = 0;                                                                  // For future use   
+  byte EdSoftLEDSOff    = 1;                                                                  // EdSoft text on/off   
+  byte ByteFuture3      = 0;                                                                  // For future use 
   byte ByteFuture4      = 0;                                                                  // For future use   
   byte UseBLELongString = 0;                                                                  // Send strings longer than 20 bytes per message. Possible in IOS app BLEserial Pro 
   uint32_t OwnColour    = 0;                                                                  // Self defined colour for clock display
@@ -670,7 +737,7 @@ struct    EEPROMstorage {                                                       
  "F Own colour (Hex FWWRRGGBB)",
  "G Scan WIFI networks",
  "H H001 rotary, H002 membrane (H000)", 
- "I To print this Info menu",
+ "I Info menu, II long menu ",
  "J Toggle use DS3231 RTC module",
                         #ifdef DCF77MOD
  "JJ Toggle use DCF77 receiver",
@@ -679,21 +746,22 @@ struct    EEPROMstorage {                                                       
  "N Display off between Nhhhh (N2208)",
  "O Display toggle On/Off",
  "P Status LED toggle On/Off", 
- "Q Display colour choice",
- "  Q0 Yellow  Q1 Hourly  Q2 White",
-                      #ifdef NL144CLOCK
- "  Q3 All Own Q4 Own Q5 Wheel Q6 Dig",
-                      #else
- "  Q3 All Own Q4 Own     Q5 Wheel",
-                      #endif //NL144CLOCK
- "R Reset settings @ = Reset MCU",
- "U Demo mode (msec) (U200)",
+ "Q Display colour choice (Q0)",
+ "R Reset settings, @ = Reset MCU",
+ "U Demo (msec) (U200) Y LED test",    // , Y LEDtest", //Option Y does not work from a WIFI page and crashes the ESP32 with Neopixel 1.12.5
  "--Light intensity settings (1-250)--",
  "S Slope, L Min, M Max  (S50 L5 M200)",
- "W WIFI, X NTP&, CCC BLE, + Fast BLE",
+ "W WIFI X NTP& Z WPS CCC BLE + Fast BLE",
  "#nnn Selftest, RTC: ! See, & Update",
- "Ed Nieuwenhuys january 2025" };
+ "Ed Nieuwenhuys April 2025" };
  
+ char menusmall[][40] = {
+ "F Own colour (Hex FWWRRGGBB)",
+ "I Menu, II long menu",
+ "N Display off between Nhhhh (N2208)",
+ "O Display toggle On/Off",
+ "Q Display colour choice (Q0)",
+ "R Reset settings, @ = Restart" };
 //  -------------------------------------   End Definitions  ---------------------------------------
 
 //--------------------------------------------                                                //
@@ -702,50 +770,38 @@ struct    EEPROMstorage {                                                       
 void setup() 
 {
  Serial.begin(115200);                                                                        // Setup the serial port to 115200 baud
- SetStatusLED(10,0,0);                                                                        // Set the status LED to red
- Previous_LDR_read = ReadLDR();                                                               // Set the initial LDR reading
- InitStorage();                        //  Tekstprintln("Stored settings loaded");            // Load settings from storage and check validity  
+ Wire.begin();
  int32_t Tick = millis(); 
- StartLeds();                          //  Tekstprintln("LED strip started");                 // LED RainbowCycle  
- while (!Serial)  
-  {
-   if ((millis() - Tick) >5000) break;                                                        // Wait max 5 seconds until serial port is started   
-   ColorLed(ProgressLedNr++,dyellow); ShowLeds();
-   delay(250);
-  }  
-                                        Tekstprintln("Serial started"); 
- ColorLed(ProgressLedNr++,frenchviolet);ShowLeds();                                           // Startup LEDs in display
- Tekstprintln("Stored settings loaded");
- ColorLed(ProgressLedNr++,capri);       ShowLeds();                                           // Startup LEDs in display 
- Tekstprintln("LED strip started");
- ColorLed(ProgressLedNr++,pink);        ShowLeds();                                           // Startup LEDs in display 
- if(Mem.UseRotary==1)  InitRotaryMod(); Tekstprintln("Rotary available");                     // Start the Rotary encoder
- if(Mem.UseRotary==2)  InitKeypad3x1(); Tekstprintln("Keypad available");                     // Start the Keypad 3x1 
- ColorLed(ProgressLedNr++,blue);        ShowLeds();                                           // Startup LEDs in display
- Wire.begin();                                                                                // Keep this close to the first start to avoid WireTimeout()
- InitDS3231Mod();                       Tekstprintln("DS3231 RTC software started");          // Start the DS3231 RTC-module even if not installed. It can be turned it on later in the menu
- ColorLed(ProgressLedNr++,dyellow);     ShowLeds();
- if(Mem.BLEOn) { StartBLEService();     Tekstprintln("BLE started"); }                        // Start BLE service
- SetStatusLED(0,0,10);                                                                        // Set the status LED to blue 
- ColorLed(ProgressLedNr++,orange);      ShowLeds();
- if(Mem.WIFIOn && CheckforWIFINetwork() ){ConnectWIFI(); Tekstprintln("WIFI started");}       // Start WIFI and optional NTP if Mem.WIFIOn = 1 
- ColorLed(ProgressLedNr++,green);       ShowLeds();
- GetTijd(true);                         Tekstprintln("");                                     // Get the time and print it
- Displaytime();                         Tekstprintln("");                                     // Print the tekst time in the display 
+ SetStatusLED(10,0,0);                                                                        // Set the status LED to red
+ InitStorage();                                                                               // Load settings from storage and check validity  
+ StartLeds();                                                                                 // LED RainbowCycle  
+ while (!Serial) {if((millis()-Tick)>5000) break; LEDstartup(dyellow); delay(250); } 
+ LEDstartup(capri); Tekstprintln("Serial started\nStored settings loaded\nLED strip started");// InitStorage and StartLEDs must be called first
+ if(Mem.UseRotary==1) {LEDstartup(pink);  InitRotaryMod(); Tekstprintln("Rotary available"); }// Start the Rotary encoder
+ if(Mem.UseRotary==2) {LEDstartup(grass); InitKeypad3x1(); Tekstprintln("Keypad available"); }// Start the Keypad 3x1 
+ InitDS3231Mod();      LEDstartup(dyellow);                Tekstprintln("DS3231 RTC started");// Start the DS3231 RTC-module even if not installed. It can be turned it on later in the menu
+ if(Mem.BLEOn)       { LEDstartup(blue);  StartBLEService(); Tekstprintln("BLE started"); }   // Start BLE service // Set the status LED to blue
+ if(Mem.WIFIOn)      { LEDstartup(purple); ConnectWIFI();    Tekstprintln("WIFI started");}   // Start WIFI and optional NTP if Mem.WIFIOn = 1 
+ Previous_LDR_read = ReadLDR();                                                               // Set the initial LDR reading
+ GetTijd(true); Tekstprintln("");                                                             // Get the time and print it
+ Displaytime(); Tekstprintln("");                                                             // Print the tekst time in the display 
  SWversion();                                                                                 // Print the menu + version 
- SetStatusLED(10,0,0);                                                                        // Set the status LED to red                                  
+ LEDstartup(green);                                                                           // Set the status LED to green                                  
  msTick = millis();                                                                           // start the seconds loop counter
 }
+
 //--------------------------------------------                                                //
 // ARDUINO Loop
 //--------------------------------------------
 void loop() 
 {
  Loopcounter++;
- if (Demo)         Demomode();                                                                // 
- else              EverySecondCheck();                                                        // Let the second led tick and run the clock program
+ if (Demo)            Demomode();                                                             // 
+ else if(FireDisplay) FireMode();                                                             //
+ else                 EverySecondCheck();                                                     // Let the second led tick and run the clock program
  CheckDevices();
 }
+
 //--------------------------------------------                                                //
 // COMMON Check connected input devices
 //--------------------------------------------
@@ -753,8 +809,6 @@ void CheckDevices(void)
 {
  CheckBLE();                                                                                  // Something with BLE to do?
  SerialCheck();                                                                               // Check serial port every second 
- NTPsyncEvent();                                                                              // Check for NTP events
- ElegantOTA.loop();                                                                           // For Over The Air updates This loop block is necessary for ElegantOTA to handle reboot after OTA update.
  if (Mem.UseRotary==1) RotaryEncoderCheck(); 
  if (Mem.UseRotary==2) Keypad3x1Check();
                                   #ifdef ONEWIREKEYPAD3x4   
@@ -779,11 +833,11 @@ void EverySecondCheck(void)
   UpdateStatusLEDs(Toggle);
   SetSecondColour();                                                                          // Set the colour per second of 'IS' and 'WAS' 
   DimLeds(TestLDR);                                                                           // Every second an intensity check and update from LDR reading 
+  if (shouldReboot) { delay(1000);   ESP.restart(); }                                         // After finish OTA update restart
   if (timeinfo.tm_min != lastminute) EveryMinuteUpdate();                                     // Enter the every minute routine after one minute; 
   Loopcounter=0;
  }  
 }
-
 //--------------------------------------------                                                //
 // COMMON Update routine done every minute
 //-------------------------------------------- 
@@ -840,7 +894,7 @@ void EveryDayUpdate(void)
     MinPhotocell      = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
     MaxPhotocell      = Previous_LDR_read;                                                    // Stores maximum reading of photocell;
 //  Mem.ReconnectWIFI = 0;                                                                    // Reset WIFI reconnection counter     
-//  StoreStructInFlashMemory();                                                               //                                                              // 
+//  StoreStructInFlashMemory();                                                               // 
     }
 }
 
@@ -907,7 +961,7 @@ void SerialCheck(void)
 }
 
 //--------------------------------------------                                                //
-// COMMON Reset to default settings
+// COMMON Reset to default settings. BLE On, WIFI NTP Off
 //--------------------------------------------
 void Reset(void)
 {
@@ -923,6 +977,8 @@ void Reset(void)
  Mem.TurnOffLEDsAtHH  = 0;                                                                    // Display Off at nn hour
  Mem.TurnOnLEDsAtHH   = 0;                                                                    // Display On at nn hour Not Used
  Mem.HetIsWasOff      = 0;                                                                    // Turn On or Off HET IS WAS   
+ Mem.EdSoftLEDSOff    = 1;                                                                    // Turn On or Off EDSOFT LEDs
+ Mem.ByteFuture3      = 0;                                                                    // 
  Mem.BLEOn            = 1;                                                                    // default BLE On
  Mem.UseBLELongString = 0;                                                                    // Default off. works only with iPhone/iPad with BLEserial app
  Mem.NTPOn            = 0;                                                                    // NTP default off
@@ -945,12 +1001,13 @@ void Reset(void)
  Displaytime();
 }
 //--------------------------------------------                                                //
-// COMMON Reset to default settings
+// COMMON Reset to empty credential settings WIFI, NTP, BLE ON
 //--------------------------------------------
 void ResetCredentials(void)
 {
  strcpy(Mem.SSID,"");                                                                         // Default SSID
  strcpy(Mem.Password,"");                                                                     // Default password
+ strcpy(Mem.BLEbroadcastName,"WordClock");
  strcpy(Mem.Timezone,"CET-1CEST,M3.5.0,M10.5.0/3");                                           // Central Europe, Amsterdam, Berlin etc.
  Mem.WIFIcredentials  = 0;                                                                    // Status of the WIFI connection  
  Mem.WIFIOn           = 1;                                                                    // WIFI on
@@ -963,24 +1020,34 @@ void ResetCredentials(void)
 //--------------------------------------------
 void Tekstprint(char const *tekst)    { if(Serial) Serial.print(tekst);  SendMessageBLE(tekst); } //sptext[0]=0; } 
 void Tekstprintln(char const *tekst)  { sprintf(sptext,"%s\n",tekst); Tekstprint(sptext); }
-void TekstSprint(char const *tekst)   { printf(tekst); } //sptext[0]=0;}                       // printing for Debugging purposes in serial monitor 
+void TekstSprint(char const *tekst)   { printf(tekst); } //sptext[0]=0;}                      // printing for Debugging purposes in serial monitor 
 void TekstSprintln(char const *tekst) { sprintf(sptext,"%s\n",tekst); TekstSprint(sptext); }
 //--------------------------------------------                                                //
 // COMMON Print web menu page and BLE menu
 // 0 = text to print, 1 = header of web page with menu, 2 = footer of web page
 //  html_info but be empty before starting: --> html_info[0] = 0; 
 //--------------------------------------------
-void WTekstprintln(char const *tekst) { WTekstprintln(tekst,"","");  } 
-void WTekstprintln(char const *tekst, char const *prefixtekst, char const *suffixtekst)  
- { 
-  sprintf(sptext,"%s\n",tekst);      Tekstprint(sptext);
-  if(strlen(html_info) + strlen(tekst) > MAXSIZE_HTML_INFO-50) 
-     { strcat(html_info,"<br> *** Increase MAXSIZE_HTML_INFO ***<br>");     return;   }
-  strcat(html_info,prefixtekst);
-  strcat(html_info,tekst);
-  strcat(html_info,suffixtekst);  
-  strcat(html_info,"<br>");     
+void WTekstappend(char const *tekst, char const *prefixtekst, char const *suffixtekst, bool newline) 
+{
+    if (newline) { sprintf(sptext, "%s\n", tekst); } 
+    else {         sprintf(sptext, "%s", tekst);   }
+    Tekstprint(sptext);
+    size_t needed = strlen(prefixtekst) + strlen(tekst) + strlen(suffixtekst) + strlen("<br>");// Estimate how much space will be added
+    if (strlen(html_info) + needed > MAXSIZE_HTML_INFO - 1) 
+       { strcat(html_info, "<br> *** Increase MAXSIZE_HTML_INFO ***<br>");   return;  }
+    strcat(html_info, prefixtekst);                                             
+    strcat(html_info, tekst);
+    strcat(html_info, suffixtekst);
+    if (newline) { strcat(html_info, "<br>"); }   // Append to html_info
 }
+
+void WTekstprintln(char const *tekst) {    WTekstappend(tekst, "", "", true);}
+void WTekstprintln(char const *tekst, char const *prefixtekst, char const *suffixtekst) 
+    { WTekstappend(tekst, prefixtekst, suffixtekst, true); }
+
+void WTekstprint(char const *tekst) {    WTekstappend(tekst, "", "", false);}
+void WTekstprint(char const *tekst, char const *prefixtekst, char const *suffixtekst) 
+    { WTekstappend(tekst, prefixtekst, suffixtekst, false);}
 
 //--------------------------------------------                                                //
 // COMMON Constrain a string with integers
@@ -1004,7 +1071,7 @@ void InitStorage(void)
     Reset();                                                                                  // If the checksum is NOK the Settings were not set
    }
  Mem.LanguageChoice  = _min(Mem.LanguageChoice, 4);                                           // Constrain the value to valid ranges 
- Mem.DisplayChoice   = _min(Mem.DisplayChoice, ANALOOG);                                      // Constrain the value to valid ranges 
+ Mem.DisplayChoice   = _min(Mem.DisplayChoice, RANDOM);                                       // Constrain the value to valid ranges 
  if(Mem.OwnColour == 0) Mem.OwnColour = green;                                                // If memory is empty cq black colour then store default value, green  
  Mem.LightReducer    = constrain(Mem.LightReducer,1,250);                                     // 
  Mem.LowerBrightness = constrain(Mem.LowerBrightness, 1, 250);                                // 
@@ -1045,16 +1112,17 @@ void GetStructFromFlashMemory(void)
  sprintf(sptext,"Mem.Checksum = %d",Mem.Checksum);Tekstprintln(sptext); 
 }
 
-
 //--------------------------------------------                                                //
 // COMMON Version info
 //--------------------------------------------
-void SWversion(void) 
+void SWversion(void) {SWversion(true);}
+void SWversion(bool small) 
 { 
  #define FILENAAM (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)    
  html_info[0] = 0;                                                                           // Empty the info web page to be used in void WTekstprintln() 
  PrintLine(35);
- for (uint8_t i = 0; i < sizeof(menu) / sizeof(menu[0]); WTekstprintln(menu[i++]) );                                       
+ if(small) {for (uint8_t i = 0; i < sizeof(menusmall) / sizeof(menusmall[0]); WTekstprintln(menusmall[i++]) ); }
+ else      {for (uint8_t i = 0; i < sizeof(menu) / sizeof(menu[0]);           WTekstprintln(menu[i++]) ); }                                     
  PrintLine(35);
  byte dp = Mem.DisplayChoice;
  sprintf(sptext,"Display off between: %02dh - %02dh",Mem.TurnOffLEDsAtHH, Mem.TurnOnLEDsAtHH);  WTekstprintln(sptext);
@@ -1062,26 +1130,28 @@ void SWversion(void)
               dp==3?"All Own":dp==4?"Own":dp==5?"Wheel":dp==6?"Digital":dp==7?"Analog":"NOP");  WTekstprintln(sptext);
  sprintf(sptext,"Slope: %d     Min: %d     Max: %d ",
                  Mem.LightReducer, Mem.LowerBrightness,Mem.UpperBrightness);                    WTekstprintln(sptext);
- sprintf(sptext,"SSID: %s", Mem.SSID);                                                          WTekstprintln(sptext); 
+ if(!small) {sprintf(sptext,"SSID: %s", Mem.SSID);                                               WTekstprintln(sptext); }
 // sprintf(sptext,"Password: %s", Mem.Password);                                                WTekstprintln(sptext);
  sprintf(sptext,"BLE name: %s", Mem.BLEbroadcastName);                                          WTekstprintln(sptext,"<span class=\"verdana-red\">","</span>");
- sprintf(sptext,"IP-address: %d.%d.%d.%d /update", WiFi.localIP()[0], WiFi.localIP()[1], 
-                                                   WiFi.localIP()[2], WiFi.localIP()[3] );      WTekstprintln(sptext);
- sprintf(sptext,"Timezone:%s", Mem.Timezone);                                                   WTekstprintln(sptext); 
+ sprintf(sptext,"IP-address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], 
+                                           WiFi.localIP()[2], WiFi.localIP()[3] );              WTekstprint(sptext);
+ sprintf(sptext,"/update");                                                                     WTekstprintln(sptext," <a href=" , "> /update</a>");                                            
+ if(!small) {sprintf(sptext,"Timezone:%s", Mem.Timezone);                                        WTekstprintln(sptext); }
  sprintf(sptext,"%s %s %s %s", Mem.WIFIOn?"WIFI=On":"WIFI=Off", 
                                Mem.NTPOn? "NTP=On":"NTP=Off",
                                Mem.BLEOn? "BLE=On":"BLE=Off",
                                Mem.UseBLELongString? "FastBLE=On":"FastBLE=Off" );              WTekstprintln(sptext);
  char fftext[20];              
- sprintf(fftext,"%s", Mem.UseDS3231? " DS3231=On":" DS3231=Off"); 
- sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
+ if(!small) {sprintf(fftext,"%s", Mem.UseDS3231?" DS3231=On":" DS3231=Off"); }
+ if(!small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
                         Mem.UseRotary==1 ?"Rotary=On Membrane=Off":
-                        Mem.UseRotary==2 ?"Rotary=Off Membrane On":"NOP",fftext);               WTekstprintln(sptext);                            
- sprintf(sptext,"%s strip with %d LEDs (switch %%)", 
-                 Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",NUM_LEDS);             WTekstprintln(sptext); 
- sprintf(sptext,"Software: %s",FILENAAM);                                                       WTekstprintln(sptext);  // VERSION);
- sprintf(sptext,"ESP32 Arduino core version: %d.%d.%d", 
-          ESP_ARDUINO_VERSION_MAJOR,ESP_ARDUINO_VERSION_MINOR,ESP_ARDUINO_VERSION_PATCH);       WTekstprintln(sptext);
+                        Mem.UseRotary==2 ?"Rotary=Off Membrane On":"NOP",fftext);               WTekstprintln(sptext); }                           
+ if(!small) { sprintf(sptext,"%s strip with %ld LEDs (switch %%)", 
+                 Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",NUM_LEDS);             WTekstprintln(sptext); }
+  if(!small) {sprintf(sptext,"Software: %s",FILENAAM);                                          WTekstprintln(sptext);}  // VERSION);
+  if(!small) {sprintf(sptext,"ESP32 Arduino core version: %d.%d.%d", 
+          ESP_ARDUINO_VERSION_MAJOR,ESP_ARDUINO_VERSION_MINOR,ESP_ARDUINO_VERSION_PATCH);       WTekstprintln(sptext); }
+ GetTijd(false);                                                                              // Get the time and store it in the proper variables
  PrintRTCTime();                                                                                
  PrintLine(35);                                                                               //
  
@@ -1098,7 +1168,7 @@ void PrintLine(byte Lengte)
 }
 
 //--------------------------------------------                                                //
-//  COMMON Input from Bluetooth or Serial
+// COMMON Input from Bluetooth, Serial or HTML page
 //--------------------------------------------
 void ReworkInputString(String InputString)
 {
@@ -1120,6 +1190,7 @@ void ReworkInputString(String InputString)
             break;
     case 'B':
     case 'b':
+             sprintf(sptext,"**** Length fault. Use between 5 and 40 characters ****");
              if (InputString.equals("BBBB"))                                                  // 
                {   
                 sprintf(sptext,"%s,**** Length fault. Use between 5 and 40 characters ****",Mem.Password);
@@ -1132,10 +1203,10 @@ void ReworkInputString(String InputString)
                Mem.NTPOn        = 1;                                                          // NTP On
                Mem.WIFIOn       = 1;                                                          // WIFI On  
               }
-             else sprintf(sptext,"**** Length fault. Use between 5 and 40 characters ****");
              break;   
     case 'C':
-    case 'c': 
+    case 'c':
+             sprintf(sptext,"**** Length fault. Use between 4 and 30 characters ****"); 
              if (InputString.equalsIgnoreCase("ccc"))                                         // Toggle BLE ON or OFF
                {   
                 Mem.BLEOn = 1 - Mem.BLEOn; 
@@ -1147,7 +1218,7 @@ void ReworkInputString(String InputString)
                 sprintf(sptext,"BLE broadcast name set: %s", Mem.BLEbroadcastName); 
                 Mem.BLEOn = 1;                                                                // BLE On
               }
-            else sprintf(sptext,"**** Length fault. Use between 4 and 30 characters ****");
+
             break;      
     case 'D':                                                                                 // Date entry 
     case 'd':  
@@ -1180,12 +1251,12 @@ void ReworkInputString(String InputString)
              if (InputString.length() == 9 )
                {
                 LetterColor = Mem.OwnColour = HexToDec(InputString.substring(1,9));           // Display letter color 
-                sprintf(sptext,"Font colour stored: 0X%08X", Mem.OwnColour);
+                sprintf(sptext,"Font colour stored: 0X%08lX", Mem.OwnColour);
                 Tekstprintln("**** Own colour changed ****");    
                 LedsOff(); 
                 Displaytime();
                }
-             else sprintf(sptext,"****Length fault. Enter Frrggbb hexadecimal (0 - F)****\nStored: 0X%08X", Mem.OwnColour);              
+             else sprintf(sptext,"****Length fault. Enter Frrggbb hexadecimal (0 - F)****\nStored: 0X%08lX", Mem.OwnColour);              
              break;
     case 'G':                                                                                 // Scan WIFI stations
     case 'g':
@@ -1200,15 +1271,29 @@ void ReworkInputString(String InputString)
     case 'h':
              if (InputString.length() == 4)
                {   
-                Mem.UseRotary = (byte) SConstrainInt(InputString,1,0,2);   // 
+                Mem.UseRotary = (byte) SConstrainInt(InputString,1,0,2);                      // 
                 if(Mem.UseRotary >2) Mem.UseRotary = 0; 
                 sprintf(sptext,"\nUse of rotary encoder is %s\nUse of membrane keypad is %s", Mem.UseRotary==1?"ON":"OFF",Mem.UseRotary==2?"ON":"OFF" );
+                Tekstprintln(sptext);
+                if(Mem.UseRotary>0)                                                           // If using a rotary or membrane then NTP must be turned off!
+                {
+                 Mem.NTPOn     = 0; 
+                 Mem.UseDS3231 = 1;
+                }
+                else 
+                {
+                 Mem.WIFIOn    = 1;                                                           // If NOT using a rotary or membrane then WIFI and NTP are turned ON. 
+                 Mem.NTPOn     = 1; 
+                 Mem.UseDS3231 = 0;                 
+                }
+                 sprintf(sptext,"Use DS3231 is %s, WIFI is %s, NTP is %s\n *** Restart clock with @ ***", Mem.UseDS3231?"ON":"OFF",Mem.WIFIOn?"ON":"OFF",Mem.NTPOn?"ON":"OFF" );
                }                                
              else sprintf(sptext,"**** Fault. Enter H000 (none), H001 (Rotary) or H002 (Membrane) ****\nUse rotary encoder is %s\nUse membrane keypad %s",Mem.UseRotary==1?"ON":"OFF",Mem.UseRotary==2?"ON":"OFF" );
              break;          
     case 'I':                                                                                 // Menu
     case 'i': 
-            SWversion();
+             if (InputString.length() == 1)  { SWversion(true);  }                            // Small menu
+             if (InputString.length() == 2)  { SWversion(false); }                            // Full menu
             break;
     case 'J':                                                                                 // Use DS3231 RTC module
     case 'j':
@@ -1224,7 +1309,8 @@ void ReworkInputString(String InputString)
     case 'K':
     case 'k':
              TestLDR = 1 - TestLDR;                                                           // If TestLDR = 1 LDR reading is printed every second instead every 30s
-             sprintf(sptext,"TestLDR: %s \nLDR reading, %%Out, loops per second and time",TestLDR? "On" : "Off");
+             sprintf(sptext,"TestLDR: %s",TestLDR? "On\n   Bits, Out, loops per second and time" : "Off\n");
+  //           if (TestLDR) strcat(sptext," bits, %%Out, loops per second and time");
              break;      
     case 'L':                                                                                 // Language to choose
     case 'l':
@@ -1268,7 +1354,7 @@ void ReworkInputString(String InputString)
                 else 
                 {
                   Tekstprintln(sptext); 
-                  lastminute = 99;
+                  lastminute = 99;                                                            // Push an display update
                   Displaytime();                                                              // Turn the display on   
                 }
                }
@@ -1296,44 +1382,56 @@ void ReworkInputString(String InputString)
                 Tekstprintln("  Q4= Own colour, HETISWAS changing");
                 Tekstprintln("  Q5= Wheel colour");
                 Tekstprintln("  Q6= Digital display");
+                Tekstprintln("  Q8= Toggle EDSOFT on/off");                
                 Tekstprintln("  Q9= Toggle HET IS WAS on/off");
                 sptext[0]=0;
                }
-             if (InputString.length() == 2 )
+               else 
                {
-                if (InputString.equalsIgnoreCase("Q9"))                                       // 
-                  { 
-                   Mem.HetIsWasOff = 1- Mem.HetIsWasOff;
-                   sprintf(sptext,"HET IS WAS is %s",Mem.HetIsWasOff? "OFF" : "ON"); 
-                  }
-                else
-                  {
-                   Mem.DisplayChoice = (byte) InputString.substring(1,2).toInt(); 
-                   if (Mem.DisplayChoice>6) Mem.DisplayChoice = 0;
-                   sprintf(sptext,"Display choice: Q%d", Mem.DisplayChoice);
-                  } 
-               }    
+                switch((byte) InputString.substring(1,2).toInt())
+                 {
+                  case  0:  // Default colour
+                  case  1:  // Hourly colour
+                  case  2:  // All white
+                  case  3:  // All Own colour
+                  case  4:  // Own colour, HETISWAS changing
+                  case  5:  // Wheel colour                   
+                  case  6:  // Digital display
+                           Mem.DisplayChoice = (byte) InputString.substring(1,2).toInt();
+                          if (Mem.DisplayChoice>6) Mem.DisplayChoice = 0;
+                          sprintf(sptext,"Display choice: Q%d", Mem.DisplayChoice);
+                          break;                                                             // Mem.DisplayChoice is OK between 0 - 6     
+                  case  7: Mem.DisplayChoice = 7; break;
+                  case  8: 
+                          Mem.EdSoftLEDSOff = 1- Mem.EdSoftLEDSOff;
+                          sprintf(sptext,"EDSOFT is %s",Mem.EdSoftLEDSOff? "OFF" : "ON");                 
+                          break;      
+                  case  9:
+                          Mem.HetIsWasOff = 1 - Mem.HetIsWasOff;
+                          sprintf(sptext,"HET IS WAS is %s",Mem.HetIsWasOff? "OFF" : "ON"); 
+                          break;
+                 }  
+               }                     
              lastminute = 99;                                                                 // Force a minute update
-   //          Displaytime();   
              break;
     case 'R':                                                                                 // Reset to default settings 
     case 'r':
              sprintf(sptext,"**** Length fault R. ****");       
-             if (InputString.equals("RRRRR"))                                                 // 
+             if (InputString.equals("RRRRR"))                                                 // Delete the WIFI settings and set to default settings
                { 
                 ResetCredentials();  
                 Reset();              
                 ESP.restart();  
                 break;
                }
-             if (InputString.equals("RRR"))                                                   // 
+             if (InputString.equals("RRR"))                                                   // Delete the WIFI settings
                { 
                 ResetCredentials(); 
                 ESP.restart();  
                 sprintf(sptext,"\nSSID and password deleted. \nWIFI, NTP and BLE is On\n Enter @ to restart");
                 break;
                } 
-             if (InputString.length() == 1)
+             if (InputString.length() == 1)                                                  // DSet to default settings
                {   
                 Reset();
                 sprintf(sptext,"\nReset to default values: Done");
@@ -1378,11 +1476,11 @@ void ReworkInputString(String InputString)
                 sprintf(sptext,"Demo mode: %s",Demo?"ON":"OFF"); 
                }
             if (InputString.length() >1 && InputString.length() < 6 )
-              {
+               {
                 MilliSecondValue = InputString.substring(1,5).toInt();                
                 Demo = true;                                                                 // Toggle Demo mode
                 sprintf(sptext,"Demo mode: %s MillisecondTime=%d",Demo?"ON":"OFF", MilliSecondValue); 
-              }
+               }
              break;     
     case 'W':
     case 'w':
@@ -1413,16 +1511,21 @@ void ReworkInputString(String InputString)
              break;  
     case 'Z':
     case 'z':
-             sprintf(sptext,"**** No operation");     
+             sprintf(sptext,"**** Start WPS on your router");   
+             WiFi.onEvent(WiFiEvent);
+             WiFi.mode(WIFI_STA);
+             Serial.println("Starting WPS");
+             wpsInitConfig();  
+             wpsStart();
              break;  
 //--------------------------------------------                                                //        
-     case '!':                                                                                // Print the NTP, RTC and DS3231 time
+    case '!':                                                                                 // Print the NTP, RTC and DS3231 time
              if (InputString.length() == 1)  PrintAllClockTimes();
              break;       
     case '@':                                                                                 // Reset 
              if (InputString.length() == 1)
                {   
-               Tekstprintln("\n*********\n ESP restarting\n*********\n");
+                Tekstprintln("\n*********\n ESP restarting\n*********\n");
                 ESP.restart();   
                }                                
              else sprintf(sptext,"**** Length fault. Enter @ ****");
@@ -1436,7 +1539,7 @@ void ReworkInputString(String InputString)
                 Selftest();   
                 Displaytime();  
                }
-            if (InputString.length() >1 && InputString.length() < 6 )
+            if (InputString.length() >1 && InputString.length() < 6 )                        // Self test with msec delay
               {
                 MilliSecondValue = InputString.substring(1,5).toInt();                
                 Zelftest = 1 - Zelftest; 
@@ -1444,26 +1547,22 @@ void ReworkInputString(String InputString)
                 Selftest(MilliSecondValue);   
                 Displaytime();  
               }
-             break;    
-                                                                                                  // Self test 
-             if (InputString.length() == 1)
+             break;
+             if (InputString.length() == 1)                                                    // Self test with default delay and On OFF
                {
                 Zelftest = 1 - Zelftest; 
                 sprintf(sptext,"Zelftest: %s", Zelftest?"ON":"OFF" ); 
                 Selftest();   
-                Displaytime();                                                                 // Turn on the display with proper time
+                Displaytime();                                                                // Turn on the display with proper time
                }                                
              else sprintf(sptext,"**** Length fault. Enter # ****");
              break; 
     case '$':
-            //  if (InputString.length() == 1)
-            //    {   
-            //     Mem.DCF77On = 1 - Mem.DCF77On; 
-            //     sprintf(sptext,"DCF77 is %s after restart", Mem.DCF77On?"used":"NOT used" );
-            //    }                                
-            //  else sprintf(sptext,"**** Length fault. Enter $ ****");
-            //  break; 
-     case '%':                                                                                // SK6812 or WS2812 strip 
+             FireDisplay = 1 - FireDisplay;                                                   // If TestLDR = 1 LDR reading is printed every second instead every 30s
+             sprintf(sptext,"FireDisplay: %s",FireDisplay? "On" : "Off");
+             Displaytime();   
+             break;       
+    case '%':                                                                                 // SK6812 or WS2812 strip 
              if (InputString.length() == 1)
                {   
                 Mem.LEDstrip = 1 - Mem.LEDstrip; 
@@ -1474,8 +1573,7 @@ void ReworkInputString(String InputString)
     case '&':
              sprintf(sptext,"**** Length fault &. ****");                                     // Forced get NTP time and update the DS32RTC module
              if (InputString.length() == 1)
-              {
-               NTP.getTime();                                                                 // Force a NTP time update  
+              { 
                SetDS3231Time();
                SetRTCTime();    
                PrintAllClockTimes();
@@ -1488,7 +1586,17 @@ void ReworkInputString(String InputString)
                 sprintf(sptext,"Fast BLE is %s", Mem.UseBLELongString?"ON":"OFF" );
                }                                
              else sprintf(sptext,"**** Length fault. Enter + ****");
-             break;                       
+             break;         
+    case '_':
+             if (InputString.length() >1 && InputString.length() < 4 )                         // Self test with msec delay
+              {
+                byte ff = (byte) InputString.substring(1,2).toInt();    
+                StoreStructInFlashMemory(); 
+                sprintf(sptext,"No use: %d", ff);                                              // Update EEPROM 
+                Tekstprintln(sptext);
+                //ESP.restart();                                                               // Restart ESP to use the proper settings
+              }
+             break;    
     case '0':
     case '1':
     case '2':        
@@ -1508,11 +1616,10 @@ void ReworkInputString(String InputString)
     default: break;
     }
    Tekstprintln(sptext); 
-   StoreStructInFlashMemory();                                                                  // Update EEPROM                                     
+   StoreStructInFlashMemory();                                                                // Update EEPROM                                     
   }  
  InputString = "";
 }
-
 
 //--------------------------------------------                                                //
 // LDR reading are between 0 and 255. 
@@ -1523,116 +1630,8 @@ int ReadLDR(void)
  return analogRead(PhotoCellPin)/16;
 }
 
-// --------------------Colour Clock Light functions -----------------------------------
 //--------------------------------------------                                                //
-//  LED Set color for LEDs in strip and print tekst
-//---------------------------------------------
-void ColorLeds(char const *Tekst, int FirstLed, int LastLed, uint32_t RGBWColor)
-{ 
- Stripfill(RGBWColor, FirstLed, ++LastLed - FirstLed );                                        //
- if (!NoTextInLeds && strlen(Tekst) > 0 )
-     {sprintf(sptext,"%s ",Tekst); Tekstprint(sptext); }                                      // Print the text  
-}
-//--------------------------------------------
-//  LED Set color for one LED
-//--------------------------------------------
-void ColorLed(int Lednr, uint32_t RGBWColor)
-{   
- Stripfill(RGBWColor, Lednr, 1 );
-}
-//--------------------------------------------                                                //
-//  LED Clear display settings of the LED's
-//--------------------------------------------
-void LedsOff(void) 
-{ 
- Stripfill(0, 0, NUM_LEDS );                                                                  // 
-}
-//--------------------------------------------                                                //
-// LED Turn On and Off the LED's after 200 milliseconds
-//--------------------------------------------
-void Laatzien(int Delaymsec) { delay(Delaymsec);Laatzien(); }
-void Laatzien()
-{ 
- ShowLeds();
- LedsOff(); 
- CheckDevices();                                                                              // Check for input from input devices
-}
-
-//--------------------------------------------                                                //
-//  LED Push data in LED strip to commit the changes
-//--------------------------------------------
-void ShowLeds(void)
-{
- LEDstrip.show();
-}
-//--------------------------------------------                                                //
-//  LED Set brighness of LEDs
-//--------------------------------------------
-void SetBrightnessLeds(byte Bright)
-{
- LEDstrip.setBrightness(Bright);                                                              // Set brightness of LEDs   
- ShowLeds();
-}
-//--------------------------------------------
-//  LED Fill the strip array for LEDFAB library
-//--------------------------------------------
-void Stripfill(uint32_t RGBWColor, int FirstLed, int NoofLEDs)
-{   
- LEDstrip.fill(RGBWColor, FirstLed, NoofLEDs);
-}
-//--------------------------------------------
-//  LED Strip Get Pixel Color 
-//--------------------------------------------
-uint32_t StripGetPixelColor(int Lednr)
-{
-return(LEDstrip.getPixelColor(Lednr));
-}
-//--------------------------------------------                                                //
-//  LED convert HSV to RGB  h is from 0-360, s,v values are 0-1
-//  r,g,b values are 0-255
-//--------------------------------------------
-uint32_t HSVToRGB(double H, double S, double V) 
-{
-  int i;
-  double r, g, b, f, p, q, t;
-  if (S == 0)  {r = V;  g = V;  b = V; }
-  else
-  {
-    H >= 360 ? H = 0 : H /= 60;
-    i = (int) H;
-    f = H - i;
-    p = V * (1.0 -  S);
-    q = V * (1.0 - (S * f));
-    t = V * (1.0 - (S * (1.0 - f)));
-    switch (i) 
-    {
-     case 0:  r = V;  g = t;  b = p;  break;
-     case 1:  r = q;  g = V;  b = p;  break;
-     case 2:  r = p;  g = V;  b = t;  break;
-     case 3:  r = p;  g = q;  b = V;  break;
-     case 4:  r = t;  g = p;  b = V;  break;
-     default: r = V;  g = p;  b = q;  break;
-    }
-  }
-return FuncCRGBW((int)(r*255), (int)(g*255), (int)(b*255), 0 );                                // R, G, B, W 
-}
-//--------------------------------------------                                                //
-//  LED function to make RGBW color
-//--------------------------------------------
-uint32_t FuncCRGBW( uint32_t Red, uint32_t Green, uint32_t Blue, uint32_t White)
-{ 
- return ( (White<<24) + (Red << 16) + (Green << 8) + Blue );
-}
-//--------------------------------------------                                                //
-//  LED functions to extract RGBW colors
-//--------------------------------------------
- uint8_t Cwhite(uint32_t c) { return (c >> 24);}
- uint8_t Cred(  uint32_t c) { return (c >> 16);}
- uint8_t Cgreen(uint32_t c) { return (c >> 8); }
- uint8_t Cblue( uint32_t c) { return (c);      }
-
-//--------------------------------------------                                                //
-//  CLOCK Set second color
+//  CLOCK Set second colour
 //  Set the colour per second of 'IS' and 'WAS'
 //---------------------------------------------
 void SetSecondColour(void)
@@ -1654,10 +1653,16 @@ void SetSecondColour(void)
    case WHEELCOLOR   : LetterColor = MINColor = SECColor = Wheel((timeinfo.tm_min*4)); break; // Colour of all letters changes per minute
    case DIGITAL      : MINColor = SECColor = 0;                                        break; // Digital display of time. No IS WAS turn color off in display
   }
- if(Mem.HetIsWasOff){MINColor = SECColor = 0;}                                                 // If HET IS WAS is turned off in menu with Q9
+ if(Mem.HetIsWasOff){MINColor = SECColor = 0;}                                                // If HET IS WAS is turned off in menu with Q9
  NoTextInLeds  = true;                                                                        // Flag to control printing of the text IS en WAS in serial
+                    #ifdef DE144CLOCK  
+ if(Is) {IST;} 
+ else {WAR;}                      
+                    #endif  //DE144CLOCK                      
+                    #if defined NL144CLOCK || defined NL92CLOCK
  if(Is) {IS;} 
  else {WAS;} 
+                    #endif  //NL144CLOCK || defined NL92CLOCK
  NoTextInLeds  = false;                                                                       // Flag to control printing of the text IS en WAS in serial
  ShowLeds();                                                                                  // Updating IS and WAS with ShowLeds is done here to avoid updating all letters every second with Displaytime function
 //    Serial.print("SecColor: ");    Serial.println(SECColor,HEX);  
@@ -1722,6 +1727,20 @@ void Selftest(int Delayms)
  NEGEN; Laatzien(Delayms); NACHT; Laatzien(Delayms); ACHT;   Laatzien(Delayms); ZES;     Laatzien(Delayms); ZEVEN;  Laatzien(Delayms);  ELF;   Laatzien(Delayms); 
  NOEN;  Laatzien(Delayms); UUR;   Laatzien(Delayms); EDSOFT; Laatzien(Delayms);
                       #endif  //NL144CLOCK
+                      #ifdef NL92CLOCK                    
+ HET;   Laatzien(Delayms); IS;    Laatzien(Delayms); WAS;    Laatzien(Delayms); PRECIES; Laatzien(Delayms); MTIEN;  Laatzien(Delayms);  MVIJF; Laatzien(Delayms);    
+ KWART; Laatzien(Delayms); VOOR;  Laatzien(Delayms); OVER;   Laatzien(Delayms); HALF;    Laatzien(Delayms);  VIJF;  Laatzien(Delayms);
+ TWEE;  Laatzien(Delayms); EEN;   Laatzien(Delayms); VIER;   Laatzien(Delayms); TIEN;    Laatzien(Delayms); TWAALF; Laatzien(Delayms);  DRIE;  Laatzien(Delayms);
+ NEGEN; Laatzien(Delayms); ACHT;  Laatzien(Delayms); ZES;    Laatzien(Delayms); ZEVEN;   Laatzien(Delayms);  ELF;   Laatzien(Delayms); 
+ UUR;   Laatzien(Delayms); //EDSOFT; Laatzien(Delayms);
+                      #endif  //NL92CLOCK
+                      #ifdef DE144CLOCK                    
+ ES;    Laatzien(Delayms);    IST;    Laatzien(Delayms); WAR;    Laatzien(Delayms); GENAU; Laatzien(Delayms); MZEHN; Laatzien(Delayms);  MFUNF; Laatzien(Delayms);    
+ VIERTEL; Laatzien(Delayms); ZWANZIG; Laatzien(Delayms); KURZ;   Laatzien(Delayms); VOR;   Laatzien(Delayms); NACH;  Laatzien(Delayms);  HALB;  Laatzien(Delayms);
+ FUNF;  Laatzien(Delayms);    EINS;   Laatzien(Delayms); VIERDE; Laatzien(Delayms); ZEHN;  Laatzien(Delayms); ZWOLF; Laatzien(Delayms);  DREI;  Laatzien(Delayms);
+ NEUN;  Laatzien(Delayms);    ACHTDE; Laatzien(Delayms); SECHS;  Laatzien(Delayms); SIEBEN;Laatzien(Delayms); ZWEI;  Laatzien(Delayms);  ELFDE; Laatzien(Delayms); 
+ UHR;   Laatzien(Delayms); 
+                      #endif  //DE144CLOCK                      
  Tekstprintln("*");      
 //  Zelftest = false; 
 //  Displaytime();                                                                               // Turn on the LEDs with proper time
@@ -1738,9 +1757,12 @@ void Displaytime()
  if( Mem.DisplayChoice == DIGITAL ) { TimePlaceDigit(timeinfo.tm_hour,timeinfo.tm_min); }
  else                                                                                        // If not a difital display 
    {
-                     #ifdef NL144CLOCK
+                     #if defined NL144CLOCK || defined NL92CLOCK
     Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
-                     #endif  //NL144CLOCK
+                     #endif  //NL144CLOCK || defined NL92CLOCK
+                     #ifdef DE144CLOCK
+    German();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
+                     #endif  //DE144CLOCK
                      #if defined NLM1M2M3M4L114  || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L144)
     Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
                      #endif  //NLM1M2M3M4
@@ -1754,10 +1776,8 @@ void Displaytime()
    }  
  ShowLeds();                                                                                  // And turn on the LEDs
 }
-
-
 //--------------------------------------------                                                //
-//  LED Dim the leds measured by the LDR and print values
+// CLOCK Dim the leds measured by the LDR and print values
 // LDR reading are between 0 and 255. The Brightness send to the LEDs is between 0 and 255
 //--------------------------------------------
 void DimLeds(bool print) 
@@ -1785,62 +1805,209 @@ void DimLeds(bool print)
  SetBrightnessLeds(OutPhotocell);     // values between 0 and 255
 }
 //--------------------------------------------                                                //
-//  LED Turn On en Off the LED's
+// CLOCK Turn On en Off the LED's
 //--------------------------------------------
 void Play_Lights()
 {
- for(int i=0; i<NUM_LEDS; i++) { ColorLeds("",i,i,chromeyellow); ShowLeds(); }
- WhiteOverRainbow(50, 50, 5 );
+ SetBrightnessLeds(50);
+ RainbowCycle(10);
+ for(int i=0; i<NUM_LEDS; i++)  { ColorLeds("",i,i,chromeyellow); } 
+ ShowLeds();
+ vTaskDelay(pdMS_TO_TICKS(2000)); //delay(2000);
+ LedsOff();
+ WhiteOverRainbow(25, 50, 5 ); 
  WhiteOverRainbow(5, 5, 5 );  // wait, whiteSpeed, whiteLength
  LedsOff();
-}
+}    
+                       #ifdef DE144CLOCK                                        
 //--------------------------------------------
-//  LED Blink UUR
+// CLOCK Blink UHR
+//--------------------------------------------
+void BlinkUUR(int NoofBlinks, int Delayms)
+{
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  UHR; Laatzien(Delayms); } 
+}
+//--------------------------------------------                                                //
+// CLOCK Blink ES IST WAR
+//--------------------------------------------
+void BlinkHETISWAS (int NoofBlinks, int Delayms)
+{ 
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  ES; IST; WAR; Laatzien(Delayms); } 
+}
+//--------------------------------------------                                                //
+// CLOCK Blink ZWOLF
+//--------------------------------------------
+void BlinkTWAALF(int NoofBlinks, int Delayms)
+{
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); ZWOLF; Laatzien(Delayms); } 
+}
+                     #else
+//--------------------------------------------                                                //
+// CLOCK Blink UUR
 //--------------------------------------------
 void BlinkUUR(int NoofBlinks, int Delayms)
 {
 for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  UUR; Laatzien(Delayms); } 
 }
 //--------------------------------------------                                                //
-//  LED Blink HET IS WAS
+// CLOCK Blink HET IS WAS
 //--------------------------------------------
 void BlinkHETISWAS (int NoofBlinks, int Delayms)
 {
 for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms);  HET; IS; WAS; Laatzien(Delayms); } 
 }
 //--------------------------------------------                                                //
-//  LED Blink PRECIES
+// CLOCK Blink TWAALF
 //--------------------------------------------
 void BlinkTWAALF(int NoofBlinks, int Delayms)
 {
 for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); TWAALF; Laatzien(Delayms); } 
 }
+
+                     #endif //DE144CLOCK
+
+// --------------------Colour Clock Light functions -----------------------------------
 //--------------------------------------------                                                //
-//  LED Blink BLE 
+// LED Set color for LEDs in strip and print tekst
+//---------------------------------------------
+void ColorLeds(char const *Tekst, int FirstLed, int LastLed, uint32_t RGBWColor)
+{ 
+ Stripfill(RGBWColor, FirstLed, ++LastLed - FirstLed );                                        //
+ if (!NoTextInLeds && strlen(Tekst) > 0 )
+     {sprintf(sptext,"%s ",Tekst); Tekstprint(sptext); }                                      // Print the text  
+}
 //--------------------------------------------
-void BlinkBLE(int NoofBlinks, int Delayms)
-{
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); BLEONOFF Laatzien(Delayms); } 
-}                           
-//--------------------------------------------                                                //
-//  LED Blink NTP RTC  
+// LED Set color for one LED
 //--------------------------------------------
-void BlinkNTP_RTC(int NoofBlinks, int Delayms)
-{
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); Laatzien(Delayms); NTPT; RTCT; Laatzien(Delayms); } 
+void ColorLed(int Lednr, uint32_t RGBWColor)
+{   
+ Stripfill(RGBWColor, Lednr, 1 );
 }
 //--------------------------------------------                                                //
-//  DISPLAY
-//  Clear the display
+// LED Clear display settings of the LEDs
+//--------------------------------------------
+void LedsOff(void) 
+{ 
+ Stripfill(0, 0, NUM_LEDS );                                                                  // 
+}
+//--------------------------------------------                                                //
+// LED Turn On and the LEDs off after Delaymsec milliseconds
+//--------------------------------------------
+void Laatzien(int Delaymsec) 
+{ 
+ ShowLeds(); 
+ vTaskDelay(pdMS_TO_TICKS(Delaymsec));   // delay(Delaymsec);
+ LedsOff(); 
+ CheckDevices();                                                                              // Check for input from input devices
+}
+
+//--------------------------------------------                                                //
+// LED Push data in LED strip to commit the changes
+//--------------------------------------------
+void ShowLeds(void)
+{
+//    if (xSemaphoreTake(ledMutex, portMAX_DELAY))                                           // A semaphore is not needed when using Neopixel
+    { // Lock the mutex
+      LEDstrip.show();
+//    xSemaphoreGive(ledMutex); // Release the mutex
+    }
+}
+//--------------------------------------------                                                //
+// LED Set brighness of LEDs
+//--------------------------------------------
+void SetBrightnessLeds(byte Bright)
+{
+ LEDstrip.setBrightness(Bright);                                                              // Set brightness of LEDs   
+ ShowLeds();
+}
+//--------------------------------------------
+// LED Fill the strip array
+//--------------------------------------------
+void Stripfill(uint32_t RGBWColor, int FirstLed, int NoofLEDs)
+{   
+ LEDstrip.fill(RGBWColor, FirstLed, NoofLEDs);
+}
+//--------------------------------------------
+// LED Strip Get Pixel Color 
+//--------------------------------------------
+uint32_t StripGetPixelColor(int Lednr)
+{
+return(LEDstrip.getPixelColor(Lednr));
+}
+//--------------------------------------------                                                //
+// LED Synchronize the colour of the LEDstrip with the Status LED
+// Used during Setup()
+//--------------------------------------------
+void LEDstartup(uint32_t LEDColour)
+{
+ static uint32_t ProgressLedNr = 0;
+ ColorLed(ProgressLedNr++,LEDColour); 
+ ShowLeds();   
+ SetStatusLED(Cred(LEDColour),Cgreen(LEDColour),Cblue(LEDColour));  
+}
+
+//--------------------------------------------                                                //
+// LED convert HSV to RGB  h is from 0-360, s,v values are 0-1
+// r,g,b values are 0-255
+//--------------------------------------------
+/**
+ * @brief Convert HSV values to packed RGBW format (white = 0).
+ * @param H Hue angle (0–360)
+ * @param S Saturation (0–1)
+ * @param V Value/Brightness (0–1)
+ * @return Packed RGBW uint32_t value
+ */
+uint32_t HSVToRGB(double H, double S, double V) 
+{
+ int i;
+ double r, g, b, f, p, q, t;
+ if (S == 0)  {r = V;  g = V;  b = V; }
+ else
+  {
+   H >= 360 ? H = 0 : H /= 60;
+   i = (int) H;
+   f = H - i;
+   p = V * (1.0 -  S);
+   q = V * (1.0 - (S * f));
+   t = V * (1.0 - (S * (1.0 - f)));
+   switch (i) 
+    {
+     case 0:  r = V;  g = t;  b = p;  break;
+     case 1:  r = q;  g = V;  b = p;  break;
+     case 2:  r = p;  g = V;  b = t;  break;
+     case 3:  r = p;  g = q;  b = V;  break;
+     case 4:  r = t;  g = p;  b = V;  break;
+     default: r = V;  g = p;  b = q;  break;
+    }
+  }
+return FuncCRGBW((int)(r*255), (int)(g*255), (int)(b*255), 0 );                                // R, G, B, W 
+}
+//--------------------------------------------                                                //
+// LED function to make RGBW colour
+//--------------------------------------------
+uint32_t FuncCRGBW( uint32_t Red, uint32_t Green, uint32_t Blue, uint32_t White)
+{ 
+ return ( (White<<24) + (Red << 16) + (Green << 8) + Blue );
+}
+//--------------------------------------------                                                //
+// LED functions to extract RGBW colours
+//--------------------------------------------
+ uint8_t Cwhite(uint32_t c) { return (c >> 24);}
+ uint8_t Cred(  uint32_t c) { return (c >> 16);}
+ uint8_t Cgreen(uint32_t c) { return (c >> 8); }
+ uint8_t Cblue( uint32_t c) { return (c);      }
+
+
+//--------------------------------------------                                                //
+//  DISPLAY Clear the display
 //--------------------------------------------
 void ClearScreen(void)
 {
  LedsOff();
 }
 //--------------------------------------------                                                //
-//  LED Wheel
-//  Input a value 0 to 255 to get a color value.
-//  The colours are a transition r - g - b - back to r.
+// DISPLAY Wheel The colours are a transition r - g - b - back to r
+// Input a value 0 to 255 to get a color value.
 //--------------------------------------------
 uint32_t Wheel(byte WheelPos) 
 {
@@ -1852,7 +2019,7 @@ uint32_t Wheel(byte WheelPos)
 }
 
 //--------------------------------------------                                                //
-//  LED RainbowCycle
+// DISPLAY Initialyse the LEDstrip for WS2812 or SK6812 LEDs
 //--------------------------------------------
 void StartLeds(void) 
 {
@@ -1881,6 +2048,9 @@ void StartLeds(void)
               wgray  = 0xAA000000;     
     }
 sprintf(sptext,"LED strip is %s", Mem.LEDstrip?"WS2812":"SK6812" ); Tekstprintln(sptext);
+
+//ledMutex = xSemaphoreCreateMutex();
+
 LEDstrip.setBrightness(16);  
 LedsOff();                                                                // Set initial brightness of LEDs  (0-255)  
 ShowLeds();
@@ -1890,14 +2060,10 @@ ShowLeds();
 // BlinkUUR(3, blinktime);                         // Change the hours
 // BlinkHETISWAS(3, blinktime);                     // Change the hours        
 // BlinkTWAALF(3, blinktime);                      // Turn on TWAALF and change intensity 
-// BlinkBLE(3, blinktime);                         // Switch BLE On/Off                              
-// BlinkNTP_RTC(3, blinktime);                     // Switch between NTP WIFI and DS3231 RTC time    
-
-
 }
 
 //--------------------------------------------                                                //
-//  LED RainbowCycle
+//  DISPLAY RainbowCycle
 //--------------------------------------------
 void RainbowCycle(uint8_t wait) 
 {
@@ -1906,25 +2072,26 @@ void RainbowCycle(uint8_t wait)
    {                                                                                          // 5 cycles of all colors on wheel
     for(i=0; i< NUM_LEDS; i++) ColorLeds("",i,i,Wheel(((i * 256 / NUM_LEDS) + j) & 255));
     ShowLeds();
-    delay(wait);
+ //   vTaskDelay(pdMS_TO_TICKS(wait));
   }
 }
+
 //--------------------------------------------                                                //
-//  LED WhiteOverRainbow
+// DISPLAY WhiteOverRainbow
+// wait Delay between frames (in ms)
+// whiteSpeed Speed at which white segment moves
+// whiteLength Length of the white segment
 //--------------------------------------------
 void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength ) 
 {
  if(whiteLength >= NUM_LEDS) whiteLength = NUM_LEDS - 1;
  uint32_t head = whiteLength - 1;
  uint32_t tail = 0;
- uint32_t loops = 1;
  uint32_t loopNum = 0;
  static unsigned long lastTime = 0;
- while(true)
-  {
-    for(uint32_t j=0; j<256; j++) 
-     {
-      for(uint32_t i=0; i<=NUM_LEDS; i++) 
+ for(uint32_t j=0; j<256; j++) 
+    {
+     for(uint32_t i=0; i<=NUM_LEDS; i++) 
        {
         if((i >= tail && i <= head) || (tail > head && i >= tail) || (tail > head && i <= head) )
               ColorLeds("",i,i,0XFFFFFF );
@@ -1937,16 +2104,15 @@ void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength )
         if(head == NUM_LEDS) loopNum++;
         lastTime = millis();
       }
-      if(loopNum == loops) return;
       head %= NUM_LEDS;
       tail %= NUM_LEDS;
       ShowLeds();
-      delay(wait);
+//    vTaskDelay(pdMS_TO_TICKS(wait)); //delay(wait);
     }
-  }  // end while
 }
+
 //--------------------------------------------                                                //
-//  LED Place digits 0 - 9 in Matrix display
+// DISPLAY Place digits 0 - 9 in Matrix display
 // First row and column = 0, PosX,PosY is left top position of 3x5 digit
 // Calculate position LED #define MATRIX_WIDTH 12 #define MATRIX_HEIGHT 12
 //--------------------------------------------
@@ -1961,8 +2127,8 @@ void Zet_Pixel(byte Cijfer,byte Pos_X, byte Pos_Y)
     int c = pgm_read_byte_near ( &Getal[Cijfer][i][j]);                                       // Reading a byte of data stored in program memory (PROGMEM area) at a specified address.
     if ( c )                                                                                  // if Digit == 1 then turn that light on
      {                                                                                        // Serial.print(strip.getPixelColor(LEDnum) & 0X00FFFFFF,HEX); Serial.print(" ");
-      if((Pos_Y+j)%2) LEDnum = ((MATRIX_WIDTH -1) - (Pos_X + i) + (Pos_Y + j) * (MATRIX_HEIGHT));
-      else            LEDnum =                      (Pos_X + i) + (Pos_Y + j) * (MATRIX_HEIGHT); 
+      if((Pos_Y+j)%2) LEDnum =((MATRIX_WIDTH-1) - (Pos_X + i) + (Pos_Y + j) * (MATRIX_HEIGHT));
+      else            LEDnum =                    (Pos_X + i) + (Pos_Y + j) * (MATRIX_HEIGHT); 
       ColorLed(LEDnum, (uint32_t)(LetterColor));
      // ColorLed(LEDnum, (uint32_t)(Mem.OwnColour));
      // StripGetPixelColor(LEDnum) && Mem.OwnColour ? OrgColor = LetterColor : OrgColor = 0;
@@ -1972,7 +2138,7 @@ void Zet_Pixel(byte Cijfer,byte Pos_X, byte Pos_Y)
   }
 }
 //--------------------------------------------                                                //
-//  LED Time in four digits in display
+// DISPLAY Time in four digits in display
 //--------------------------------------------
 void TimePlaceDigit(byte uur, byte minuut)
 {   
@@ -1981,17 +2147,15 @@ void TimePlaceDigit(byte uur, byte minuut)
 }
 
 //--------------------------------------------                                                //
-//  LED In- or decrease light intensity value i.e. Slope
+// CLOCK In- or decrease light intensity value i.e. Slope
 //--------------------------------------------
 void WriteLightReducer(int amount)
 {
  int value = Mem.LightReducer + amount;                                                       // Prevent byte overflow by making it an integer before adding
- Mem.LightReducer = (byte) min(value,  255);                                                         // May not be larger than 255
+ Mem.LightReducer = (byte) constrain(value,5, 250);                                           // Between 5 and 250
  sprintf(sptext,"Max brightness: %3d%%",Mem.LightReducer);
  Tekstprintln(sptext);
 }
-
-
 //--------------------------- Time functions --------------------------
     
 //--------------------------------------------                                                //
@@ -2002,7 +2166,6 @@ void WriteLightReducer(int amount)
 time_t GetTijd(bool printit)
 {
  time_t now;
- 
  if (Mem.UseDS3231) GetDS3231Time(false);                                                     // If the DS3231 is attached and used get its time in timeinfo struct
  else
     { 
@@ -2013,14 +2176,12 @@ time_t GetTijd(bool printit)
  localtime(&now);                                                                             // Get the actual time and
  return now;                                                                                  // Return the unixtime in seconds
 }
-
-
 //--------------------------------------------                                                //
 // NTP print the NTP time for the timezone set 
 //--------------------------------------------
 void GetNTPtime(bool printit)
 {
- NTP.getTime();                                                                               // Force a NTP time update 
+ wait4SNTP();                                                                                 // Force a NTP time update 
  if(printit) PrintNTPtime();
 }
 //--------------------------------------------                                                //
@@ -2028,46 +2189,22 @@ void GetNTPtime(bool printit)
 //--------------------------------------------
 void PrintNTPtime(void)
 {
- sprintf(sptext,"%s  ", NTP.getTimeDateString());  
- Tekstprint(sptext);              // 17/10/2022 16:08:15
+  getLocalTime(&timeinfo); //   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  PrintRTCTime(); 
 }
-
 //--------------------------------------------                                                //
 // NTP print the NTP UTC time 
 //--------------------------------------------
 void PrintUTCtime(void)
 {
- time_t tmi;
- struct tm* UTCtime;
- time(&tmi);
- UTCtime = gmtime(&tmi);
+ time_t tmi = time(nullptr);
+ struct tm* UTCtime = gmtime(&tmi);
  sprintf(sptext,"UTC: %02d:%02d:%02d %02d-%02d-%04d  ", 
      UTCtime->tm_hour,UTCtime->tm_min,UTCtime->tm_sec,
      UTCtime->tm_mday,UTCtime->tm_mon+1,UTCtime->tm_year+1900);
  Tekstprint(sptext);   
 }
-//--------------------------------------------                                                //
-// Rotary encoder Init 
-//--------------------------------------------
- void InitRotaryMod(void)
- {
- pinMode(encoderPinA,  INPUT_PULLUP);
- pinMode(encoderPinB,  INPUT_PULLUP);  
- pinMode(clearButton,  INPUT_PULLUP); 
- myEnc.write(0);                                                                              // Clear Rotary encoder buffer
- sprintf(sptext,"Rotary %s used", Mem.UseRotary==1?"IS":"NOT");
- Tekstprintln(sptext);   
- } 
 
-//--------------------------------------------                                                //
-// Keypad3x1 Init 
-//--------------------------------------------
- void InitKeypad3x1(void)
- {
- digitalWrite(COLPIN,LOW);
- sprintf(sptext,"3*1 keypad %s used", Mem.UseRotary==2?"IS":"NOT");
- Tekstprintln(sptext);
- }
 //--------------------------------------------                                                //
 // DS3231 Init module
 //--------------------------------------------
@@ -2135,7 +2272,7 @@ RTCklok.adjust(DateTime(timeinfo.tm_year+1900, timeinfo.tm_mon+1, timeinfo.tm_md
 //--------------------------------------------
 void GetDS3231Time(bool printit)
 {
- Inow             = RTCklok.now();                                                           // Be sure to get the lates DS3231 RTC clock time
+ DateTime Inow    = RTCklok.now();                                                           // Be sure to get the latest DS3231 RTC clock time
  timeinfo.tm_hour = Inow.hour();
  timeinfo.tm_min  = Inow.minute();
  timeinfo.tm_sec  = Inow.second();
@@ -2151,7 +2288,7 @@ void GetDS3231Time(bool printit)
 //--------------------------------------------
 void PrintDS3231Time(void)
 {
- Inow = RTCklok.now();                                                                        // Be sure to get the lates DS3231 RTC clock time
+ DateTime Inow = RTCklok.now();                                                                        // Be sure to get the lates DS3231 RTC clock time
  sprintf(sptext,"%02d/%02d/%04d %02d:%02d:%02d ", Inow.day(),Inow.month(),Inow.year(),
                                                   Inow.hour(),Inow.minute(),Inow.second());
  Tekstprint(sptext);
@@ -2181,28 +2318,27 @@ void PrintTimeHMS(byte format)
   case 2: Tekstprintln(sptext); break;  
  }
 }
-
 //--------------------------------------------                                                //
-// RTC Set time from global timeinfo struct
-// Check if values are within range
+// RTC Set time using global timeinfo struct
 //--------------------------------------------
 void SetRTCTime(void) 
 { 
  time_t t = mktime(&timeinfo);                                                                // t= unixtime
- setRTCTime(t);
+ SetRTCTime(t);
 }  
-
-void setRTCTime(time_t t)
+//--------------------------------------------                                                //
+// RTC Set RTC time using Unix timestamp
+//--------------------------------------------
+void SetRTCTime(time_t t)
 { 
- // time_t t = mktime(&timeinfo);  // t= unixtime
- sprintf(sptext, "Setting time: %s", asctime(&timeinfo));    Tekstprintln(sptext);
+ snprintf(sptext, sizeof(sptext), "Setting time: %s", asctime(&timeinfo));                    // Safer than sprintf to avoid buffer overflows
+ Tekstprintln(sptext); 
  struct timeval now = { .tv_sec = t , .tv_usec = 0};
  settimeofday(&now, NULL);
- GetTijd(false);                                                                                  // Synchronize time with RTC clock
- Displaytime();
- PrintTimeHMS();
+ GetTijd(false);                                                                              // Sync global timeinfo with RTC                                                                    // Synchronize time with RTC clock
+ Displaytime();                                                                               // Show time on clock
+ PrintTimeHMS();                                                                              // Print time in HH:MM:SS format
 }
-
 //--------------------------------------------                                                //
 // Print all the times available 
 //--------------------------------------------
@@ -2228,20 +2364,21 @@ void PrintAllClockTimes(void)
 //--------------------------------------------                                                //
 //  CLOCK Convert Hex to uint32
 //--------------------------------------------
-uint32_t HexToDec(String hexString) 
-{
- uint32_t decValue = 0;
- int nextInt;
- for (uint8_t i = 0; i < hexString.length(); i++) 
-  {
-   nextInt = int(hexString.charAt(i));
-   if (nextInt >= 48 && nextInt <= 57)  nextInt = map(nextInt, 48, 57, 0, 9);
-   if (nextInt >= 65 && nextInt <= 70)  nextInt = map(nextInt, 65, 70, 10, 15);
-   if (nextInt >= 97 && nextInt <= 102) nextInt = map(nextInt, 97, 102, 10, 15);
-   nextInt = constrain(nextInt, 0, 15);
-   decValue = (decValue * 16) + nextInt;
-  }
- return decValue;
+uint32_t HexToDec(const String& hexString) {
+    uint32_t decValue = 0;
+
+    for (size_t i = 0; i < hexString.length(); i++) 
+       {
+        char c = hexString.charAt(i);
+        uint8_t value = 0;
+        if      (c >= '0' && c <= '9') { value = c - '0';      } 
+        else if (c >= 'A' && c <= 'F') { value = c - 'A' + 10; } 
+        else if (c >= 'a' && c <= 'f') { value = c - 'a' + 10; } 
+        else { continue;                                                                      // Skip invalid characters
+        }
+        decValue = (decValue << 4) | value;                                                   // Multiply by 16 and add value
+    }
+    return decValue;
 }
 //------------------------------------------------------------------------------              //
 // CLOCK Demo mode
@@ -2263,16 +2400,81 @@ void Demomode(void)
   SerialCheck();
  }
 }
+//------------------------------------------------------------------------------              //
+// CLOCK Fire display on MATRIX_HEIGHT MATRIX_WIDTH
+//------------------------------------------------------------------------------
+void FireMode(void)
+{
+  Fire2023_2D();
+  SerialCheck();
+}
+//--------------------------------------------                                                //
+// FIRE
+//--------------------------------------------
+// ==== FIRE EFFECT SETTINGS ====
+#define COOLING     90
+#define SPARKING    40
+#define FIRE_DELAY  50
+
+uint8_t heat[MATRIX_HEIGHT][MATRIX_WIDTH];  // 2D heat map
+//--------------------------------------------                                                //
+// FIRE Utils
+//--------------------------------------------
+uint8_t clamp_sub(uint8_t val, uint8_t sub) { return (val > sub) ? (val - sub) : 0;}
+uint8_t clamp_add(uint8_t val, uint8_t add) { return (val + add > 255) ? 255 : (val + add);}
+void HeatColor(uint8_t temperature, uint8_t &r, uint8_t &g, uint8_t &b) 
+{
+ uint8_t t192 = (temperature * 192) / 255;
+ uint8_t heatramp = (t192 & 0x3F) << 2;
+ if      (t192 > 128) { r = 255;      g = 255;      b = heatramp; } 
+ else if (t192 > 64)  { r = 255;      g = heatramp; b = 0;        } 
+ else                 { r = heatramp; g = 0;        b = 0;        }
+}
+
+uint16_t XY(uint8_t x, uint8_t y) 
+{  return (y % 2 == 0) ? (y * MATRIX_WIDTH + x) : (y * MATRIX_WIDTH + (MATRIX_WIDTH-1-x)); }  // Serpentine index mapping
 
 //--------------------------------------------                                                //
-//  CLOCK Dutch clock display
+// FIRE ==== Fire Logic ====
 //--------------------------------------------
-                      #if defined(NL) || defined(NL144CLOCK)  
+void Fire2023_2D() 
+{
+ for (uint8_t x = 0; x < MATRIX_WIDTH; x++)                                                   // Step 1: Cool down
+     for (uint8_t y = 0; y < MATRIX_HEIGHT; y++) 
+         heat[y][x] = clamp_sub(heat[y][x], random(0, ((COOLING*10) / MATRIX_HEIGHT) + 2));
+ for (uint8_t x = 0; x < MATRIX_WIDTH; x++)                                                   // Step 2: Heat falls down
+   {                                                 
+    for (int y = 0; y < MATRIX_HEIGHT - 2; y++) 
+        heat[y][x] = (heat[y + 1][x] + heat[y + 2][x] + heat[y + 2][x]) / 3;
+    heat[MATRIX_HEIGHT - 2][x]=(heat[MATRIX_HEIGHT - 1][x] + heat[MATRIX_HEIGHT - 1][x]) / 2; // Safe heat fall for second-to-top row
+   }
+ for (uint8_t x = 0; x < MATRIX_WIDTH; x++)                                                   // Step 3: Sparking at the top
+    if (random(255) < SPARKING)  
+       heat[MATRIX_HEIGHT - 1][x] = clamp_add(heat[MATRIX_HEIGHT - 1][x], random(160, 255));
+ for (uint8_t y = 0; y < MATRIX_HEIGHT; y++)                                                  // Step 4: Draw pixels from heat map
+   {
+    for (uint8_t x = 0; x < MATRIX_WIDTH; x++) 
+      {
+       uint8_t r, g, b;
+       HeatColor(heat[y][x], r, g, b);
+       LEDstrip.setPixelColor(XY(x, y), r, g, b, 0);                                          // Add W=0
+      }
+    }   
+ LEDstrip.show();
+ delay(FIRE_DELAY);
+}
+//--------------------------------------------                                                //
+// CLOCK Dutch clock display
+//--------------------------------------------
+                      #if defined(NL) || defined(NL144CLOCK)  || defined (NL92CLOCK)
 void Dutch(void)
 {
-HET;                                                                                          // HET  is always on
+if(!Mem.EdSoftLEDSOff) EDSOFT;                                                                // EDSOFT On or Off
+HET; 
+                      #if defined(NL) || defined(NL144CLOCK)                                                                                          // HET  is always on
  if (timeinfo.tm_hour == 12 && timeinfo.tm_min == 0 && random(2)==0) { IS; NOEN; return; }
- if (timeinfo.tm_hour == 00 && timeinfo.tm_min == 0 && random(2)==0) { IS; MIDDER; NACHT; return; } 
+ if (timeinfo.tm_hour == 00 && timeinfo.tm_min == 0 && random(2)==0) { IS; MIDDER; NACHT; return; }
+                      #endif //#if defined(NL) || defined(NL144CLOCK)  
 switch (timeinfo.tm_min)
  {
   case  0: IS;  PRECIES; break;
@@ -2377,20 +2579,24 @@ switch (sayhour)
   case  2: 
   case  3: UUR;  break; 
  }
-  switch (timeinfo.tm_min % 5)                                                                // The minutes modulo 5
- {
-  case  0: break;
-  case  1: MIN1; break;
-  case  2: MIN1; MIN2; break;
-  case  3: MIN1; MIN2; MIN3; break;
-  case  4: MIN1; MIN2; MIN3; MIN4;  
- }  
+//                        #if defined(NL) || defined(NL144CLOCK) 
+//   switch (timeinfo.tm_min % 5)                                                                // The minutes modulo 5
+//  {
+//   case  0: break;
+//   case  1: MIN1; break;
+//   case  2: MIN1; MIN2; break;
+//   case  3: MIN1; MIN2; MIN3; break;
+//   case  4: MIN1; MIN2; MIN3; MIN4;  
+//  }  
+//                       #endif // defined(NL) || defined(NL144CLOCK) 
 }
-                                    #endif //NL144CLOCK
+
+                                    #endif //#if defined(NL) || defined(NL144CLOCK)  || defined (NL92CLOCK)
 
                                     #if defined NLM1M2M3M4L114 || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L144)
 void Dutch(void)
 {
+if(!Mem.EdSoftLEDSOff) EDSOFT;     
 HET;                                                                                          // HET  is always on
 switch (timeinfo.tm_min)
  {
@@ -2623,7 +2829,7 @@ switch (sayhour)
  }
 }
                      #endif //UK
-                     #ifdef DE
+                     #if defined DE || defined DE144CLOCK
 //--------------------------------------------                                                //
 //  CLOCK German clock display
 //--------------------------------------------
@@ -2844,9 +3050,9 @@ switch (sayhour)
  } 
 }
                      #endif //FR
+
 //--------------------------------------------                                                //
-// BLE 
-// SendMessage by BLE Slow in packets of 20 chars
+// BLE SendMessage by BLE Slow in packets of 20 chars
 // or fast in one long string.
 // Fast can be used in IOS app BLESerial Pro
 //------------------------------
@@ -2879,9 +3085,9 @@ void SendMessageBLE(std::string Message)
 class MyServerCallbacks: public NimBLEServerCallbacks 
 {
  void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override 
-    {deviceConnected = true; Serial.println("Connected" ); };
+    {deviceConnected = true; Serial.println("BLE Connected"      );}
  void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override 
-    {deviceConnected = false; Serial.println("NOT Connected" );}
+    {deviceConnected = false; Serial.println("BLE NOT Connected" );}
 };
   
 class MyCallbacks: public NimBLECharacteristicCallbacks 
@@ -2895,26 +3101,6 @@ class MyCallbacks: public NimBLECharacteristicCallbacks
   }  
 };
 
-/* /-----------------------------
-// BLE Start BLE Classes NimBLE Version 1.4.3
-//------------------------------
-class MyServerCallbacks: public BLEServerCallbacks 
-{
- void onConnect(BLEServer* pServer) {deviceConnected = true; };
- void onDisconnect(BLEServer* pServer) {deviceConnected = false;}
-};
-
-class MyCallbacks: public BLECharacteristicCallbacks 
-{
- void onWrite(BLECharacteristic *pCharacteristic) 
-  {
-   std::string rxValue = pCharacteristic->getValue();
-   ReceivedMessageBLE = rxValue + "\n";
-//   if (rxValue.length() > 0) {for (int i = 0; i < rxValue.length(); i++) printf("%c",rxValue[i]); }
-//   printf("\n");
-  }  
-};
-*/
 //--------------------------------------------                                                //
 // BLE Start BLE Service
 //------------------------------
@@ -2939,7 +3125,7 @@ void StartBLEService(void)
 }
 //                                                                                            //
 //-----------------------------
-// BLE  CheckBLE
+// BLE CheckBLE input and rework string
 //------------------------------
 void CheckBLE(void)
 {
@@ -2971,7 +3157,7 @@ void WiFiEvent(WiFiEvent_t event)
 {
   sprintf(sptext,"[WiFi-event] event: %d  : ", event); 
   Tekstprint(sptext);
- // WiFiEventInfo_t info;
+  WiFiEventInfo_t info;
     switch (event) 
      {
         case ARDUINO_EVENT_WIFI_READY: 
@@ -2992,42 +3178,47 @@ void WiFiEvent(WiFiEvent_t event)
        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
             sprintf(sptext,"WiFi lost connection.");                                          // Reason: %d",info.wifi_sta_disconnected.reason); 
             Tekstprintln(sptext);
-              // WiFi.disconnect();
-              // WIFIwasConnected = false; 
-//            WiFi.reconnect();
+ //           WiFi.reconnect(); is checked in EveryMinuteUpdate()
             break;
         case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
             Tekstprintln("Authentication mode of access point has changed");
             break;
         case ARDUINO_EVENT_WIFI_STA_GOT_IP:
-            sprintf(sptext, "Obtained IP address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+//            sprintf(sptext,"Connected to : %s %s",WiFi.SSID().c_str(), WiFi.psk().c_str()  );
+            sprintf(sptext,"Connected to : %s",WiFi.SSID().c_str());
             Tekstprintln(sptext);
+            sprintf(sptext, "Obtained IP address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
+            Tekstprintln(sptext);         
+            strcpy(Mem.SSID,      WiFi.SSID().c_str());
+            strcpy(Mem.Password , WiFi.psk().c_str());                                         // Store SSID and password
+            Mem.NTPOn        = 1;                                                              // NTP On
+            Mem.WIFIOn       = 1;                                                              // WIFI On  
+            StoreStructInFlashMemory();  
             break;
         case ARDUINO_EVENT_WIFI_STA_LOST_IP:
             Tekstprintln("Lost IP address and IP address is reset to 0");
             break;
         case ARDUINO_EVENT_WPS_ER_SUCCESS:
-     //      txtstr = WiFi.SSID().c_str();
-           sprintf(sptext, "WPS Successfull, stopping WPS and connecting to: %s: ", WiFi.SSID().c_str());
-           Tekstprintln(sptext);
-//            wpsStop();
-//            delay(10);
-//            WiFi.begin();
+            wpsStop();
+            delay(100);
+            WiFi.begin();
+            delay(200);
+             sprintf(sptext, "WPS Successfull, stopping WPS and connecting to: %s: ", WiFi.SSID().c_str());
+            Tekstprintln(sptext);       
             break;
         case ARDUINO_EVENT_WPS_ER_FAILED:
             Tekstprintln("WPS Failed, retrying");
-//            wpsStop();
-//            wpsStart();
+            wpsStop();
+            wpsStart();
             break;
         case ARDUINO_EVENT_WPS_ER_TIMEOUT:
-            Tekstprintln("WPS Timedout, retrying");
-//            wpsStop();
-//            wpsStart();
+            Tekstprintln("WPS Timedout, Start WPS again");
+            wpsStop();
+            // wpsStart();
             break;
         case ARDUINO_EVENT_WPS_ER_PIN:
- //           txtstr = wpspin2string(info.wps_er_pin.pin_code).c_str();
-//            sprintf(sptext,"WPS_PIN = %s",txtstr);
-//            Tekstprintln(sptext);
+            sprintf(sptext,"WPS_PIN = %s",wpspin2string(info.wps_er_pin.pin_code).c_str());
+            Tekstprintln(sptext);
             break;
         case ARDUINO_EVENT_WIFI_AP_START:
             Tekstprintln("WiFi access point started");
@@ -3076,49 +3267,18 @@ void WiFiEvent(WiFiEvent_t event)
     }
 }
 //--------------------------------------------                                                //
-// NTP Check NTP SyncEvent 
-//--------------------------------------------
-void NTPsyncEvent(void)
-{
-    if (syncEventTriggered) 
-    {
-      syncEventTriggered = false;
-      processSyncEvent (ntpEvent);
-    }
-}
-//--------------------------------------------                                                //
-// NTP processSyncEvent 
-//--------------------------------------------
-void processSyncEvent (NTPEvent_t ntpEvent) 
-{
- switch (ntpEvent.event) 
-    {
-        case timeSyncd:
-        case partlySync:
-        case syncNotNeeded:
-        case accuracyError:
-            sprintf(sptext,"[NTP-event] %s", NTP.ntpEvent2str (ntpEvent));
-            Tekstprintln(sptext);
-            break;
-        default:
-            break;
-    }
-}
-
-
-//--------------------------------------------                                                //
 // WIFI Check for WIFI Network 
 // Check if WIFI network to connect to is available
 //--------------------------------------------
  bool CheckforWIFINetwork(void)         { return CheckforWIFINetwork(true);}
  bool CheckforWIFINetwork(bool PrintIt)
  {
-  WiFi.mode(WIFI_STA);                                                                         // Set WiFi to station mode and disconnect from an AP if it was previously connected.
+  WiFi.mode(WIFI_STA);                                                                        // Set WiFi to station mode and disconnect from an AP if it was previously connected.
   WiFi.disconnect(); 
   WIFIwasConnected = false;
+  Tekstprintln("Scanning for networks");
   int n = WiFi.scanNetworks();                                                                // WiFi.scanNetworks will return the number of networks found
   SSIDandNetworkfound = false;
-  Tekstprintln("Scanning for networks");
   if (n == 0) { Tekstprintln("no networks found"); return false;} 
   else 
     { 
@@ -3155,39 +3315,20 @@ void ScanWIFI(void)
     for(int i = 0; i < n; ++i) 
       {
        sprintf(sptext,"%2d | %-32.32s | %4d | %2d | ",i + 1, 
-                       WiFi.SSID(i).c_str(), (int)WiFi.RSSI(i), (int)WiFi.channel(i));                 // Print SSID and RSSI for each network found
+                       WiFi.SSID(i).c_str(), (int)WiFi.RSSI(i), (int)WiFi.channel(i));        // Print SSID and RSSI for each network found
        Tekstprint(sptext);
        switch (WiFi.encryptionType(i))
            {
-            case WIFI_AUTH_OPEN:
-                Tekstprint("open");
-                break;
-            case WIFI_AUTH_WEP:
-                Tekstprint("WEP");
-                break;
-            case WIFI_AUTH_WPA_PSK:
-                Tekstprint("WPA");
-                break;
-            case WIFI_AUTH_WPA2_PSK:
-                Tekstprint("WPA2");
-                break;
-            case WIFI_AUTH_WPA_WPA2_PSK:
-                Tekstprint("WPA+WPA2");
-                break;
-            case WIFI_AUTH_WPA2_ENTERPRISE:
-                Tekstprint("WPA2-EAP");
-                break;
-            case WIFI_AUTH_WPA3_PSK:
-                Tekstprint("WPA3");
-                break;
-            case WIFI_AUTH_WPA2_WPA3_PSK:
-                Tekstprint("WPA2+WPA3");
-                break;
-            case WIFI_AUTH_WAPI_PSK:
-                Tekstprint("WAPI");
-                break;
-            default:
-                Tekstprint("unknown");
+             case WIFI_AUTH_OPEN:            Tekstprint("open");      break;
+             case WIFI_AUTH_WEP:             Tekstprint("WEP");       break;
+             case WIFI_AUTH_WPA_PSK:         Tekstprint("WPA");       break;
+             case WIFI_AUTH_WPA2_PSK:        Tekstprint("WPA2");      break;
+             case WIFI_AUTH_WPA_WPA2_PSK:    Tekstprint("WPA+WPA2");  break;
+             case WIFI_AUTH_WPA2_ENTERPRISE: Tekstprint("WPA2-EAP");  break;
+             case WIFI_AUTH_WPA3_PSK:        Tekstprint("WPA3");      break;
+             case WIFI_AUTH_WPA2_WPA3_PSK:   Tekstprint("WPA2+WPA3"); break;
+             case WIFI_AUTH_WAPI_PSK:        Tekstprint("WAPI");      break;
+             default:                        Tekstprint("unknown");
             }
             Tekstprintln("");
             delay(10);
@@ -3215,7 +3356,7 @@ if( (strlen(Mem.Password)<5 || strlen(Mem.SSID)<3))   // If WIFI required and no
  }
 
 //--------------------------------------------                                                //
-// WIFI WEBPAGE 
+// WIFI Start WIFI connection and NTP service
 //--------------------------------------------
 void StartWIFI_NTP(void)
 {
@@ -3225,9 +3366,11 @@ void StartWIFI_NTP(void)
  WiFi.mode(WIFI_STA);  
  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
  WIFIwasConnected = false;
- WiFi.onEvent(WiFiEvent);                                                                     // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
+ wifiEventHandler = WiFi.onEvent(WiFiEvent);                                                  //                   // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
  WiFi.begin(Mem.SSID, Mem.Password);
  MDNS.begin(Mem.BLEbroadcastName);                                                            // After reset http://wordclock.local 
+ // Task function, Name, Stack size, Parameter, Priority, Task handle, Core 1
+ xTaskCreatePinnedToCore(WebServerTask,"WebServerTask", 4096, NULL, 1, NULL, 1 );             // Start handleClient loop on core 1
  int tryDelay = 5000;                                                                         // Will try for about 50 seconds (20x 10,000ms)
  int numberOfTries = 10;
  while (true)                                                                                 // Wait for the WiFi event
@@ -3255,15 +3398,16 @@ void StartWIFI_NTP(void)
      case WL_CONNECTED:
           sprintf(sptext, "IP Address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );
           Tekstprintln(sptext); 
-          WIFIwasConnected = true;
+          WIFIwasConnected = true;                                                            // No we know the SSID ans password are correct and we can reconnect
           Mem.WIFIcredentials = SET_AND_OK;
+
           break;
      default:
           Serial.print("[WiFi] WiFi Status: ");
           Serial.println(WiFi.status());
           break;
     } 
-  ColorLed(ProgressLedNr++,white); ShowLeds();
+  LEDstartup(0xFFFFFF);                                                                      // white colour in WS2812 and SK6812 LEDs
   if (WIFIwasConnected) break;       
   if(numberOfTries <= 0)
     {
@@ -3299,105 +3443,192 @@ void StartWIFI_NTP(void)
   }
 if ( !WIFIwasConnected) return;                                                                  // If WIFI connection fails -> returm
 //  sprintf(sptext, "IP Address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], WiFi.localIP()[2], WiFi.localIP()[3] );  Tekstprintln(sptext); 
-ElegantOTA.begin(&server);                                                                      // Start ElegantOTA  new version in 2023  
-       // if compile error see here :https://docs.elegantota.pro/async-mode/  // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:                                                                                        // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1    
-                                                                                                // Save the changes to the ElegantOTA.h file.   
 if(Mem.NTPOn )
   { 
-   NTP.setTimeZone(Mem.Timezone);                                                             // TZ_Europe_Amsterdam); //\TZ_Etc_GMTp1); // TZ_Etc_UTC 
-   NTP.begin();  // crashes core 3.1 here ****                                                                           // https://raw.githubusercontent.com/nayarsystems/posix_tz_db/master/zones.csv
-   NTP.onNTPSyncEvent([](NTPEvent_t event){ntpEvent=event; syncEventTriggered=true;});
-   Tekstprintln("NTP is On");
+   initSNTP();
+   if(wait4SNTP())  Tekstprintln("NTP is On and synced");
+   else             Tekstprintln("NTP is On but NOT synced");
    }   
  if(Mem.WIFIOn) WebPage();                                                                    // Show the web page if WIFI is on
  Tekstprint("Web page started\n");
+ WiFi.removeEvent(wifiEventHandler);                                                          // Remove the WIFI event handler
+}
+//--------------------------------------------                                                //
+// WIFI WebServerTask on Core 1
+// instead of 1000 loops/s it is now 210,000 loops/s 
+//--------------------------------------------
+void WebServerTask(void *pvParameters) 
+{
+  for (;;) 
+  {
+    server.handleClient();                                                                    // This is normally blocking
+    vTaskDelay(1);                                                                            // Small delay to yield control
+  }
+}
+//--------------------------------------------                                                //
+// NTP functions
+//--------------------------------------------
+void NTPnotify(struct timeval* t) { Tekstprintln("*** NTP time synchronized ***");}
+void setTimezone()                { setenv("TZ", Mem.Timezone, 1);  tzset(); }
+void initSNTP() 
+{  
+ sntp_set_sync_interval(1 * 60 * 60 * 1000UL);  // 1 hour
+ sntp_set_time_sync_notification_cb(NTPnotify);
+ esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+ esp_sntp_setservername(0, "pool.ntp.org");
+ esp_sntp_init();
+ setTimezone();
+}
+bool wait4SNTP() 
+{
+ int32_t Tick = millis(); 
+ bool SNTPtimeValid = true;
+ while (sntp_get_sync_status() != SNTP_SYNC_STATUS_COMPLETED) 
+  { if ((millis() - Tick) >5000) {SNTPtimeValid = false; break;}   }                          // Wait max 5 seconds 
+return  SNTPtimeValid;
 }
 
 //--------------------------------------------                                                //
 // WIFI WEBPAGE 
 //--------------------------------------------
-void WebPage(void) 
+void WebPage(void)
 {
- int i=0,n;
- SWversion();                                                                                 // Print the menu to the web page and BLE
- for (n=0;n<strlen(index_html_top);n++)       HTML_page[i++] = (char) index_html_top[n];
- if( i > MAXSIZE_HTML_PAGE - 999) 
-   {  
+  int i = 0, n;
+  SWversion();                                                                                // Print the menu to the web page and BLE
+  for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = (char) index_html_top[n];
+  if (i > MAXSIZE_HTML_PAGE - 999)
+   {
     strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>");
    }
- else
-   {
-    for (n=0;n<strlen(html_info);n++)         HTML_page[i++] = (char) html_info[n];
-    for (n=0;n<strlen(index_html_footer);n++) HTML_page[i++] = (char) index_html_footer[n];
-    HTML_page[i]=0;
+  else
+  {
+    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];
+    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n];
+    HTML_page[i] = 0;
    }
- server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)                                  // Send web page with input fields to client
-   {  request->send(200, "text/html",(const char*) HTML_page  );  }    ); 
- server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request)                              // Send a GET request to <ESP_IP>/get?input1=<inputMessage>
-   { 
-    String inputMessage;    String inputParam;
-    if (request->hasParam(PARAM_INPUT_1))                                                 // GET input1 value on <ESP_IP>/get?input1=<inputMessage>
-       {
-        inputMessage = request->getParam(PARAM_INPUT_1)->value();
-        inputParam = PARAM_INPUT_1;
-       }
+  server.on("/", HTTP_GET, []() {server.send(200, "text/html", (const char*)HTML_page); });   // Root page
+  server.on("/get", HTTP_GET, []() 
+   {                                                                                          // Handle GET with input
+    String inputMessage;
+    String inputParam;
+    if (server.hasArg(PARAM_INPUT_1)) 
+      { inputMessage = server.arg(PARAM_INPUT_1);   inputParam = PARAM_INPUT_1; } 
     else 
-       {
-        inputMessage = "";                                                                //inputMessage = "No message sent";
-        inputParam = "none";
-       }                                                                                  //     sprintf(sptext,"%s",inputMessage.c_str());    Tekstprintln(sptext); 
+      { inputMessage = "";                          inputParam = "none";        }
     ReworkInputString(inputMessage);
-    SWversion();                                                                          // Print the menu to the web page and BLE
-    int i=0,n;
-    for (n=0;n<strlen(index_html_top);n++)    HTML_page[i++] = (char) index_html_top[n];
-    for (n=0;n<strlen(html_info);n++)         HTML_page[i++] = (char) html_info[n];
-    for (n=0;n<strlen(index_html_footer);n++) HTML_page[i++] = (char) index_html_footer[n];
-    HTML_page[i]=0;        
-    request->send(200, "text/html", HTML_page );  
-   }   );   
- server.onNotFound(notFound);
- server.begin();
-}
+    SWversion();                                                                               // Print updated info
+ 
+    int i = 0, n;
+    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = (char) index_html_top[n];
+    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];
+    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n];
+    HTML_page[i] = 0;
+    server.send(200, "text/html", HTML_page);
+   }  );
 
+  server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });          // If //update is type after the URL OTA GET page
+  server.on("/update", HTTP_POST, []()                                                        // OTA POST handler
+    {
+    shouldReboot = true;                                                                      // Reboot flag. Reboot the MCU after upload
+    server.send(200, "text/html",
+      "<!DOCTYPE html><html><body>"
+      "<h2>Update successful. Rebooting...</h2>"
+      "<p>You will be redirected shortly.</p>"
+      "<script>setTimeout(()=>{location.href='/'}, 7000);</script>"
+      "</body></html>");
+  });
+  server.onFileUpload([]() 
+  {
+    HTTPUpload& upload = server.upload();                                                     // OTA file upload
+    if (upload.status == UPLOAD_FILE_START) 
+      {
+       Serial.printf("OTA Start: %s\n", upload.filename.c_str());
+       if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {  Update.printError(Serial);  }
+      } 
+    else if (upload.status == UPLOAD_FILE_WRITE) 
+        {
+         if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) 
+          {  Update.printError(Serial);  }
+        } 
+    else if (upload.status == UPLOAD_FILE_END) 
+       {
+        if ( Update.end(true)) {Serial.printf("OTA Success: %u bytes\n", upload.totalSize);  } 
+        else { Update.printError(Serial);   }
+       }
+  });
 //--------------------------------------------                                                //
-// WIFI WEBPAGE 
+// WIFI WEBPAGE 404 handler
 //--------------------------------------------
-void notFound(AsyncWebServerRequest *request) 
-{
-  request->send(404, "text/plain", "Not found");
+  server.onNotFound([]() {  server.send(404, "text/plain", "Not found");  });
+  server.begin();
 }
 //--------------------------------------------                                                //
-// WIFI WEBPAGE Login cedentials page with 192.168.4.1
+// WIFI WEBPAGE Login credentials Access Point page with 192.168.4.1
 //--------------------------------------------
 void StartAPMode(void) 
 {
- apMode = true;
- Mem.WIFIcredentials = IN_AP_NOT_SET;
- WiFi.softAP(AP_SSID, AP_PASSWORD);
- dnsServer.start(53, "*", WiFi.softAPIP());
- server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-  { request->send(200,"text/html",SoftAP_html);  });
- server.on("/", HTTP_POST, [](AsyncWebServerRequest *request)
-   {
-    int params = request->params();
+  apMode = true;
+  Mem.WIFIcredentials = IN_AP_NOT_SET;
+  WiFi.softAP(AP_SSID, AP_PASSWORD);
+  dnsServer.start(53, "*", WiFi.softAPIP());
+  server.on("/", HTTP_GET, []() {  server.send(200, "text/html", SoftAP_html); });            // Serve AP HTML form
+  server.on("/", HTTP_POST, []()                                                              // Handle AP form POST
+  {
+    int params = server.args();
     for (int i = 0; i < params; i++) 
-      {
-       const AsyncWebParameter* p = request->getParam(i);
-       if (p->name() == "ssid") { strcpy(Mem.SSID,p->value().c_str());       }
-       if (p->name() == "pass") { strcpy(Mem.Password , p->value().c_str()); }
-      }
+    {
+      String name = server.argName(i);
+      String value = server.arg(i);
+      if (name == "ssid") strcpy(Mem.SSID, value.c_str());
+      if (name == "pass") strcpy(Mem.Password, value.c_str());
+    }
     StoreStructInFlashMemory();
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)                                  // Send web page with input fields to client
-      { request->send(200, "text/plain", "Credentials saved. Restarting...");  } );  
     Mem.WIFIcredentials = SET;
+    server.send(200, "text/plain", "Credentials saved. Restarting..."); 
     delay(300);
     ESP.restart();
-   });
- server.begin();
- Serial.println("AP Mode Started");
- Serial.print("AP SSID: ");       Serial.println(AP_SSID);
- Serial.print("AP IP Address: "); Serial.println(WiFi.softAPIP());       
+  } );
+
+  server.begin();
+
+  Serial.println("AP Mode Started");
+  Serial.print("AP SSID: ");       Serial.println(AP_SSID);
+  Serial.print("AP IP Address: "); Serial.println(WiFi.softAPIP()); 
 }
+
+//--------------------------------------------                                                //
+// WIFI WPS functions
+//--------------------------------------------
+void wpsInitConfig()
+{
+ config.wps_type = ESP_WPS_MODE;
+ strcpy(config.factory_info.manufacturer, ESP_MANUFACTURER);
+ strcpy(config.factory_info.model_number, ESP_MODEL_NUMBER);
+ strcpy(config.factory_info.model_name, ESP_MODEL_NAME);
+ strcpy(config.factory_info.device_name, ESP_DEVICE_NAME);
+}
+
+void wpsStart()
+{
+ if(esp_wifi_wps_enable(&config))  Serial.println("WPS Enable Failed");
+ else if(esp_wifi_wps_start(0)) 	 Serial.println("WPS Start Failed");
+}
+
+void wpsStop()
+{
+ if(esp_wifi_wps_disable()) 	     Serial.println("WPS Disable Failed");
+}
+
+String wpspin2string(uint8_t a[])
+{
+ char wps_pin[9];
+ for(int i=0;i<8;i++){ wps_pin[i] = a[i]; }
+ wps_pin[8] = '\0';
+ return (String)wps_pin;
+}
+//--------------------------------------------                                                //
+// End WPS
+//--------------------------------------------
 
                                   #ifdef ONEWIREKEYPAD3x4
 //--------------------------------------------                                                //
@@ -3426,7 +3657,7 @@ void OnewireKeypad3x4Check(void)
   }
  if(keyvalue<13) { Serial.println(Key); delay(300); }
   if (Key == 12)   // *                                                                       // Pressing a * activates the keyboard input. 
-   { 
+   {  
     KeyInputactivated = true;
     KeyLooptime = millis();
     KeypadString ="";
@@ -3491,6 +3722,15 @@ void OnewireKeypad3x1Check(void)
     }
 }
                                   #endif //ONEWIREKEYPAD3x1
+//--------------------------------------------                                                //
+// KEYPAD 3x1 Init 
+//--------------------------------------------
+ void InitKeypad3x1(void)
+ {
+ digitalWrite(COLPIN,LOW);
+ sprintf(sptext,"3*1 keypad %s used", Mem.UseRotary==2?"IS":"NOT");
+ Tekstprintln(sptext);
+ }
 //--------------------------------------------
 // KEYPAD check for Keypad input
 //--------------------------------------------                           
@@ -3511,30 +3751,32 @@ void Keypad3x1Check(void)
   }
 } 
 //--------------------------------------------                                                //
+// KY-040 ROTARY encoder Init 
+//--------------------------------------------
+ void InitRotaryMod(void)
+ {
+ pinMode(encoderPinA,  INPUT_PULLUP);
+ pinMode(encoderPinB,  INPUT_PULLUP);  
+ pinMode(clearButton,  INPUT_PULLUP); 
+ myEnc.write(0);                                                                              // Clear Rotary encoder buffer
+ sprintf(sptext,"Rotary %s used", Mem.UseRotary==1?"IS":"NOT");
+ Tekstprintln(sptext);   
+ } 
+//--------------------------------------------                                                //
 // KY-040 ROTARY check if the rotary is moving
 //--------------------------------------------
 void RotaryEncoderCheck(void)
 {
  int ActionPress = 999;
  if (digitalRead(clearButton) == LOW )          ProcessKeyPressTurn(0);                       // Set the time by pressing rotary button
- else if (ChangeTime)    
+ else if (ChangeTime || ChangeLightIntensity)    
   {   
    ActionPress = myEnc.read();                                                                // If the knob is turned store the direction (-1 or 1)
    if (ActionPress == 0) {  ActionPress = 999;  ProcessKeyPressTurn(ActionPress);  }          // Sent 999 = nop (no operation) 
    if (ActionPress == 1 || ActionPress == -1 )  ProcessKeyPressTurn(ActionPress);             // Process the ActionPress
   } 
  myEnc.write(0);                                                                              // Set encoder pos back to 0
-}
 
-//--------------------------------------------                                                //
-// CLOCK
-// KY-040 or Membrane 3x1 processing input
-// encoderPos < 1 left minus 
-// encoderPos = 0 attention and selection choice
-// encoderPos > 1 right plus
-//--------------------------------------------
-void ProcessKeyPressTurn(int encoderPos)
-{
 if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                                    // After 60 sec after shaft is pressed time of light intensity can not be changed 
    {
     if (ChangeTime || ChangeLightIntensity)                         
@@ -3544,7 +3786,17 @@ if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                      
       }
     ChangeTime            = false;
     ChangeLightIntensity  = false;
-   }  
+   }   
+}
+
+//--------------------------------------------                                                //
+// CLOCK KY-040 Rotary or Membrane 3x1 processing input
+// encoderPos < 1 left minus 
+// encoderPos = 0 attention and selection choice
+// encoderPos > 1 right plus
+//--------------------------------------------
+void ProcessKeyPressTurn(int encoderPos)
+{
  if (ChangeTime || ChangeLightIntensity)                                                      // If shaft is pressed time of light intensity can be changed
    {
     if ( encoderPos!=999 && ( (millis() - Looptime) > 250))                                   // If rotary turned avoid debounce within 0.25 sec
@@ -3559,7 +3811,9 @@ if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                      
               {if( ++timeinfo.tm_hour >23) { timeinfo.tm_hour = 0; } }      
            if (NoofRotaryPressed == 2)                                                        // Change minutes
               {  timeinfo.tm_sec = 0;
-               if( ++timeinfo.tm_min >59) { timeinfo.tm_min = 0; if( ++timeinfo.tm_hour >23) { timeinfo.tm_hour = 0; } }   }
+               if( ++timeinfo.tm_min  >59) 
+                 { timeinfo.tm_min  = 0; if( timeinfo.tm_hour >=23) { timeinfo.tm_hour = 0; } }   
+              }
            } 
         }    
       if (encoderPos == -1)                                                                   // Decrease
@@ -3568,16 +3822,20 @@ if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                      
        if (ChangeTime)     
           {
            if (NoofRotaryPressed == 1)                                                        // Change hours
-            { if( timeinfo.tm_hour-- ==0) { timeinfo.tm_hour = 23; } }      
+             {if( timeinfo.tm_hour-- ==0)  { timeinfo.tm_hour = 23; }  }      
            if (NoofRotaryPressed == 2)                                                        // Change minutes
-            { timeinfo.tm_sec = 0;
-             if( timeinfo.tm_min-- == 0) { timeinfo.tm_min = 59; if( timeinfo.tm_hour-- == 0) { timeinfo.tm_hour = 23; } }  }
-          }          
+             { 
+              timeinfo.tm_sec = 0;
+              if( timeinfo.tm_min-- == 0) 
+                { timeinfo.tm_min  = 59; if( timeinfo.tm_hour  == 0) { timeinfo.tm_hour = 23; } }
+             } 
+           }          
         } 
       SetDS3231Time();  
       PrintDS3231Time();
-      Looptime = millis();       
-     }                                                
+      Displaytime();
+      Looptime = millis();    
+     }                                                     
    }
  if (encoderPos == 0 )                                                                        // Set the time by pressing rotary button
    { 
@@ -3591,7 +3849,7 @@ if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                      
        case 1:  ChangeTime = true;           BlinkUUR(3, 300);      break;                    // Change the hours
        case 2:  ChangeTime = true;           BlinkHETISWAS(3, 300); break;                    // Change the hours        
        case 3:  ChangeLightIntensity = true; BlinkTWAALF(3, 300);   break;                    // Turn on TWAALF and change intensity 
-       case 4:  ChangeNTP_RTC = true;        BlinkNTP_RTC(3, 300);  break;                    // Switch between NTP WIFI and DS3231 RTC time                            
+       case 4:                                                      break;                    // 
        case 5:                                                      break;                    // 
        case 6:                                                      break;                    // 
        case 7:                                                      break;                    //                                
@@ -3605,5 +3863,3 @@ if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                      
    }
  }
 
-
-//                                                                                            //

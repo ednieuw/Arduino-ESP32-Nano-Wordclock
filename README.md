@@ -8,7 +8,9 @@ Built your own word clock with one or four languages with an Arduino ESP32 Nano.
 The clock can be controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC, a rotary encoder or membrane swiches.<br>
 <img src="https://github.com/user-attachments/assets/0b566154-2bc8-415f-927c-ea496154f767" style="width:50%;">
 
+To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
+
 It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and day light saving corrections.<br>
 
 If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary or membrane pad time can be set.<br>
