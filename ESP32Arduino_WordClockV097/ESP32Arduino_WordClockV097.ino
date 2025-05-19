@@ -60,10 +60,11 @@
  Changes V091: Replaced AsyncWebserver en AsyncTCP with standard ESP32 Webserver library. This app does not need Async. 
                (NB loop counts drops from 210000 to 1000 loops/sec)
  Changes V092: Compiles with ESP32 core 3.2.0 and Adafruit NeoPixel at version 1.13.0. Removed EdSoftLED.h
- Changes V093: Added small menu
+ Changes V093: Added Small menu
  Changes V094: Replaced NIMBLE with ESP32 BLE
  Changes V095: Cleanup code. New function LEDstartup
  Changes V096: Removed ESP32 BLE. Caused restarts in ESP32 3.2.0. NimBLE works fine and probably better.
+ Changes V097: Webpage remembers and also shows last small or long menu display
 
 How to compile: 
 Install ESP32 boards
@@ -77,11 +78,11 @@ Select below, with only one #define selected, the clock type
 // =============================================================================================================================
 // ------------------>   Define only one clock type
 //#define FOURLANGUAGECLOCK
-//#define NL144CLOCK              // Dutch display for 12 x 12 Front
+#define NL144CLOCK              // Dutch display for 12 x 12 Front
 //#define NL92CLOCK               // Dutch display for one LED behind every character
 //#define DE144CLOCK              // German display for 12 x 12 Front
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
-#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
+//#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
 //--------------------------------------------
 // ESP32 Definition of installed modules
@@ -681,7 +682,7 @@ static esp_wps_config_t config;
 //----------------------------------------
 // Common
 //----------------------------------------
- #define   MAXTEXT 255
+#define   MAXTEXT 255
 char      sptext[MAXTEXT];                                                                    // For common print use 
 bool      LEDsAreOff        = false;                                                          // If true LEDs are off except time display
 bool      NoTextInLeds      = false;                                                          // Flag to control printing of the text in function ColorLeds()
@@ -702,7 +703,7 @@ struct    EEPROMstorage {                                                       
   byte NTPOn            = 1;
   byte WIFIOn           = 1;  
   byte StatusLEDOn      = 1;
-  int  ReconnectWIFI    = 0;                                                                  // No of times WIFI reconnected 
+  int  MCUrestarted     = 0;                                                                  // No of times WIFI reconnected 
   byte DCF77On          = 0;
   byte UseRotary        = 0;                                                                  // Use coding for Rotary encoder ==1 or 3x1 membrane keypad ==2
   byte UseDS3231        = 0;                                                                  // Use the DS3231 time module 
@@ -730,7 +731,8 @@ struct    EEPROMstorage {                                                       
 // Menu
 //0        1         2         3         4
 //1234567890123456789012345678901234567890----  
- char menu[][40] = {
+bool LastMenuformat = 0;                                                                      // Small of full menu
+char menu[][40] = {
  "A SSID B Password C BLE beacon name",
  "D Date (D15012021) T Time (T132145)",
  "E Timezone  (E<-02>2 or E<+01>-1)",
@@ -775,8 +777,11 @@ void setup()
  SetStatusLED(10,0,0);                                                                        // Set the status LED to red
  InitStorage();                                                                               // Load settings from storage and check validity  
  StartLeds();                                                                                 // LED RainbowCycle  
- while (!Serial) {if((millis()-Tick)>5000) break; LEDstartup(dyellow); delay(250); } 
+ while (!Serial) {if((millis()-Tick)>5000) break; LEDstartup(dyellow); delay(512); }          // Wait max 5 second to establish serial connection
  LEDstartup(capri); Tekstprintln("Serial started\nStored settings loaded\nLED strip started");// InitStorage and StartLEDs must be called first
+ Mem.MCUrestarted++;                                                                          // MCU Restart counter     
+ StoreStructInFlashMemory();                                                                  // 
+ if(Mem.MCUrestarted>5) { Reset();  ResetCredentials(); }                                     // If the MCU restarts so often Reset all 
  if(Mem.UseRotary==1) {LEDstartup(pink);  InitRotaryMod(); Tekstprintln("Rotary available"); }// Start the Rotary encoder
  if(Mem.UseRotary==2) {LEDstartup(grass); InitKeypad3x1(); Tekstprintln("Keypad available"); }// Start the Keypad 3x1 
  InitDS3231Mod();      LEDstartup(dyellow);                Tekstprintln("DS3231 RTC started");// Start the DS3231 RTC-module even if not installed. It can be turned it on later in the menu
@@ -787,6 +792,8 @@ void setup()
  Displaytime(); Tekstprintln("");                                                             // Print the tekst time in the display 
  SWversion();                                                                                 // Print the menu + version 
  LEDstartup(green);                                                                           // Set the status LED to green                                  
+ Mem.MCUrestarted = 0;                                                                        // Startup went well; Set MCUrestart counter to 0    
+ StoreStructInFlashMemory();                                                                  // 
  msTick = millis();                                                                           // start the seconds loop counter
 }
 
@@ -893,11 +900,8 @@ void EveryDayUpdate(void)
     Previous_LDR_read = ReadLDR();                                                            // to have a start value
     MinPhotocell      = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
     MaxPhotocell      = Previous_LDR_read;                                                    // Stores maximum reading of photocell;
-//  Mem.ReconnectWIFI = 0;                                                                    // Reset WIFI reconnection counter     
-//  StoreStructInFlashMemory();                                                               // 
     }
 }
-
 //--------------------------------------------                                                //
 // COMMON Update routine for the status LEDs
 //-------------------------------------------- 
@@ -983,7 +987,7 @@ void Reset(void)
  Mem.UseBLELongString = 0;                                                                    // Default off. works only with iPhone/iPad with BLEserial app
  Mem.NTPOn            = 0;                                                                    // NTP default off
  Mem.WIFIOn           = 0;                                                                    // WIFI default off
- Mem.ReconnectWIFI    = 0;                                                                    // Correct time if necessary in seconds
+ Mem.MCUrestarted     = 0;                                                                    // MCU Restart counter
  Mem.WIFIcredentials  = 0;                                                                    // Status of the WIFI connection
  //Mem.UseRotary      = 0;    // Do not erase this setting with a reset                       // Use the rotary coding
  Mem.DCF77On          = 0;                                                                    // Default off
@@ -993,7 +997,6 @@ void Reset(void)
  MinPhotocell         = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
  MaxPhotocell         = Previous_LDR_read;                                                    // Stores maximum reading of photocell;                                            
  TestLDR              = 0;                                                                    // If true LDR display is printed every second
-// WIFIwasConnected     = false;
  Tekstprintln("**** Reset of preferences ****"); 
  StoreStructInFlashMemory();                                                                  // Update Mem struct       
  GetTijd(false);                                                                              // Get the time and store it in the proper variables
@@ -1041,13 +1044,13 @@ void WTekstappend(char const *tekst, char const *prefixtekst, char const *suffix
     if (newline) { strcat(html_info, "<br>"); }   // Append to html_info
 }
 
-void WTekstprintln(char const *tekst) {    WTekstappend(tekst, "", "", true);}
+void WTekstprintln(char const *tekst) { WTekstappend(tekst, "", "", true);}
 void WTekstprintln(char const *tekst, char const *prefixtekst, char const *suffixtekst) 
-    { WTekstappend(tekst, prefixtekst, suffixtekst, true); }
+                                      { WTekstappend(tekst, prefixtekst, suffixtekst, true); }
 
-void WTekstprint(char const *tekst) {    WTekstappend(tekst, "", "", false);}
+void WTekstprint(char const *tekst)   { WTekstappend(tekst, "", "", false);}
 void WTekstprint(char const *tekst, char const *prefixtekst, char const *suffixtekst) 
-    { WTekstappend(tekst, prefixtekst, suffixtekst, false);}
+                                      { WTekstappend(tekst, prefixtekst, suffixtekst, false);}
 
 //--------------------------------------------                                                //
 // COMMON Constrain a string with integers
@@ -1115,13 +1118,14 @@ void GetStructFromFlashMemory(void)
 //--------------------------------------------                                                //
 // COMMON Version info
 //--------------------------------------------
-void SWversion(void) {SWversion(true);}
-void SWversion(bool small) 
+void SWversion(void) {SWversion(LastMenuformat);}
+void SWversion(bool Small) 
 { 
  #define FILENAAM (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)    
  html_info[0] = 0;                                                                           // Empty the info web page to be used in void WTekstprintln() 
+ LastMenuformat = Small;
  PrintLine(35);
- if(small) {for (uint8_t i = 0; i < sizeof(menusmall) / sizeof(menusmall[0]); WTekstprintln(menusmall[i++]) ); }
+ if(Small) {for (uint8_t i = 0; i < sizeof(menusmall) / sizeof(menusmall[0]); WTekstprintln(menusmall[i++]) ); }
  else      {for (uint8_t i = 0; i < sizeof(menu) / sizeof(menu[0]);           WTekstprintln(menu[i++]) ); }                                     
  PrintLine(35);
  byte dp = Mem.DisplayChoice;
@@ -1130,26 +1134,26 @@ void SWversion(bool small)
               dp==3?"All Own":dp==4?"Own":dp==5?"Wheel":dp==6?"Digital":dp==7?"Analog":"NOP");  WTekstprintln(sptext);
  sprintf(sptext,"Slope: %d     Min: %d     Max: %d ",
                  Mem.LightReducer, Mem.LowerBrightness,Mem.UpperBrightness);                    WTekstprintln(sptext);
- if(!small) {sprintf(sptext,"SSID: %s", Mem.SSID);                                               WTekstprintln(sptext); }
+ if(!Small) {sprintf(sptext,"SSID: %s", Mem.SSID);                                               WTekstprintln(sptext); }
 // sprintf(sptext,"Password: %s", Mem.Password);                                                WTekstprintln(sptext);
  sprintf(sptext,"BLE name: %s", Mem.BLEbroadcastName);                                          WTekstprintln(sptext,"<span class=\"verdana-red\">","</span>");
  sprintf(sptext,"IP-address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], 
                                            WiFi.localIP()[2], WiFi.localIP()[3] );              WTekstprint(sptext);
  sprintf(sptext,"/update");                                                                     WTekstprintln(sptext," <a href=" , "> /update</a>");                                            
- if(!small) {sprintf(sptext,"Timezone:%s", Mem.Timezone);                                        WTekstprintln(sptext); }
+ if(!Small) {sprintf(sptext,"Timezone:%s", Mem.Timezone);                                        WTekstprintln(sptext); }
  sprintf(sptext,"%s %s %s %s", Mem.WIFIOn?"WIFI=On":"WIFI=Off", 
                                Mem.NTPOn? "NTP=On":"NTP=Off",
                                Mem.BLEOn? "BLE=On":"BLE=Off",
                                Mem.UseBLELongString? "FastBLE=On":"FastBLE=Off" );              WTekstprintln(sptext);
  char fftext[20];              
- if(!small) {sprintf(fftext,"%s", Mem.UseDS3231?" DS3231=On":" DS3231=Off"); }
- if(!small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
+ if(!Small) {sprintf(fftext,"%s", Mem.UseDS3231?" DS3231=On":" DS3231=Off"); }
+ if(!Small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
                         Mem.UseRotary==1 ?"Rotary=On Membrane=Off":
                         Mem.UseRotary==2 ?"Rotary=Off Membrane On":"NOP",fftext);               WTekstprintln(sptext); }                           
- if(!small) { sprintf(sptext,"%s strip with %ld LEDs (switch %%)", 
+ if(!Small) { sprintf(sptext,"%s strip with %ld LEDs (switch %%)", 
                  Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",NUM_LEDS);             WTekstprintln(sptext); }
-  if(!small) {sprintf(sptext,"Software: %s",FILENAAM);                                          WTekstprintln(sptext);}  // VERSION);
-  if(!small) {sprintf(sptext,"ESP32 Arduino core version: %d.%d.%d", 
+  if(!Small) {sprintf(sptext,"Software: %s",FILENAAM);                                          WTekstprintln(sptext);}  // VERSION);
+  if(!Small) {sprintf(sptext,"ESP32 Arduino core version: %d.%d.%d", 
           ESP_ARDUINO_VERSION_MAJOR,ESP_ARDUINO_VERSION_MINOR,ESP_ARDUINO_VERSION_PATCH);       WTekstprintln(sptext); }
  GetTijd(false);                                                                              // Get the time and store it in the proper variables
  PrintRTCTime();                                                                                
@@ -1419,8 +1423,8 @@ void ReworkInputString(String InputString)
              sprintf(sptext,"**** Length fault R. ****");       
              if (InputString.equals("RRRRR"))                                                 // Delete the WIFI settings and set to default settings
                { 
-                ResetCredentials();  
-                Reset();              
+                Reset(); 
+                ResetCredentials();                                                           // WIFI, NTP and BLE are On
                 ESP.restart();  
                 break;
                }
@@ -1433,7 +1437,7 @@ void ReworkInputString(String InputString)
                } 
              if (InputString.length() == 1)                                                  // DSet to default settings
                {   
-                Reset();
+                Reset();                                                                      // WIFI, NTP are Off, BLE is On
                 sprintf(sptext,"\nReset to default values: Done");
                 lastminute = 99;                                                              // Force a minute update
                 Displaytime();                                                                // Turn on the display with proper time
@@ -1487,7 +1491,6 @@ void ReworkInputString(String InputString)
              if (InputString.length() == 1)
                {   
                 Mem.WIFIOn = 1 - Mem.WIFIOn; 
-                Mem.ReconnectWIFI = 0;                                                       // Reset WIFI reconnection counter 
                 Mem.NTPOn = Mem.WIFIOn;                                                      // If WIFI is off turn NTP also off
                 sprintf(sptext,"WIFI is %s after restart", Mem.WIFIOn?"ON":"OFF" );
                }                                
@@ -1560,6 +1563,7 @@ void ReworkInputString(String InputString)
     case '$':
              FireDisplay = 1 - FireDisplay;                                                   // If TestLDR = 1 LDR reading is printed every second instead every 30s
              sprintf(sptext,"FireDisplay: %s",FireDisplay? "On" : "Off");
+             ClearScreen();
              Displaytime();   
              break;       
     case '%':                                                                                 // SK6812 or WS2812 strip 
@@ -3366,7 +3370,7 @@ void StartWIFI_NTP(void)
  WiFi.mode(WIFI_STA);  
  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
  WIFIwasConnected = false;
- wifiEventHandler = WiFi.onEvent(WiFiEvent);                                                  //                   // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
+ wifiEventHandler = WiFi.onEvent(WiFiEvent);                                                  // Using WiFi.onEvent interrupts and crashes IL9341 screen display while writing the screen
  WiFi.begin(Mem.SSID, Mem.Password);
  MDNS.begin(Mem.BLEbroadcastName);                                                            // After reset http://wordclock.local 
  // Task function, Name, Stack size, Parameter, Priority, Task handle, Core 1
@@ -3379,6 +3383,9 @@ void StartWIFI_NTP(void)
     {
      case WL_NO_SSID_AVAIL:
           Tekstprintln("[WiFi] SSID not found (Unexpected error)\n Reset the clock with option R and re-enter SSID and Password.");
+          WiFi.disconnect(true,true);
+          Tekstprintln("[WiFi] Starting AP-mode http://192.168.4.1");
+          StartAPMode(); 
           return;
           break;
      case WL_CONNECT_FAILED:
@@ -3400,7 +3407,6 @@ void StartWIFI_NTP(void)
           Tekstprintln(sptext); 
           WIFIwasConnected = true;                                                            // No we know the SSID ans password are correct and we can reconnect
           Mem.WIFIcredentials = SET_AND_OK;
-
           break;
      default:
           Serial.print("[WiFi] WiFi Status: ");
@@ -3497,9 +3503,7 @@ void WebPage(void)
   SWversion();                                                                                // Print the menu to the web page and BLE
   for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = (char) index_html_top[n];
   if (i > MAXSIZE_HTML_PAGE - 999)
-   {
-    strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>");
-   }
+    {strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>");}
   else
   {
     for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];
@@ -3516,19 +3520,17 @@ void WebPage(void)
     else 
       { inputMessage = "";                          inputParam = "none";        }
     ReworkInputString(inputMessage);
-    SWversion();                                                                               // Print updated info
- 
+    SWversion();                                                                              // Print updated info
     int i = 0, n;
-    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = (char) index_html_top[n];
-    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];
-    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n];
+    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = (char) index_html_top[n];// Top of the web page
+    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];     // the menu items in the HTML page
+    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n]; // The footer of the HTML page
     HTML_page[i] = 0;
     server.send(200, "text/html", HTML_page);
    }  );
 
   server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });          // If //update is type after the URL OTA GET page
-  server.on("/update", HTTP_POST, []()                                                        // OTA POST handler
-    {
+  server.on("/update", HTTP_POST, []()  {                                                     // OTA POST handler
     shouldReboot = true;                                                                      // Reboot flag. Reboot the MCU after upload
     server.send(200, "text/html",
       "<!DOCTYPE html><html><body>"
