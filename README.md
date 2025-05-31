@@ -170,10 +170,12 @@ Download the program folder and compile for Arduino Nano ESP32.<br>
 Libraries update constantly what may result in incompatibility with this source code after a few years. Therefore these libraries are included.
 
 An alternative is to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE.<br>
-Upload it in the Nano ESP32 and note the IP-address that is printed in the Serial monitor of the Arduino IDE.
+Upload the OTA-updater in the Nano ESP32 and note the IP-address that is printed in the Serial monitor of the Arduino IDE.
 Type this IP-address URL in a browser and enter admin/admin as user and password.<br>
 Then upload the .bin file from this repository.<br>
-
+<br>
+Or use this one: [Uploads .bin files in the ESP32 by using wifimanager](https://github.com/ednieuw/OTA-webupdater).<br>
+<br>
 # How to compile: 
 At the moment of writing (1 jan 2025) the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. V3.1.0 does crash when WIFI is connected. 
 Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.17 or 2.0.18, compiles without errors and is advised to use.
