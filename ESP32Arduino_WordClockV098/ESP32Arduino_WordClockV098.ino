@@ -57,15 +57,16 @@
  Changes V088: Use of rotary and DS3231 usage optimized in menu. NTP off when DS3231 and rotary on. 
  Changes V089: In webpage last input removed from url
  Changes V090: Added LEDstrip update semaphore mutex
- Changes V091: Replaced AsyncWebserver en AsyncTCP with standard ESP32 Webserver library. This app does not need Async. 
-               (NB loop counts drops from 210000 to 1000 loops/sec)
+ Changes V091: Replaced AsyncWebserver en AsyncTCP with standard ESP32 Webserver library. This app does not need Async. (NB loop counts drops from 210000 to 1000 loops/sec)
  Changes V092: Compiles with ESP32 core 3.2.0 and Adafruit NeoPixel at version 1.13.0. Removed EdSoftLED.h
  Changes V093: Added Small menu
  Changes V094: Replaced NIMBLE with ESP32 BLE
- Changes V095: Cleanup code. New function LEDstartup
+ Changes V095: Cleanup code. New function LEDstartup. Webserver to core 1. Loop is again 210,000L/s -> xTaskCreatePinnedToCore(WebServerTask,"WebServerTask", 4096, NULL, 1, NULL, 1 ); 
  Changes V096: Removed ESP32 BLE. Caused restarts in ESP32 3.2.0. NimBLE works fine and probably better.
  Changes V097: Webpage remembers and also shows last small or long menu display
-
+ Changes V098: Cleanup code in ReworkInputString(). Changed if(Mem.WIFIcredentials == SET_AND_OK)  WiFi.reconnect(); in every minute. After power faillure the clock starts faster than a WIFI-router
+               .bin upload repaired. Did not upload since V091
+ Changes V099:                
 How to compile: 
 Install ESP32 boards
 Board: Arduino Nano ESP32
@@ -816,6 +817,7 @@ void CheckDevices(void)
 {
  CheckBLE();                                                                                  // Something with BLE to do?
  SerialCheck();                                                                               // Check serial port every second 
+// server.handleClient(); 
  if (Mem.UseRotary==1) RotaryEncoderCheck(); 
  if (Mem.UseRotary==2) Keypad3x1Check();
                                   #ifdef ONEWIREKEYPAD3x4   
@@ -855,7 +857,7 @@ void EveryMinuteUpdate(void)
    {
     if(WiFi.localIP()[0] == 0) 
        {
-        if(WIFIwasConnected)  WiFi.reconnect();                                               // If connection lost and WIFI is used reconnect
+        if(Mem.WIFIcredentials == SET_AND_OK)  WiFi.reconnect();                              // If connection lost and WIFI is used reconnect
         if(CheckforWIFINetwork(false) && !WIFIwasConnected) StartWIFI_NTP();                  // If there was no WIFI at start up start a WIFI connection 
         if(WiFi.localIP()[0] != 0) 
           {
@@ -1140,7 +1142,7 @@ void SWversion(bool Small)
  sprintf(sptext,"IP-address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], 
                                            WiFi.localIP()[2], WiFi.localIP()[3] );              WTekstprint(sptext);
  sprintf(sptext,"/update");                                                                     WTekstprintln(sptext," <a href=" , "> /update</a>");                                            
- if(!Small) {sprintf(sptext,"Timezone:%s", Mem.Timezone);                                        WTekstprintln(sptext); }
+ if(!Small) {sprintf(sptext,"Timezone:%s", Mem.Timezone);                                       WTekstprintln(sptext); }
  sprintf(sptext,"%s %s %s %s", Mem.WIFIOn?"WIFI=On":"WIFI=Off", 
                                Mem.NTPOn? "NTP=On":"NTP=Off",
                                Mem.BLEOn? "BLE=On":"BLE=Off",
@@ -1150,8 +1152,8 @@ void SWversion(bool Small)
  if(!Small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
                         Mem.UseRotary==1 ?"Rotary=On Membrane=Off":
                         Mem.UseRotary==2 ?"Rotary=Off Membrane On":"NOP",fftext);               WTekstprintln(sptext); }                           
- if(!Small) { sprintf(sptext,"%s strip with %ld LEDs (switch %%)", 
-                 Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",NUM_LEDS);             WTekstprintln(sptext); }
+ if(!Small) { sprintf(sptext,"%s strip with %u LEDs (switch %%)", 
+                 Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",(uint32_t) NUM_LEDS);  WTekstprintln(sptext); }
   if(!Small) {sprintf(sptext,"Software: %s",FILENAAM);                                          WTekstprintln(sptext);}  // VERSION);
   if(!Small) {sprintf(sptext,"ESP32 Arduino core version: %d.%d.%d", 
           ESP_ARDUINO_VERSION_MAJOR,ESP_ARDUINO_VERSION_MINOR,ESP_ARDUINO_VERSION_PATCH);       WTekstprintln(sptext); }
@@ -1178,451 +1180,445 @@ void ReworkInputString(String InputString)
 {
  if(InputString.length()> 40){Serial.printf("Input string too long (max40)\n"); return;}      // If garbage return
  InputString.trim();                                                                          // Remove CR, LF etc.
- sptext[0] = 0;             
- if(InputString[0] > 31 && InputString[0] <127)                                               // Does the string start with a letter?
-  { 
-  switch (InputString[0])
+ sptext[0] = 0;   
+if(InputString[0] > 31 && InputString[0] < 127)                                               // Does the string start with a letter?
+  {
+  char cmd = toupper(InputString[0]);                                                         // Convert to uppercase once
+  bool validLength = false;
+  int len = InputString.length();
+  switch(cmd) 
    {
-    case 'A':
-    case 'a': 
-            if (InputString.length() >4 && InputString.length() <30)
-            {
-             InputString.substring(1).toCharArray(Mem.SSID,InputString.length());
-             sprintf(sptext,"SSID set: %s", Mem.SSID);  
-            }
-            else sprintf(sptext,"**** Length fault. Use between 4 and 30 characters ****");
-            break;
-    case 'B':
-    case 'b':
-             sprintf(sptext,"**** Length fault. Use between 5 and 40 characters ****");
-             if (InputString.equals("BBBB"))                                                  // 
-               {   
-                sprintf(sptext,"%s,**** Length fault. Use between 5 and 40 characters ****",Mem.Password);
-                break;
-               } 
-             if (InputString.length() >4 && InputString.length() <40)
-              {  
-               InputString.substring(1).toCharArray(Mem.Password,InputString.length());
-               sprintf(sptext,"Password set: %s\n Enter @ to reset ESP32 and connect to WIFI and NTP\n WIFI and NTP are turned ON", Mem.Password); 
-               Mem.NTPOn        = 1;                                                          // NTP On
-               Mem.WIFIOn       = 1;                                                          // WIFI On  
-              }
-             break;   
-    case 'C':
-    case 'c':
-             sprintf(sptext,"**** Length fault. Use between 4 and 30 characters ****"); 
-             if (InputString.equalsIgnoreCase("ccc"))                                         // Toggle BLE ON or OFF
-               {   
-                Mem.BLEOn = 1 - Mem.BLEOn; 
-                sprintf(sptext,"BLE is %s after restart", Mem.BLEOn?"ON":"OFF" );
-               }    
-             if (InputString.length() >4 && InputString.length() <30)
-               {  
-                InputString.substring(1).toCharArray(Mem.BLEbroadcastName,InputString.length());
-                sprintf(sptext,"BLE broadcast name set: %s", Mem.BLEbroadcastName); 
-                Mem.BLEOn = 1;                                                                // BLE On
-              }
+    case 'A':                                                                                 // SSID setting
+      validLength = (len > 4 && len < 30);
+      if(validLength) 
+        {
+        InputString.substring(1).toCharArray(Mem.SSID, len);
+        sprintf(sptext, "SSID set: %s", Mem.SSID);
+        } 
+      else sprintf(sptext, "**** Length fault. Use between 4 and 30 characters ****");
+      break;
+      
+    case 'B':                                                                                 // Password setting
+      if(InputString.equals("BBBB")) 
+      {
+        sprintf(sptext, "%s,**** Length fault. Use between 5 and 40 characters ****", Mem.Password);
+        break;
+      }
+      validLength = (len > 4 && len < 40);
+      if(validLength) 
+        {
+        InputString.substring(1).toCharArray(Mem.Password, len);
+        sprintf(sptext, "Password set: %s\n Enter @ to reset ESP32 and connect to WIFI and NTP\n WIFI and NTP are turned ON", Mem.Password);
+        Mem.NTPOn = Mem.WIFIOn = 1;                                                          // Turn both on
+        } 
+      else sprintf(sptext, "**** Length fault. Use between 5 and 40 characters ****");
+      break;
 
-            break;      
-    case 'D':                                                                                 // Date entry 
-    case 'd':  
-             if (InputString.length() == 9 )
-               {
-                timeinfo.tm_mday = (int) SConstrainInt(InputString,1,3,0,31);
-                timeinfo.tm_mon  = (int) SConstrainInt(InputString,3,5,0,12) - 1; 
-                timeinfo.tm_year = (int) SConstrainInt(InputString,5,9,2000,9999) - 1900;
-                if (DS3231Installed)
-                  {
-                   sprintf(sptext,"Time set in external RTC module");  
-                   SetDS3231Time();
-                   PrintDS3231Time();
-                  }
-                else sprintf(sptext,"No external RTC module detected");
-                } 
-              else sprintf(sptext,"****\nLength fault. Enter Dddmmyyyy\n****");
-              break;
-    case 'E':                                                                                 // Time zone setting 
-    case 'e':  
-             if (InputString.length() >2 )
-              {  
-               InputString.substring(1).toCharArray(Mem.Timezone,InputString.length());
-               sprintf(sptext,"Timezone set: %s", Mem.Timezone); 
-              }
-              else sprintf(sptext,"**** Length fault. Use more than 2 characters ****");
-              break;  
-    case 'F':
-    case 'f':  
-             if (InputString.length() == 9 )
-               {
-                LetterColor = Mem.OwnColour = HexToDec(InputString.substring(1,9));           // Display letter color 
-                sprintf(sptext,"Font colour stored: 0X%08lX", Mem.OwnColour);
-                Tekstprintln("**** Own colour changed ****");    
-                LedsOff(); 
-                Displaytime();
-               }
-             else sprintf(sptext,"****Length fault. Enter Frrggbb hexadecimal (0 - F)****\nStored: 0X%08lX", Mem.OwnColour);              
-             break;
+    case 'C':                                                                                // BLE settings
+      if(InputString.equals("CCC")) 
+       {
+        Mem.BLEOn = 1 - Mem.BLEOn;
+        sprintf(sptext, "BLE is %s after restart", Mem.BLEOn ? "ON" : "OFF");
+        break;
+       }
+      validLength = (len > 4 && len < 30);
+      if(validLength) 
+       {
+        InputString.substring(1).toCharArray(Mem.BLEbroadcastName, len);
+        sprintf(sptext, "BLE broadcast name set: %s", Mem.BLEbroadcastName);
+        Mem.BLEOn = 1;
+       } 
+      else sprintf(sptext, "**** Length fault. Use between 4 and 30 characters ****");
+      break;
+      
+    case 'D':                                                                                 // Date entry
+      if(len == 9) 
+       {
+        timeinfo.tm_mday = (int)SConstrainInt(InputString, 1, 3, 0, 31);
+        timeinfo.tm_mon = (int)SConstrainInt(InputString, 3, 5, 0, 12) - 1;
+        timeinfo.tm_year = (int)SConstrainInt(InputString, 5, 9, 2000, 9999) - 1900;
+        if(DS3231Installed) 
+         {
+          sprintf(sptext, "Time set in external RTC module");
+          SetDS3231Time();
+          PrintDS3231Time();
+         } 
+        else sprintf(sptext, "No external RTC module detected");
+       } 
+      else sprintf(sptext, "****\nLength fault. Enter Dddmmyyyy\n****");
+      break;
+      
+    case 'E':                                                                                 // Time zone setting
+      validLength = (len > 2);
+      if(validLength) 
+       {
+        InputString.substring(1).toCharArray(Mem.Timezone, len);
+        sprintf(sptext, "Timezone set: %s", Mem.Timezone);
+       } 
+      else sprintf(sptext, "**** Length fault. Use more than 2 characters ****");
+      break;
+      
+    case 'F':                                                                                 // Font color setting
+      if(len == 9) 
+      {
+        LetterColor = Mem.OwnColour = HexToDec(InputString.substring(1, 9));
+        sprintf(sptext, "Font colour stored: 0X%08" PRIX32, Mem.OwnColour);
+        Tekstprintln("**** Own colour changed ****");
+        LedsOff();
+        Displaytime();
+      } 
+      else sprintf(sptext, "****Length fault. Enter Frrggbb hexadecimal (0 - F)****\nStored: 0X%08" PRIX32, Mem.OwnColour);
+      break;
+      
     case 'G':                                                                                 // Scan WIFI stations
-    case 'g':
-             if (InputString.length() == 1) 
-               {
-                ScanWIFI(); 
-                if(WIFIwasConnected)  WiFi.reconnect();
-               }
-             else sprintf(sptext,"**** Length fault. Enter G ****");            
-             break;
-    case 'H':                                                                                 // Use rotary encoder 
-    case 'h':
-             if (InputString.length() == 4)
-               {   
-                Mem.UseRotary = (byte) SConstrainInt(InputString,1,0,2);                      // 
-                if(Mem.UseRotary >2) Mem.UseRotary = 0; 
-                sprintf(sptext,"\nUse of rotary encoder is %s\nUse of membrane keypad is %s", Mem.UseRotary==1?"ON":"OFF",Mem.UseRotary==2?"ON":"OFF" );
-                Tekstprintln(sptext);
-                if(Mem.UseRotary>0)                                                           // If using a rotary or membrane then NTP must be turned off!
-                {
-                 Mem.NTPOn     = 0; 
-                 Mem.UseDS3231 = 1;
-                }
-                else 
-                {
-                 Mem.WIFIOn    = 1;                                                           // If NOT using a rotary or membrane then WIFI and NTP are turned ON. 
-                 Mem.NTPOn     = 1; 
-                 Mem.UseDS3231 = 0;                 
-                }
-                 sprintf(sptext,"Use DS3231 is %s, WIFI is %s, NTP is %s\n *** Restart clock with @ ***", Mem.UseDS3231?"ON":"OFF",Mem.WIFIOn?"ON":"OFF",Mem.NTPOn?"ON":"OFF" );
-               }                                
-             else sprintf(sptext,"**** Fault. Enter H000 (none), H001 (Rotary) or H002 (Membrane) ****\nUse rotary encoder is %s\nUse membrane keypad %s",Mem.UseRotary==1?"ON":"OFF",Mem.UseRotary==2?"ON":"OFF" );
-             break;          
+      if(len == 1) 
+       {
+        ScanWIFI();
+        if(WIFIwasConnected) WiFi.reconnect();
+       } 
+      else sprintf(sptext, "**** Length fault. Enter G ****");
+      break;
+      
+    case 'H':                                                                                 // Use rotary encoder
+      if(len == 4) 
+       {
+        Mem.UseRotary = (byte)SConstrainInt(InputString, 1, 0, 2);
+        if(Mem.UseRotary > 2) Mem.UseRotary = 0;
+        sprintf(sptext, "\nUse of rotary encoder is %s\nUse of membrane keypad is %s", 
+                Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF");
+        Tekstprintln(sptext);
+        if(Mem.UseRotary > 0)  {Mem.NTPOn = 0;              Mem.UseDS3231 = 1;  }             // Configure related settings based on rotary use 
+        else                   {Mem.WIFIOn = Mem.NTPOn = 1; Mem.UseDS3231 = 0;}
+        sprintf(sptext, "Use DS3231 is %s, WIFI is %s, NTP is %s\n *** Restart clock with @ ***", 
+                Mem.UseDS3231 ? "ON" : "OFF", Mem.WIFIOn ? "ON" : "OFF", Mem.NTPOn ? "ON" : "OFF");
+       } 
+      else sprintf(sptext, "**** Fault. Enter H000 (none), H001 (Rotary) or H002 (Membrane) ****\nUse rotary encoder is %s\nUse membrane keypad %s",
+                    Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF");
+      break;
+      
     case 'I':                                                                                 // Menu
-    case 'i': 
-             if (InputString.length() == 1)  { SWversion(true);  }                            // Small menu
-             if (InputString.length() == 2)  { SWversion(false); }                            // Full menu
-            break;
+      SWversion(len == 1);                                                                    // true for small menu, false for full menu
+      break;
+      
     case 'J':                                                                                 // Use DS3231 RTC module
-    case 'j':
-             if (InputString.length() == 1)
-               {   
-                Mem.UseDS3231 = 1 - Mem.UseDS3231; 
-                Mem.NTPOn = (1 - Mem.UseDS3231);
-                if (Mem.WIFIOn == 0 ) Mem.NTPOn = 0;                                          // If WIFI is Off then No NTP
-                sprintf(sptext,"Use DS3231 is %s, WIFI is %s, NTP is %s", Mem.UseDS3231?"ON":"OFF",Mem.WIFIOn?"ON":"OFF",Mem.NTPOn?"ON":"OFF" );
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter J ****");
-             break; 
-    case 'K':
-    case 'k':
-             TestLDR = 1 - TestLDR;                                                           // If TestLDR = 1 LDR reading is printed every second instead every 30s
-             sprintf(sptext,"TestLDR: %s",TestLDR? "On\n   Bits, Out, loops per second and time" : "Off\n");
-  //           if (TestLDR) strcat(sptext," bits, %%Out, loops per second and time");
-             break;      
-    case 'L':                                                                                 // Language to choose
-    case 'l':
-             if (InputString.length() > 1 &&  InputString.length() < 5)
-               {      
-                Mem.LowerBrightness = (byte) SConstrainInt(InputString,1,0,255);
-                sprintf(sptext,"Lower brightness: %d bits",Mem.LowerBrightness);
-               }
-             else sprintf(sptext,"**** Input fault. \nEnter Lnnn where n between 1 and 255");               
-             break;    
-    case 'M':                                                                                 // Max brightness 
-    case 'm':   
-             if (InputString.length() > 1 &&  InputString.length() < 5)
-               {    
-                Mem.UpperBrightness = SConstrainInt(InputString,1,1,255);
-                sprintf(sptext,"Upper brightness changed to: %d bits",Mem.UpperBrightness);
-               }
-             else sprintf(sptext,"**** Input fault. \nEnter Mnnn where n between 1 and 255");
-             break;  
-    case 'N':                                                                                 // Turn off display bewteen hours 
-    case 'n':
-             sprintf(sptext,"**** Length fault N. ****");   
-             if (InputString.length() == 1 )         Mem.TurnOffLEDsAtHH = Mem.TurnOnLEDsAtHH = 0;
-             if (InputString.length() == 5 )
-              {
-               Mem.TurnOffLEDsAtHH =(byte) InputString.substring(1,3).toInt(); 
-               Mem.TurnOnLEDsAtHH  =(byte) InputString.substring(3,5).toInt(); 
-              }
-             Mem.TurnOffLEDsAtHH = _min(Mem.TurnOffLEDsAtHH, 23);
-             Mem.TurnOnLEDsAtHH  = _min(Mem.TurnOnLEDsAtHH, 23); 
-             sprintf(sptext,"Display is OFF between %2d:00 and %2d:00", Mem.TurnOffLEDsAtHH,Mem.TurnOnLEDsAtHH );
-             break;
-    case 'O':                                                                                 // Turn On/Off Display 
-    case 'o':
-             sprintf(sptext,"**** Length fault O. ****");
-             if(InputString.length() == 1)
-               {
-                LEDsAreOff = !LEDsAreOff;
-                sprintf(sptext,"Display is %s", LEDsAreOff?"OFF":"ON" );
-                if(LEDsAreOff) { ClearScreen();}                                              // Turn the display off
-                else 
-                {
-                  Tekstprintln(sptext); 
-                  lastminute = 99;                                                            // Push an display update
-                  Displaytime();                                                              // Turn the display on   
-                }
-               }
-             break;                                                                   
-    case 'P':                                                                                 // Status LEDs On/Off 
-    case 'p':  
-             sprintf(sptext,"**** Length fault P. ****");  
-             if(InputString.length() == 1)
-               {
-                Mem.StatusLEDOn = !Mem.StatusLEDOn;
-                UpdateStatusLEDs(0);
-                sprintf(sptext,"StatusLEDs are %s", Mem.StatusLEDOn?"ON":"OFF" );               
-               }
-             break;        
+      if(len == 1) 
+      {
+        Mem.UseDS3231 = 1 - Mem.UseDS3231;
+        Mem.NTPOn = (1 - Mem.UseDS3231);
+        if(Mem.WIFIOn == 0) Mem.NTPOn = 0;                                                    // If WIFI is Off then No NTP
+        sprintf(sptext, "Use DS3231 is %s, WIFI is %s, NTP is %s", 
+                Mem.UseDS3231 ? "ON" : "OFF", Mem.WIFIOn ? "ON" : "OFF", Mem.NTPOn ? "ON" : "OFF");
+       } 
+      else sprintf(sptext, "**** Length fault. Enter J ****");
+      break;
+      
+    case 'K':                                                                                 // Test LDR
+      TestLDR = 1 - TestLDR;
+      sprintf(sptext, "TestLDR: %s", TestLDR ? "On\n   Bits, Out, loops per second and time" : "Off\n");
+      break;
+      
+    case 'L':                                                                                 // Lower brightness
+      validLength = (len > 1 && len < 5);
+      if(validLength) 
+       {
+        Mem.LowerBrightness = (byte)SConstrainInt(InputString, 1, 0, 255);
+        sprintf(sptext, "Lower brightness: %d bits", Mem.LowerBrightness);
+       } 
+      else sprintf(sptext, "**** Input fault. \nEnter Lnnn where n between 1 and 255");
+      break;
+      
+    case 'M':                                                                                 // Max brightness
+      validLength = (len > 1 && len < 5);
+      if(validLength) 
+       {
+        Mem.UpperBrightness = SConstrainInt(InputString, 1, 1, 255);
+        sprintf(sptext, "Upper brightness changed to: %d bits", Mem.UpperBrightness);
+       } 
+      else sprintf(sptext, "**** Input fault. \nEnter Mnnn where n between 1 and 255");
+      break;
+      
+    case 'N':                                                                                 // Turn off display between hours
+      sprintf(sptext, "**** Length fault N. ****");
+      if(len == 1) { Mem.TurnOffLEDsAtHH = Mem.TurnOnLEDsAtHH = 0;  } 
+      else if(len == 5) 
+       {
+        Mem.TurnOffLEDsAtHH = (byte)InputString.substring(1, 3).toInt();
+        Mem.TurnOnLEDsAtHH  = (byte)InputString.substring(3, 5).toInt();
+       }
+      Mem.TurnOffLEDsAtHH = _min(Mem.TurnOffLEDsAtHH, 23);
+      Mem.TurnOnLEDsAtHH  = _min(Mem.TurnOnLEDsAtHH, 23);
+      sprintf(sptext, "Display is OFF between %2d:00 and %2d:00", Mem.TurnOffLEDsAtHH, Mem.TurnOnLEDsAtHH);
+      break;
+      
+    case 'O':                                                                                 // Turn On/Off Display
+      if(len == 1) 
+       {
+        LEDsAreOff = !LEDsAreOff;
+        sprintf(sptext, "Display is %s", LEDsAreOff ? "OFF" : "ON");
+        if(LEDsAreOff) { ClearScreen(); }
+        else 
+         {
+          Tekstprintln(sptext);
+          lastminute = 99;                                                                    // Force display update
+          Displaytime();
+         }
+       } 
+      else sprintf(sptext, "**** Length fault O. ****");
+      break;
+      
+    case 'P':  // Status LEDs On/Off
+      if(len == 1) {
+        Mem.StatusLEDOn = !Mem.StatusLEDOn;
+        UpdateStatusLEDs(0);
+        sprintf(sptext, "StatusLEDs are %s", Mem.StatusLEDOn ? "ON" : "OFF");
+      } else sprintf(sptext, "**** Length fault P. ****");
+      break;
+      
+    case 'Q':                                                                                 // Display choice
+      if(len == 1) 
+       {
+                                                                                              // Print display options menu
+        Tekstprintln("  Q0= Default colour");
+        Tekstprintln("  Q1= Hourly colour");
+        Tekstprintln("  Q2= All white");
+        Tekstprintln("  Q3= All Own colour");
+        Tekstprintln("  Q4= Own colour, HETISWAS changing");
+        Tekstprintln("  Q5= Wheel colour");
+        Tekstprintln("  Q6= Digital display");
+        Tekstprintln("  Q8= Toggle EDSOFT on/off");
+        Tekstprintln("  Q9= Toggle HET IS WAS on/off");
+        sptext[0] = 0;
+       } 
+      else 
+      {
+        byte choice = (byte)InputString.substring(1, 2).toInt();
+        switch(choice) 
+         {
+          case 0: case 1: case 2: case 3: case 4: case 5: case 6:
+            Mem.DisplayChoice = choice;
+            sprintf(sptext, "Display choice: Q%d", Mem.DisplayChoice);
+            break;
+          case 7:
+            Mem.DisplayChoice = 7;
+            break;
+          case 8:
+            Mem.EdSoftLEDSOff = 1 - Mem.EdSoftLEDSOff;
+            sprintf(sptext, "EDSOFT is %s", Mem.EdSoftLEDSOff ? "OFF" : "ON");
+            break;
+          case 9:
+            Mem.HetIsWasOff = 1 - Mem.HetIsWasOff;
+            sprintf(sptext, "HET IS WAS is %s", Mem.HetIsWasOff ? "OFF" : "ON");
+            break;
+        }
+      }
+      lastminute = 99;                                                                                 // Force a minute update
+      break;
+      
+    case 'R':                                                                                 // Reset to default settings
+      if(InputString.equals("RRRRR"))                                                                                  // Delete WIFI settings and set defaults
+      {
+        Reset();
+        ResetCredentials();
+        ESP.restart();
+        break;
+      }
+      if(InputString.equals("RRR"))                                                                                  // Delete WIFI settings only
+       { 
+        ResetCredentials();
+        sprintf(sptext, "\nSSID and password deleted. \nWIFI, NTP and BLE is On\n Enter @ to restart");
+        break;
+       }
+      if(len == 1)                                                                                  // Set to default settings
+        {
+        Reset();
+        sprintf(sptext, "\nReset to default values: Done");
+        lastminute = 99;
+        Displaytime();
+       } 
+      else sprintf(sptext, "**** Length fault R. ****");
+      break;
+      
+    case 'S':                                                                                 // Slope factor for brightness
+      validLength = (len > 1 && len < 5);
+      if(validLength) 
+       {
+        Mem.LightReducer = (byte)SConstrainInt(InputString, 1, 1, 255);
+        sprintf(sptext, "Slope brightness changed to: %d%%", Mem.LightReducer);
+       } 
+      else sprintf(sptext, "**** Input fault. \nEnter Snnn where n between 1 and 255");
+      break;
+      
+    case 'T':                                                                                 // Time setting
+      if(len == 7) 
+       {
+        timeinfo.tm_hour = (int)SConstrainInt(InputString, 1, 3, 0, 23);
+        timeinfo.tm_min = (int)SConstrainInt(InputString, 3, 5, 0, 59);
+        timeinfo.tm_sec = (int)SConstrainInt(InputString, 5, 7, 0, 59);
+        if(DS3231Installed) 
+         {
+          sprintf(sptext, "Time set in external RTC module");
+          SetDS3231Time();
+          PrintDS3231Time();
+         } 
+        else sprintf(sptext, "No external RTC module detected");
+       } 
+      else sprintf(sptext, "**** Length fault. Enter Thhmmss ****");
+      break;
+      
+    case 'U':                                                                                 // Demo mode
+      if(len == 1) 
+       {
+        Demo = false;
+        sprintf(sptext, "Demo mode: %s", Demo ? "ON" : "OFF");
+       } 
+      else if(len > 1 && len < 6) 
+       {
+        MilliSecondValue = InputString.substring(1, 5).toInt();
+        Demo = true;
+        sprintf(sptext, "Demo mode: %s MillisecondTime=%d", Demo ? "ON" : "OFF", MilliSecondValue);
+       } 
+      else sprintf(sptext, "**** Length fault U. Demo mode (Unnn or U) ****");
+      break;
+      
+    case 'W':                                                                                 // WIFI toggle
+      if(len == 1) 
+       {
+        Mem.WIFIOn = 1 - Mem.WIFIOn;
+        Mem.NTPOn = Mem.WIFIOn;                                                               // If WIFI is off turn NTP also off
+        sprintf(sptext, "WIFI is %s after restart", Mem.WIFIOn ? "ON" : "OFF");
+       } 
+      else sprintf(sptext, "**** Length fault. Enter W ****");
+      break;
+      
+    case 'X':                                                                                 // NTP toggle
+      if(len == 1) 
+       {
+        Mem.NTPOn = 1 - Mem.NTPOn;
+        sprintf(sptext, "NTP is %s after restart", Mem.NTPOn ? "ON" : "OFF");
+       } 
+      else sprintf(sptext, "**** Length fault. Enter X ****");
+      break;
+      
+    case 'Y':                                                                                 // Play lights
+      Play_Lights();
+      lastminute = 99;
+      Displaytime();
+      sprintf(sptext, "**** Play Lights");
+      break;
+      
+    case 'Z':                                                                                 // Start WPS
+      sprintf(sptext, "**** Start WPS on your router");
+      WiFi.onEvent(WiFiEvent);
+      WiFi.mode(WIFI_STA);
+      Serial.println("Starting WPS");
+      wpsInitConfig();
+      wpsStart();
+      break;
+      
+    case '!':                                                                                 // Print times
+      if(len == 1) PrintAllClockTimes();
+      break;
+      
+    case '@':                                                                                 // Reset ESP
+      if(len == 1) 
+       {
+        Tekstprintln("\n*********\n ESP restarting\n*********\n");
+        ESP.restart();
+       } 
+      else sprintf(sptext, "**** Length fault. Enter @ ****");
+      break;
+      
+    case '#':                                                                                 // Self test
+      if(len == 1) 
+       {
+        Zelftest = 1 - Zelftest;
+        sprintf(sptext, "Zelftest: %s", Zelftest ? "ON" : "OFF");
+        Selftest();
+        Displaytime();
+       } 
+      else if(len > 1 && len < 6) 
+       {
+        MilliSecondValue = InputString.substring(1, 5).toInt();
+        Zelftest = 1 - Zelftest;
+        sprintf(sptext, "Zelftest: %s", Zelftest ? "ON" : "OFF");
+        Selftest(MilliSecondValue);
+        Displaytime();
+       } 
+      else sprintf(sptext, "**** Length fault #. Demo mode (#nnnn or #) ****");
+      break;
+      
+    case '$':                                                                                 // Fire display
+      FireDisplay = 1 - FireDisplay;
+      sprintf(sptext, "FireDisplay: %s", FireDisplay ? "On" : "Off");
+      ClearScreen();
+      Displaytime();
+      break;
+      
+    case '%':                                                                                 // LED strip type
+      if(len == 1) 
+       {
+        Mem.LEDstrip = 1 - Mem.LEDstrip;
+        sprintf(sptext, "LED strip is %s after restart", Mem.LEDstrip ? "WS2812" : "SK6812");
+       } 
+      else sprintf(sptext, "**** Length fault . ****");
+      break;
+      
+    case '&':                                                                                 // Force NTP update
+      if(len == 1) 
+       {
+        SetDS3231Time();
+        SetRTCTime();
+        PrintAllClockTimes();
+       } 
+      else sprintf(sptext, "**** Length fault &. ****");
+      break;
+      
+    case '+':                                                                                 // BLE string toggle
+      if(len == 1) 
+       {
+        Mem.UseBLELongString = 1 - Mem.UseBLELongString;
+        sprintf(sptext, "Fast BLE is %s", Mem.UseBLELongString ? "ON" : "OFF");
+       } 
+      else sprintf(sptext, "**** Length fault. Enter + ****");
+      break;
+      
+    case '_':                                                                                 // Store in flash
+      if(len > 1 && len < 4) 
+       {
+        byte ff = (byte)InputString.substring(1, 2).toInt();
+        StoreStructInFlashMemory();
+        sprintf(sptext, "No use: %d", ff);
+        Tekstprintln(sptext);
+       }
+      break;
 
-    case 'q':                                                                                 // Display choice
-    case 'Q':   
-             sprintf(sptext,"**** Length fault Q. ****"); 
-             if (InputString.length() == 1 )
-               {
-                Tekstprintln("  Q0= Default colour");
-                Tekstprintln("  Q1= Hourly colour");
-                Tekstprintln("  Q2= All white");
-                Tekstprintln("  Q3= All Own colour");
-                Tekstprintln("  Q4= Own colour, HETISWAS changing");
-                Tekstprintln("  Q5= Wheel colour");
-                Tekstprintln("  Q6= Digital display");
-                Tekstprintln("  Q8= Toggle EDSOFT on/off");                
-                Tekstprintln("  Q9= Toggle HET IS WAS on/off");
-                sptext[0]=0;
-               }
-               else 
-               {
-                switch((byte) InputString.substring(1,2).toInt())
-                 {
-                  case  0:  // Default colour
-                  case  1:  // Hourly colour
-                  case  2:  // All white
-                  case  3:  // All Own colour
-                  case  4:  // Own colour, HETISWAS changing
-                  case  5:  // Wheel colour                   
-                  case  6:  // Digital display
-                           Mem.DisplayChoice = (byte) InputString.substring(1,2).toInt();
-                          if (Mem.DisplayChoice>6) Mem.DisplayChoice = 0;
-                          sprintf(sptext,"Display choice: Q%d", Mem.DisplayChoice);
-                          break;                                                             // Mem.DisplayChoice is OK between 0 - 6     
-                  case  7: Mem.DisplayChoice = 7; break;
-                  case  8: 
-                          Mem.EdSoftLEDSOff = 1- Mem.EdSoftLEDSOff;
-                          sprintf(sptext,"EDSOFT is %s",Mem.EdSoftLEDSOff? "OFF" : "ON");                 
-                          break;      
-                  case  9:
-                          Mem.HetIsWasOff = 1 - Mem.HetIsWasOff;
-                          sprintf(sptext,"HET IS WAS is %s",Mem.HetIsWasOff? "OFF" : "ON"); 
-                          break;
-                 }  
-               }                     
-             lastminute = 99;                                                                 // Force a minute update
-             break;
-    case 'R':                                                                                 // Reset to default settings 
-    case 'r':
-             sprintf(sptext,"**** Length fault R. ****");       
-             if (InputString.equals("RRRRR"))                                                 // Delete the WIFI settings and set to default settings
-               { 
-                Reset(); 
-                ResetCredentials();                                                           // WIFI, NTP and BLE are On
-                ESP.restart();  
-                break;
-               }
-             if (InputString.equals("RRR"))                                                   // Delete the WIFI settings
-               { 
-                ResetCredentials(); 
-                ESP.restart();  
-                sprintf(sptext,"\nSSID and password deleted. \nWIFI, NTP and BLE is On\n Enter @ to restart");
-                break;
-               } 
-             if (InputString.length() == 1)                                                  // DSet to default settings
-               {   
-                Reset();                                                                      // WIFI, NTP are Off, BLE is On
-                sprintf(sptext,"\nReset to default values: Done");
-                lastminute = 99;                                                              // Force a minute update
-                Displaytime();                                                                // Turn on the display with proper time
-               }                                
-             break;     
-    case 'S':                                                                                 // Slope. factor ( 0 - 1) to multiply brighness (0 - 255) with 
-    case 's':
-             sprintf(sptext,"**** Length fault S. ****");    
-             if (InputString.length() > 1 && InputString.length() < 5)
-               {                
-                Mem.LightReducer = (byte) SConstrainInt(InputString,1,1,255);
-                sprintf(sptext,"Slope brightness changed to: %d%%",Mem.LightReducer);
-               }
-             else sprintf(sptext,"**** Input fault. \nEnter Snnn where n between 1 and 255");
-             break;                     
-    case 'T':
-    case 't':
-//                                                                                            //
-             if(InputString.length() == 7)  // T125500
-               {
-                timeinfo.tm_hour = (int) SConstrainInt(InputString,1,3,0,23);
-                timeinfo.tm_min  = (int) SConstrainInt(InputString,3,5,0,59); 
-                timeinfo.tm_sec  = (int) SConstrainInt(InputString,5,7,0,59);
-                if (DS3231Installed)
-                  {
-                   sprintf(sptext,"Time set in external RTC module");  
-                   SetDS3231Time();
-                   PrintDS3231Time();
-                  }
-                else sprintf(sptext,"No external RTC module detected");
-               } 
-             else sprintf(sptext,"**** Length fault. Enter Thhmmss ****");
-             break;            
-    case 'U':                                                                                 // factor to multiply brighness (0 - 255) with 
-    case 'u':
-            sprintf(sptext,"**** Length fault U. Demo mode (Unnn or U) ****");
-            if (InputString.length() == 1)
-               {   
-                Demo = false; 
-                sprintf(sptext,"Demo mode: %s",Demo?"ON":"OFF"); 
-               }
-            if (InputString.length() >1 && InputString.length() < 6 )
-               {
-                MilliSecondValue = InputString.substring(1,5).toInt();                
-                Demo = true;                                                                 // Toggle Demo mode
-                sprintf(sptext,"Demo mode: %s MillisecondTime=%d",Demo?"ON":"OFF", MilliSecondValue); 
-               }
-             break;     
-    case 'W':
-    case 'w':
-             if (InputString.length() == 1)
-               {   
-                Mem.WIFIOn = 1 - Mem.WIFIOn; 
-                Mem.NTPOn = Mem.WIFIOn;                                                      // If WIFI is off turn NTP also off
-                sprintf(sptext,"WIFI is %s after restart", Mem.WIFIOn?"ON":"OFF" );
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter W ****");
-             break; 
-    case 'X':
-    case 'x':
-             if (InputString.length() == 1)
-               {   
-                Mem.NTPOn = 1 - Mem.NTPOn; 
-                sprintf(sptext,"NTP is %s after restart", Mem.NTPOn?"ON":"OFF" );
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter X ****");
-             break; 
-    case 'Y':
-    case 'y':
-             Play_Lights();
-             lastminute = 99;                                                                // Force a minute update
-             Displaytime(); 
-             sprintf(sptext,"**** Play Lights");     
-             break;  
-    case 'Z':
-    case 'z':
-             sprintf(sptext,"**** Start WPS on your router");   
-             WiFi.onEvent(WiFiEvent);
-             WiFi.mode(WIFI_STA);
-             Serial.println("Starting WPS");
-             wpsInitConfig();  
-             wpsStart();
-             break;  
-//--------------------------------------------                                                //        
-    case '!':                                                                                 // Print the NTP, RTC and DS3231 time
-             if (InputString.length() == 1)  PrintAllClockTimes();
-             break;       
-    case '@':                                                                                 // Reset 
-             if (InputString.length() == 1)
-               {   
-                Tekstprintln("\n*********\n ESP restarting\n*********\n");
-                ESP.restart();   
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter @ ****");
-             break;     
-    case '#':
-            sprintf(sptext,"**** Length fault #. Demo mode (#nnnn or #) ****");
-            if (InputString.length() == 1)
-               {   
-                Zelftest = 1 - Zelftest; 
-                sprintf(sptext,"Zelftest: %s", Zelftest?"ON":"OFF" ); 
-                Selftest();   
-                Displaytime();  
-               }
-            if (InputString.length() >1 && InputString.length() < 6 )                        // Self test with msec delay
-              {
-                MilliSecondValue = InputString.substring(1,5).toInt();                
-                Zelftest = 1 - Zelftest; 
-                sprintf(sptext,"Zelftest: %s", Zelftest?"ON":"OFF" ); 
-                Selftest(MilliSecondValue);   
-                Displaytime();  
-              }
-             break;
-             if (InputString.length() == 1)                                                    // Self test with default delay and On OFF
-               {
-                Zelftest = 1 - Zelftest; 
-                sprintf(sptext,"Zelftest: %s", Zelftest?"ON":"OFF" ); 
-                Selftest();   
-                Displaytime();                                                                // Turn on the display with proper time
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter # ****");
-             break; 
-    case '$':
-             FireDisplay = 1 - FireDisplay;                                                   // If TestLDR = 1 LDR reading is printed every second instead every 30s
-             sprintf(sptext,"FireDisplay: %s",FireDisplay? "On" : "Off");
-             ClearScreen();
-             Displaytime();   
-             break;       
-    case '%':                                                                                 // SK6812 or WS2812 strip 
-             if (InputString.length() == 1)
-               {   
-                Mem.LEDstrip = 1 - Mem.LEDstrip; 
-                sprintf(sptext,"LED strip is %s after restart", Mem.LEDstrip?"WS2812":"SK6812" );
-               }                                
-             else sprintf(sptext,"**** Length fault . ****");
-             break; 
-    case '&':
-             sprintf(sptext,"**** Length fault &. ****");                                     // Forced get NTP time and update the DS32RTC module
-             if (InputString.length() == 1)
-              { 
-               SetDS3231Time();
-               SetRTCTime();    
-               PrintAllClockTimes();
-               } 
-             break;
-    case '+':
-             if (InputString.length() == 1)
-               {   
-                Mem.UseBLELongString = 1 - Mem.UseBLELongString; 
-                sprintf(sptext,"Fast BLE is %s", Mem.UseBLELongString?"ON":"OFF" );
-               }                                
-             else sprintf(sptext,"**** Length fault. Enter + ****");
-             break;         
-    case '_':
-             if (InputString.length() >1 && InputString.length() < 4 )                         // Self test with msec delay
-              {
-                byte ff = (byte) InputString.substring(1,2).toInt();    
-                StoreStructInFlashMemory(); 
-                sprintf(sptext,"No use: %d", ff);                                              // Update EEPROM 
-                Tekstprintln(sptext);
-                //ESP.restart();                                                               // Restart ESP to use the proper settings
-              }
-             break;    
-    case '0':
-    case '1':
-    case '2':        
-             if (InputString.length() == 6)                                                   // For compatibility input with only the time digits
-              {
-               timeinfo.tm_hour = (int) SConstrainInt(InputString,0,2,0,23);
-               timeinfo.tm_min  = (int) SConstrainInt(InputString,2,4,0,59); 
-               timeinfo.tm_sec  = (int) SConstrainInt(InputString,4,6,0,59);
-               if (DS3231Installed)
-                 {
-                  sprintf(sptext,"Time set in external RTC module");  
-                  SetDS3231Time();
-                  PrintDS3231Time();
-                 }
-               else sprintf(sptext,"No external RTC module detected");
-               } 
-    default: break;
-    }
-   Tekstprintln(sptext); 
-   StoreStructInFlashMemory();                                                                // Update EEPROM                                     
-  }  
- InputString = "";
+    case '=':                                                                                 // Print permanent Mem memory
+      if(len == 1)  PrintMem(); 
+      else sprintf(sptext, "**** Length fault. Enter = ****");
+      break;     
+
+    case '0': case '1': case '2':                                                             // Time entry compatibility mode
+      if(len == 6) 
+       {
+        timeinfo.tm_hour = (int)SConstrainInt(InputString, 0, 2, 0, 23);
+        timeinfo.tm_min = (int)SConstrainInt(InputString, 2, 4, 0, 59);
+        timeinfo.tm_sec = (int)SConstrainInt(InputString, 4, 6, 0, 59);
+        if(DS3231Installed) 
+         {
+          sprintf(sptext, "Time set in external RTC module");
+          SetDS3231Time();
+          PrintDS3231Time();
+         } 
+        else sprintf(sptext, "No external RTC module detected");
+       }   
+      else sprintf(sptext, "**** Length fault. Enter Thhmmss ****");
+      break;
+  }
+  Tekstprintln(sptext);
+  StoreStructInFlashMemory();                                                                 // Update EEPROM
+}
+InputString = "";
+
 }
 
 //--------------------------------------------                                                //
@@ -2352,15 +2348,14 @@ void PrintAllClockTimes(void)
  PrintRTCTime();
  if(WiFi.localIP()[0] != 0)                                                                   // If no WIFI then no NTP time printed
    {
-    Tekstprint("\n   NTP time: ");
+    Tekstprint("   NTP time: ");
     PrintNTPtime();
    }
  if(DS3231Installed)
    {
-    Tekstprint("\nDS3231 time: ");
+    Tekstprint("DS3231 time: ");
     PrintDS3231Time();
    }
- Tekstprintln(""); 
 }
 //                                                                                            //
 // ------------------- End  Time functions 
@@ -3159,9 +3154,10 @@ void CheckBLE(void)
 //--------------------------------------------
 void WiFiEvent(WiFiEvent_t event)
 {
-  sprintf(sptext,"[WiFi-event] event: %d  : ", event); 
-  Tekstprint(sptext);
+  // sprintf(sptext,"[WiFi-event] event: %d  : ", event); 
+  // Tekstprint(sptext);
   WiFiEventInfo_t info;
+  static bool LostPrinted = false;
     switch (event) 
      {
         case ARDUINO_EVENT_WIFI_READY: 
@@ -3178,10 +3174,15 @@ void WiFiEvent(WiFiEvent_t event)
             break;
         case ARDUINO_EVENT_WIFI_STA_CONNECTED:
             Tekstprintln("Connected to access point");
+            LostPrinted = false;
             break;
        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
-            sprintf(sptext,"WiFi lost connection.");                                          // Reason: %d",info.wifi_sta_disconnected.reason); 
-            Tekstprintln(sptext);
+            if(!LostPrinted)
+             {
+              sprintf(sptext,"WiFi lost connection.");                                          // Reason: %d",info.wifi_sta_disconnected.reason); 
+              Tekstprintln(sptext);
+              LostPrinted = true;
+             }
  //           WiFi.reconnect(); is checked in EveryMinuteUpdate()
             break;
         case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:
@@ -3382,16 +3383,11 @@ void StartWIFI_NTP(void)
     switch(WiFi.status()) 
     {
      case WL_NO_SSID_AVAIL:
-          Tekstprintln("[WiFi] SSID not found (Unexpected error)\n Reset the clock with option R and re-enter SSID and Password.");
-          WiFi.disconnect(true,true);
-          Tekstprintln("[WiFi] Starting AP-mode http://192.168.4.1");
-          StartAPMode(); 
+          Tekstprintln("[WiFi] SSID not found (Unexpected error)\n Is the router turned off?");
           return;
-          break;
      case WL_CONNECT_FAILED:
           Tekstprint("[WiFi] Failed - WiFi not connected! Reason:? \n Reset the clock with option R and re-enter SSID and Password.");
           return;
-          break;
      case WL_CONNECTION_LOST:
           Tekstprintln("[WiFi] Connection was lost");
           break;
@@ -3500,64 +3496,76 @@ return  SNTPtimeValid;
 void WebPage(void)
 {
   int i = 0, n;
-  SWversion();                                                                                // Print the menu to the web page and BLE
-  for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = (char) index_html_top[n];
-  if (i > MAXSIZE_HTML_PAGE - 999)
-    {strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>");}
-  else
-  {
-    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];
-    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n];
-    HTML_page[i] = 0;
-   }
-  server.on("/", HTTP_GET, []() {server.send(200, "text/html", (const char*)HTML_page); });   // Root page
+
+  SWversion();                                                                                // Update version/menu info used in html_info
+
+
+  for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = index_html_top[n];             // Start building the HTML page
+
+  if (i > MAXSIZE_HTML_PAGE - 999) 
+    { strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>"); } 
+  else 
+    {
+     for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = html_info[n];
+     for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = index_html_footer[n];
+     HTML_page[i] = 0;                                                                         // Null-terminate
+    }
+
+  // Root page handler
+  server.on("/", HTTP_GET, []() { server.send(200, "text/html", HTML_page);  });
+
+  // GET handler for input parameter
   server.on("/get", HTTP_GET, []() 
-   {                                                                                          // Handle GET with input
+    {
     String inputMessage;
-    String inputParam;
-    if (server.hasArg(PARAM_INPUT_1)) 
-      { inputMessage = server.arg(PARAM_INPUT_1);   inputParam = PARAM_INPUT_1; } 
-    else 
-      { inputMessage = "";                          inputParam = "none";        }
+    if (server.hasArg(PARAM_INPUT_1)) { inputMessage = server.arg(PARAM_INPUT_1); } 
+    else { inputMessage = ""; }
     ReworkInputString(inputMessage);
-    SWversion();                                                                              // Print updated info
+    SWversion();
     int i = 0, n;
-    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = (char) index_html_top[n];// Top of the web page
-    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = (char) html_info[n];     // the menu items in the HTML page
-    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = (char) index_html_footer[n]; // The footer of the HTML page
+    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = index_html_top[n];
+    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = html_info[n];
+    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = index_html_footer[n];
     HTML_page[i] = 0;
     server.send(200, "text/html", HTML_page);
-   }  );
+    });
 
-  server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });          // If //update is type after the URL OTA GET page
-  server.on("/update", HTTP_POST, []()  {                                                     // OTA POST handler
-    shouldReboot = true;                                                                      // Reboot flag. Reboot the MCU after upload
-    server.send(200, "text/html",
-      "<!DOCTYPE html><html><body>"
-      "<h2>Update successful. Rebooting...</h2>"
-      "<p>You will be redirected shortly.</p>"
-      "<script>setTimeout(()=>{location.href='/'}, 7000);</script>"
-      "</body></html>");
-  });
-  server.onFileUpload([]() 
-  {
-    HTTPUpload& upload = server.upload();                                                     // OTA file upload
-    if (upload.status == UPLOAD_FILE_START) 
-      {
-       Serial.printf("OTA Start: %s\n", upload.filename.c_str());
-       if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {  Update.printError(Serial);  }
-      } 
-    else if (upload.status == UPLOAD_FILE_WRITE) 
+
+  server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });             // OTA update page
+  server.on("/update", HTTP_POST, []() {                                                         // OTA upload handler
+         shouldReboot = true;
+         server.send(200, "text/html",
+        "<!DOCTYPE html><html><body>"
+        "<h2>Update successful. Rebooting...</h2>"
+        "<p>You will be redirected shortly.</p>"
+        "<script>setTimeout(()=>{location.href='/'}, 7000);</script>"
+        "</body></html>");  }, []() 
+     {
+      HTTPUpload& upload = server.upload();
+      if (upload.status == UPLOAD_FILE_START) 
         {
-         if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) 
-          {  Update.printError(Serial);  }
+         Serial.printf("OTA Start: %s\n", upload.filename.c_str());
+         if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { Update.printError(Serial); }
         } 
-    else if (upload.status == UPLOAD_FILE_END) 
-       {
-        if ( Update.end(true)) {Serial.printf("OTA Success: %u bytes\n", upload.totalSize);  } 
-        else { Update.printError(Serial);   }
-       }
-  });
+      else if (upload.status == UPLOAD_FILE_WRITE) 
+        {
+        size_t written = Update.write(upload.buf, upload.currentSize);
+        if (written != upload.currentSize) 
+          {
+           Serial.printf("OTA Write Failed: written %u != %u\n", written, upload.currentSize);
+           Update.printError(Serial);
+          }
+        } 
+      else if (upload.status == UPLOAD_FILE_END) 
+        {
+         if (Update.end(true)) { Serial.printf("OTA Success: %u bytes\n", upload.totalSize);} 
+         else { Serial.printf("OTA End Failed\n");      Update.printError(Serial);   }
+        } 
+      else if (upload.status == UPLOAD_FILE_ABORTED) 
+        {  Update.end();    Serial.println("OTA Aborted");      }
+     }  );                                                                                     // END OTA upload handler
+
+
 //--------------------------------------------                                                //
 // WIFI WEBPAGE 404 handler
 //--------------------------------------------
@@ -3665,7 +3673,7 @@ void OnewireKeypad3x4Check(void)
     KeypadString ="";
     ColorLeds("",0,NUM_LEDS-1,0x00FF00);                                                      // Turn all LEDs green
     ShowLeds();                                                                               // Push data in LED strip to commit the changes
-    Serial.println(F("Key entry activated"));
+    Serial.println("Key entry activated");
    }
  if (KeyInputactivated && (Key>=0 && Key<10))
    {
@@ -3681,20 +3689,20 @@ void OnewireKeypad3x4Check(void)
      { 
       KeypadString = "";   
       Reset();
-      Serial.println(F("Settings reset"));   
+      Serial.println("Settings reset");   
      }
     else 
      {      
       ReworkInputString(KeypadString);                                                        // Rework ReworkInputString();
       KeypadString = "";
-      Serial.println(F("Time changed"));
+      Serial.println("Time changed");
      }    
    }
  if ( KeyInputactivated && ((millis() - KeyLooptime) > 30000) ) 
    {  
     KeyInputactivated = false;                                                                // Stop data entry after 30 seconds. This avoids unintended entry 
     KeypadString ="";
-    Serial.println(F("Keyboard entry stopped"));
+    Serial.println("Keyboard entry stopped");
   }
 }
                                   #endif  //ONEWIREKEYPAD3x4  
@@ -3865,3 +3873,47 @@ void ProcessKeyPressTurn(int encoderPos)
    }
  }
 
+//--------------------------------------------                                                //
+// COMMON Print permanent Mem memory
+//--------------------------------------------
+void PrintMem(void)
+{
+  sprintf(sptext,"DisplayChoice: %d",Mem.DisplayChoice); Tekstprintln(sptext);
+  sprintf(sptext,"TurnOffLEDsAtHH: %d",Mem.TurnOffLEDsAtHH); Tekstprintln(sptext);
+  sprintf(sptext,"TurnOnLEDsAtHH: %d",Mem.TurnOnLEDsAtHH); Tekstprintln(sptext);
+  sprintf(sptext,"LanguageChoice: %d",Mem.LanguageChoice); Tekstprintln(sptext);
+  sprintf(sptext,"LightReducer: %d",Mem.LightReducer); Tekstprintln(sptext);
+  sprintf(sptext,"LowerBrightness: %d",Mem.LowerBrightness); Tekstprintln(sptext);
+  sprintf(sptext,"DisplayChoice: %d",Mem.UpperBrightness); Tekstprintln(sptext);
+     
+ for (int i=0;i<12;i++) { sprintf(sptext,"%03d ",Mem.NVRAMmem[i]); Tekstprint(sptext); }   Tekstprintln("");
+ for (int i=12;i<24;i++){ sprintf(sptext,"%03d ",Mem.NVRAMmem[i]); Tekstprint(sptext); }       Tekstprintln("");
+                                                                    
+  sprintf(sptext,"BLEOn: %d",Mem.BLEOn ); Tekstprintln(sptext);
+  sprintf(sptext,"NTPOn: %d",Mem.NTPOn ); Tekstprintln(sptext);
+  sprintf(sptext,"WIFIOn: %d",Mem.WIFIOn );   Tekstprintln(sptext);
+  sprintf(sptext,"StatusLEDOn: %d",Mem.StatusLEDOn ); Tekstprintln(sptext);
+  sprintf(sptext,"MCUrestarted: %d",Mem.MCUrestarted );  Tekstprintln(sptext);                                              
+  sprintf(sptext,"DCF77On: %d",Mem.DCF77On ); Tekstprintln(sptext);
+  sprintf(sptext,"UseRotary: %d",Mem.UseRotary );     Tekstprintln(sptext);
+  sprintf(sptext,"UseDS3231: %d",Mem.UseDS3231 );     Tekstprintln(sptext);
+  sprintf(sptext,"LEDstrip: %d",Mem.LEDstrip ); Tekstprintln(sptext);
+  sprintf(sptext,"FiboChrono: %d",Mem.FiboChrono ); Tekstprintln(sptext);
+  sprintf(sptext,"NoExUl: %d", Mem.NoExUl); Tekstprintln(sptext);
+  sprintf(sptext,"WIFIcredentials: %d",Mem.WIFIcredentials ); Tekstprintln(sptext);
+  sprintf(sptext,"IntFuture2: %d",Mem.IntFuture2 ); Tekstprintln(sptext);
+  sprintf(sptext,"IntFuture3: %d",Mem.IntFuture3 ); Tekstprintln(sptext);
+  sprintf(sptext,"HetIsWasOff: %d", Mem.HetIsWasOff); Tekstprintln(sptext);
+  sprintf(sptext,"EdSoftLEDSOff: %d",Mem.EdSoftLEDSOff ); Tekstprintln(sptext);
+  sprintf(sptext,"ByteFuture3: %d", Mem.ByteFuture3); Tekstprintln(sptext);
+  sprintf(sptext,"ByteFuture4: %d", Mem.ByteFuture4); Tekstprintln(sptext);
+  sprintf(sptext,"UseBLELongString: %d",Mem.UseBLELongString ); Tekstprintln(sptext);
+  sprintf(sptext,"OwnColour: %d",Mem.OwnColour ); Tekstprintln(sptext);
+  sprintf(sptext,"DimmedLetter: %d",Mem.DimmedLetter ); Tekstprintln(sptext);
+  sprintf(sptext,"BackGround: %d",Mem.BackGround); Tekstprintln(sptext);
+  sprintf(sptext,"SSID: %s",Mem.SSID); Tekstprintln(sptext);
+  // sprintf(sptext,"BackGround: %s",Mem.Password); Tekstprintln(sptext);
+  sprintf(sptext,"BLEbroadcastName: %s",Mem.BLEbroadcastName); Tekstprintln(sptext);
+  sprintf(sptext,"Timezone: %s",Mem.Timezone); Tekstprintln(sptext);
+  sprintf(sptext,"Checksum: %d",Mem.Checksum); Tekstprintln(sptext);
+}
