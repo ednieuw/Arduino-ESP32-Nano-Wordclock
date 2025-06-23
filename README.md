@@ -1,3 +1,7 @@
+
+
+
+
 # Arduino-ESP32-Nano-Word clock
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
@@ -177,23 +181,15 @@ Then upload the .bin file from this repository.<br>
 Or use this one: [Uploads .bin files in the ESP32 by using wifimanager](https://github.com/ednieuw/OTA-webupdater).<br>
 <br>
 # How to compile: 
-At the moment of writing (1 jan 2025) the Espressif ESP32 board core V3.0.7 with the Arduino Nano ESP32 selected does compile to a working program. V3.1.0 does crash when WIFI is connected. 
-Select the Nano ESP32 board from Arduino. The Arduino ESP32 board with core version 2.0.17 or 2.0.18, compiles without errors and is advised to use.
-This 2.0.18 core uses the Adafruit Neopixel library. This Neopixel library uses machine code to control the LED-strips and does not work (in dec 2024) with the new core V3.0 boards. I made a library for the SK6812 and WS2812 that uses the RMT driver for the ESP32 V3.0 core.
+At the moment of writing ( june 2025) the Espressif ESP32 board core V3.2. with the Arduino Nano ESP32 selected does compile to a working program when ESP32WordclockV100.ino of a higher version is used.
+Select the Nano ESP32 board from Arduino. 
+The Arduino ESP32 board with core version 2.0.17/2.0.18, compiles without errors and is advised to use. 
+It generates the smallest binary code (V2.0.18 = 1.0 Mb vs V3.20 = 1.3 Mb)
 
-
-```
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
-#include "EdSoftLED.h"         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
-                      #else
-#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
-                      #endif
-
-```
 ![image](https://github.com/user-attachments/assets/1f4eeec5-ebc5-47fb-b513-2514f5ff6ecd)
 
 There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 or by Arduino pin numbering.<br>
-At the moment (Nov 2024) this code must be compiled with GPIO numbering selected!! <br>
+This code must be compiled with GPIO numbering selected!! <br>
 If LEDs do not turn on properly check this GPIO numbering setting.<br>
 When the Arduino macro numbering D1, D2, ... , D13 is used for digital pins and A0, A1, .. A7 for the analogue pins and LED_BUILTIN, LED_RED LED_GREEN, LED_BLUE for the LEDs on the Nano ESP32 board 'GPIO numbering' must be selected in the compiler.
 
@@ -530,7 +526,10 @@ Same as & option but this option will not update from the internet NTP server bu
 ## #= Self test
 Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
-#nnnn were nnnn is the delay between minutes in milli seconds.  
+#nnnn were nnnn is the delay between minutes in milli seconds.
+  
+## % = Fire display
+Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
 
 ## % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
@@ -555,11 +554,6 @@ Remember to install the ESP32 boards as explained above.<br>
 
 <img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" />
 <p>
-
-
-
-
-
 
 <p># Program explanation
  The program uses the following standard libraries.   
@@ -1619,7 +1613,3 @@ void notFound(AsyncWebServerRequest *request)
  Etc/Greenwich,"GMT0" 
  Etc/Universal,"UTC0" 
  Etc/Zulu,"UTC0" </pre>
-
- 
-
-
