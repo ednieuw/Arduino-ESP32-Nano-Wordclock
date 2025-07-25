@@ -1,7 +1,4 @@
 
-
-
-
 # Arduino-ESP32-Nano-Word clock
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
@@ -403,29 +400,29 @@ These preferences are permanently stored in the Arduino Nano ESP32 storage space
 Enter the first character in the menu of the item to be changed followed with the parameter. <br>
 For most entries upper and lower case are identical. 
 
-## A SSID B Password C BLE beacon name<br>
+### A SSID B Password C BLE beacon name<br>
 Change the name of the SSID of the router to be connected to.<br>
 aFRITZ!Box or AFRITZ!Box<br>
 Then enter the password. For example: BSecret_pass <br>
 and cMywordclock as a name of the BLE beacon that will be shown in your phone. (default after a reset:  wordclock )
 
 Restart the MCU by sending @. <br>
-## CCC  
+### CCC  
 Entering CCC or ccc will toggle BLE on or off. Be careful turning it off. When BLE is off the clock can only be controlled with WIFI or the USB serial port.
 
-## D Set Date and T Set Time <br>
+### D Set Date and T Set Time <br>
 If not connected to WIFI time and a RTC DS3231 is attached date must be set by hand.<br>
 For example enter: D06112022 to set the date to 6 November 2022.  <br>
 Enter for example T132145 (or 132145 , or t132145) to set time to 45 seconds and 21 minutes past one o'clock.
 
-## E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
+### E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
 At the bottom of this page you can find the time zones used in 2022. <br>
 It is a rather complicated string and it is therefore wise to copy it. <br>
 Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
-## F Own colour  (Hex FWWRRGGBB <br>
+### F Own colour  (Hex FWWRRGGBB <br>
 With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
 The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
 The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
@@ -436,42 +433,46 @@ You get gray if red, green and blue has the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
 For example: F8800FF00 is 50% white with 100% green.
 
-## I To print this Info menu<br>
+### I To print this Info menu<br>
 Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
 
-## K LDR reads/sec toggle On/Off<br>
+### K LDR reads/sec toggle On/Off<br>
 Prints the LDR-readings and the calculated intensity output.
 
-## N Display off between Nhhhh (N2208)<br>
+### N Display off between Nhhhh (N2208)<br>
 With N2208 the display will be turned off between 22:00 and 08:00. 
 
-## O Display toggle On/Off<br>
+### O Display toggle On/Off<br>
  O toggles the display off and on.
  
-##  Q Display colour choice (Q0-6)<br>
-Q0 Yellow Q1 hourly Q2 White Q3 All Own Q4 Own Q5 Wheel Q6 Digital display <br>
-Q0 will show the time with yellow words. <br>
+###  Q Display colour choice (Q0-9)<br>
+Q0 will show the time with yellow words., HETISWAS changing. <br>
+HET will change from green to red via yellow in an hour and IS/WAS with change from green to red in a minute.<br>
 Q1 will show every hour another colour. <br>
 Q2 shows all the texts white. <br>
-Q3 and Q4 uses you own defined colours. <br>
+Q3 uses you own defined colours. 
+Q4 uses you own defined colours with HETISWAS changing. <br>
 Q5 will follow rainbow colours every hour. <br>
-Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock <br>
-Send an 'I' to display the latest's settings 
+Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock. <br>
+Q7= Hourly colour, HETISWAS changing.
+Q8= Rainbow colour changing in a minute.
+Q9= Rainbow fast colour changing in 4 seconds.
+Send an 'I' to display the latest's settings in the menu. 
 
-## R Reset settings <br>
+### R Reset settings <br>
 R will set all preferences to default settings. The SSID and password, timezone, the LED-strip type and use a rotary will be kept.<br>
 RRR will clear SSID, password, set Time zone to Amsterdam (CET-1) and turn WIFI, NTP and BLE on.<br>
-RRRRR is a total reset
+RRRRR is a total reset. A combination of R and RRR
 
-## U Demo mode (msec) (U200)
+### U Demo mode (msec) (U200)
 Enter U followed with the duration of a second in milli seconds. 
-M200 (200 milli second) will speed up the clock 5 times.  
-Sending an U will turn off the demo mode.
+M200 (200 millisecond) will speed up the clock 5*60 times.  
+Sending an U will turn off the demo mode or if not in demo mode start demo mode with 200 ms/min.
 
-## Y Play lights
-To test the functionality of the LEDs
+### Y Play lights
+To test the functionality of the LEDs.
 
-## Light intensity (1-250)
+### Light intensity (1-250)
 S=Slope L=Min M=Max (S100 L5 M200)
 
 <table style="width: 100%">
@@ -496,10 +497,6 @@ or display. </td>
 <tr>
 <td> 
 
-
-
-# @ = Restart MCU<br>
-@ will restart the MCU. This is handy when the SSID, password, et cetera are changed and the program must be restarted.<br>
 <br>
 W=WIFI, X=NTP, Y=BLE<br>
 Toggle WIFI, NTP and BLE on and off.<br>
@@ -511,7 +508,7 @@ At the bottom of the menu the state is printed.<br>
 </tr>
 </table>
 
-## + Fast BLE
+### + Fast BLE
 
 The BLE UART protocol sends default packets of 20 bytes. Between every packet there is a delay of 50 msec.<br>
 The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed.<br>With most apps you will see these will truncate the long strings of the menu.<br>
@@ -519,31 +516,39 @@ Then turn off Fast BLE. <br>
 Option Z toggles between the long and short packages. 
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 
-## ! = Show NTP, RTC and DS3231 time
+### ~ = change display mode per minute or hour
+~ will start the changing display mode option. ~1 wil change the dislay mode every minute and ~2 every hour.our 0 is off. 
+This is convenient for testing and demonstrations.
+
+
+### ! = Show NTP, RTC and DS3231 time
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and being used to show a realistic time.
 Same as & option but this option will not update from the internet NTP server but only shows the time.
 
-## #= Self test
+### #= Self test
 Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
 #nnnn were nnnn is the delay between minutes in milli seconds.
   
-## % = Fire display
+### % = Fire display
 Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
 
-## % = Switch between SK6812 and WS2812 LED strip
+### % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
 A Reset of all settings by sending a R in the menu will not change this LED strip selection.
 
-## @ = Reset MCU
+### @ = Restart MCU
 @ will restart the MCU. This is handy when the SSID, et cetera are changed and the program must be restarted. Settings will not be deleted.
 
-## & = Get and stores NTP time in RTC and DS3231 time
+### & = Get and stores NTP time in RTC and DS3231 time
 &  will get the NTP time immediately from the internet and stores it in the RTC clocks. This option is convenient to force the clock to get the proper NTP time. 
 In other cases the program will check the time running in the clock and on the NTP server so now and then and update the RTC clocks.
 The DS3231 time module must be installed and being used to show a realistic time.
 
-## 123456 Set time in RTC module
+### = = Display a permanent memory values in Mem
+=  will print the values stored in the permanent memory of the Arduino.
+
+### 123456 Set time in RTC module
 Enter the time as 152300 hhmmss. Same as T152300
 Changing date and time only works when a DS3231 RTC module is attached.
 
@@ -558,26 +563,30 @@ Remember to install the ESP32 boards as explained above.<br>
 <p># Program explanation
  The program uses the following standard libraries.   
 <br>
-<pre>// Includes defines and initialisations 
+<pre>
+//------------------------------------------------------------------------------              //
+// ESP32 Includes defines and initialisations
+//-------------------------------------------
+#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (3, 2, 0)                                  //Use EdSoftLED with ESP32 compiler.
+#define USEEDSOFTLED
+#endif
 
 #include <Preferences.h>
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL(3, 0, 0)
+                      #ifdef USEEDSOFTLED
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
                       #else
 #include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
                       #endif
-#include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
-#include <ESPNtpClient.h>      // https://github.com/gmag11/ESPNtpClient
+#include <NimBLEDevice.h>      // For BLE communication.
 #include <WiFi.h>              // Used for web page 
-#include <AsyncTCP.h>          // Used for webpage                                                         old https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/mathieucarbou/ESPAsyncWebServer     Old original one https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ElegantOTA.h>        // If a large bunch of compile error see here :https://docs.elegantota.pro/async-mode
-                               // Locate the ELEGANTOTA_USE_ASYNC_WEBSERVER macro in the ElegantOTA.h file, and set it to 1:
-                               // #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
+#include <WebServer.h>         // Used for web page 
+#include "esp_sntp.h"          // for NTP
+#include "esp_wps.h"           // For WPS
+#include <Update.h>            // For Over-the-Air (OTA)
 #include <ESPmDNS.h>           // To show BLEname in router
 #include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
 #include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
-#include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
+#include <RTClib.h>            // Used for connected DS3231 RTC 
 #include <Encoder.h>           // For rotary encoder
 #include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
 
