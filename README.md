@@ -517,7 +517,7 @@ Option Z toggles between the long and short packages.
 Settings are stored in the SPIFFS space from the Arduino Nano ESP32
 
 ### ~ = change display mode per minute or hour
-~ will start the changing display mode option. ~1 wil change the dislay mode every minute and ~2 every hour.our 0 is off. 
+~ will start the changing display mode option. ~ or ~1 will change the dislay mode every minute and ~2 every hour. ~ or ~0 turns the option off. 
 This is convenient for testing and demonstrations.
 
 
@@ -530,12 +530,19 @@ Sending a # will start the clock self test. This is convenient to check if all t
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
 #nnnn were nnnn is the delay between minutes in milli seconds.
   
-### % = Fire display
-Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
 
 ### % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
 A Reset of all settings by sending a R in the menu will not change this LED strip selection.
+
+### $ = Fire display
+Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
+
+### ( = Turns additional optional LEDs On/Off
+The clock can optionally be equipped with an extra logo text. 
+
+### ) = Turns HET/IS/WAS On/Off
+IT/IS/ WAS is always off
 
 ### @ = Restart MCU
 @ will restart the MCU. This is handy when the SSID, et cetera are changed and the program must be restarted. Settings will not be deleted.
@@ -595,6 +602,7 @@ Remember to install the ESP32 boards as explained above.<br>
 Webpage.h is included in the program as a TAB in the IDE. It contains the web page to display in the browser.<br>
 
 I made the web page in the free 'Microsoft Expression Web 4'. It is not maintained anymore but has more than enough functionalities for our purposes.<br>
+Notepad++ or an AI are also good alternatives<br>
 <br>
 To copy the code from the MS-Expression: <br>
 At the bottom line of the window of MS-Expression click 'Split'.<br>
@@ -754,7 +762,7 @@ void EveryDayUpdate(void)
 
 Update the LEDs on the Nano and the PCB. 
 On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON
-```
+<pre>
 //--------------------------------------------                                                //
 // COMMON Update routine for the status LEDs
 //-------------------------------------------- 
@@ -770,7 +778,6 @@ void SetStatusLED(int Red, int Green, int Blue)
  analogWrite(LED_BLUE,  512 - Blue);
 }
 
-```
 </pre>
 
 Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
