@@ -261,17 +261,15 @@ tijd in woorden weergeeft in de talen Nederlands, Engels, Frans en Duits in een
 grote 4-talenklok of als een eentalige klok. </span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL><br>
-Een Arduino ESP32 Nano computer in de klok wordt gebruikt om de klok aan te
-sturen en verbinding met WIFI en Bluetooth op te zetten. <br>
+Een Arduino ESP32 Nano computer in de klok wordt gebruikt om de tijd in de klok
+aan te sturen en verbinding met WIFI en Bluetooth op te zetten. <br>
 De tijd wordt gesynchroniseerd met het Network Time Protocol (NTP) van het
 internet via een WIFI-verbinding. Daarnaast bestaat de optie om de tijd zonder
 WIFI of Bluetooth met draai/drukknop gelijk te zetten.</span></span><span
 lang=NL><br>
 <span class=auto-style51>Instellingen kunnen worden beheerd met een webpagina,
 een PC of een Bluetooth Low Energy (BLE) seriële terminal-app die is
-geïnstalleerd op een telefoon, pc of tablet.<br>
-<br>
-</span></span></p>
+geïnstalleerd op een telefoon, pc of tablet.</span></span></p>
 
 <table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=653
  style='border-collapse:collapse;border:none'>
@@ -325,7 +323,10 @@ geïnstalleerd op een telefoon, pc of tablet.<br>
   <p class=MsoNoSpacing style='page-break-before:always'><span
   class=auto-style51><b><span lang=NL style='font-size:14.0pt'>Snelle start</span></b></span></p>
   <p class=MsoNoSpacing><span lang=NL>Zoek één van de volgende apps in de app
-  store.</span></p>
+  store. De app wordt gebruikt om commando’s naar de klok te sturen. </span></p>
+  <p class=MsoNoSpacing><span lang=NL>Mocht de app niet te downloaden zijn lees
+  dan verder hoe de WIFI aan te sluiten.</span></p>
+  <p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
   <table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=604
    style='margin-left:.05pt;border-collapse:collapse;border:none'>
    <tr style='height:17.3pt'>
@@ -397,7 +398,7 @@ geïnstalleerd op een telefoon, pc of tablet.<br>
  </tr>
 </table>
 
-<p class=MsoNoSpacing><img width=146 height=214
+<p class=MsoNoSpacing><img width=174 height=254
 src="Handleiding_ArduinoESP32Nano-NL_files/image007.gif" align=left hspace=12><span
 class=auto-style51><span lang=NL>De klok is ingesteld om met WIFI de tijd te
 ontvangen. Als de naam van de WIFI-router en wachtwoord niet zijn ingevoerd
@@ -432,15 +433,14 @@ gebruiken.</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Bluetooth app</span></b></span></p>
 
-<p class=MsoNoSpacing><img width=159 height=198
-src="Handleiding_ArduinoESP32Nano-NL_files/image008.gif" align=left hspace=12><span
-class=auto-style51><span lang=NL>Instellen is makkelijker met de Bluetooth app
-op de telefoon of tablet.</span></span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Instellen is
+makkelijker met de Bluetooth app op de telefoon of tablet.</span></span></p>
 
 <p class=MsoNoSpacing style='margin-left:0cm;text-indent:-7.1pt'><span
 class=auto-style51><span lang=NL style='font-family:"Verdana",sans-serif'>-<span
-style='font:7.0pt "Times New Roman"'> </span></span></span><span
-class=auto-style51><span lang=NL>Open de Bluetooth app.</span></span></p>
+style='font:7.0pt "Times New Roman"'> </span></span></span><img width=178
+height=220 src="Handleiding_ArduinoESP32Nano-NL_files/image008.gif" align=left
+hspace=12><span class=auto-style51><span lang=NL>Open de Bluetooth app.</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>De IOS app toont
 een lijst met Bluetooth stations.<br>
@@ -472,6 +472,12 @@ class=auto-style51><span lang=NL>Stuur @ om de klok te herstarten.</span></span>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
 
+<span class=auto-style51><b><span lang=NL style='font-size:12.0pt'><br
+clear=all style='page-break-before:always'>
+</span></b></span>
+
+<p class=MsoNormal><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Of start WPS</span></b><span
 lang=NL> (Een knop op de router met WPS. Lees dit na in de handleiding)</span></span></p>
 
@@ -486,7 +492,7 @@ class=auto-style51><span lang=NL>Druk de WPS-knop en stuur daarna het commando:
 <p class=MsoNoSpacing style='margin-left:0cm;text-indent:-7.1pt'><span
 class=auto-style51><span lang=NL style='font-family:"Verdana",sans-serif'>-<span
 style='font:7.0pt "Times New Roman"'> </span></span></span><span
-class=auto-style51><b><span lang=NL>Als een geen WIFI mogelijk is</span></b><span
+class=auto-style51><b><span lang=NL>Als geen WIFI mogelijk is</span></b><span
 lang=NL><br>
 Stuur de letter J in het menu met de Bluetooth app. </span></span></p>
 
@@ -507,17 +513,29 @@ class=auto-style51><span lang=NL style='font-family:"Verdana",sans-serif'>-<span
 style='font:7.0pt "Times New Roman"'> </span></span></span><span
 class=auto-style51><span lang=NL>Stuur de juiste tijd en datum via het menu. <br>
 </span></span><span class=auto-style51><span lang=NL style='font-size:11.0pt'>(bijv
-stuur: T143000 voor ‘half drie’ en bijv als datum: D090625</span><span lang=NL>)<br>
-</span></span><span lang=NL><br clear=all style='page-break-before:always'>
-</span></p>
+stuur: T143000 voor ‘half drie’ en bijv als datum: D090625</span><span lang=NL>)</span></span></p>
 
-<p class=MsoNoSpacing><span lang=NL><img border=0 width=526 height=222
-id=Image8 src="Handleiding_ArduinoESP32Nano-NL_files/image009.jpg"></span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
+
+<p class=MsoNoSpacing style='margin-left:0cm;text-indent:-7.1pt'><span
+class=auto-style51><span lang=NL style='font-family:"Verdana",sans-serif'>-<span
+style='font:7.0pt "Times New Roman"'> </span></span></span><span lang=NL><img
+border=0 width=526 height=222 id=Image8
+src="Handleiding_ArduinoESP32Nano-NL_files/image009.jpg"></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Klein PCB-ontwerp
 met Rotary en DS3231 RTC bevestigd</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
+<span class=auto-style51><b><span lang=NL style='font-size:16.0pt'><br
+clear=all style='page-break-before:always'>
+</span></b></span>
+
+<p class=MsoNormal><span class=auto-style51><b><span lang=NL style='font-size:
+16.0pt'>&nbsp;</span></b></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL
 style='font-size:16.0pt'>Voor het starten </span><span lang=NL><br>
@@ -764,7 +782,7 @@ geïnstalleerd</span></strong></p>
 
 <p class=MsoNormal style='margin-left:7.1pt;text-indent:-7.1pt'><span
 class=auto-style51><span lang=NL>Met de ‘Bluetooth serial terminal’ app kan de
-klok via bluetooth worden bedient met je telefoon, tablet of MAcOS PC.</span></span></p>
+klok via bluetooth worden bedient met je telefoon, tablet of MacOS PC.</span></span></p>
 
 <p class=MsoNormal style='margin-left:7.1pt;text-indent:-7.1pt'><span
 class=auto-style51><span lang=NL>&nbsp;</span></span></p>
@@ -839,7 +857,7 @@ klok.</span></strong></p>
   id=Image14 src="Handleiding_ArduinoESP32Nano-NL_files/image016.gif"></span></p>
   <p class=MsoNormal><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
   <p class=MsoListParagraph style='margin-left:1.7pt'><span class=auto-style51><span
-  lang=NL>In the FRITZBox WIFI router is als voorbeeld de klok met de naam
+  lang=NL>In de FRITZBox WIFI router is als voorbeeld de klok met de naam
   “SteelClock-01” met WIFI verbonden.</span></span></p>
   <p class=MsoNormal><span class=auto-style51><span lang=NL>Je kan de webpagina
   van de klok in een browser starten door te tikken:</span></span></p>
@@ -899,12 +917,13 @@ color:#1F2328'>&nbsp;</span></strong></p>
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328;font-weight:normal'>Een rotary encoder en DS3231 RTC zijn
 optioneel en niet persé nodig. <br>
-Ze zijn wel nodig als een klok geen WIFI kan ontvangen.</span></strong></p>
+Beide componeneten zijn wel nodig als een klok geen WIFI kan ontvangen.</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
-color:#1F2328;font-weight:normal'>In het klokmenu kan de rotary encoder( of
-drie drukknoppen) aan of uit worden gezet. Zet de optie uit als er geen rotary
-encoder is geïnstalleerd. </span></strong></p>
+color:#1F2328;font-weight:normal'>In het klokmenu kan de rotary encoder (of
+drie drukknoppen) aan of uit worden gezet. <br>
+Zet de rotary met de optie J in het menu uit als er geen rotary encoder is
+geïnstalleerd. (Open het langere instelmenu door ii te sturen)</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328'>&nbsp;</span></strong></p>
@@ -1018,8 +1037,6 @@ ESP32Arduino_WordClockV060 werkt alleen NimBLE versie 1.4.3</span></p>
 
 <p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>&nbsp;</span></p>
 
-<p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>&nbsp;</span></p>
-
 <p class=MsoNoSpacing><span lang=NL><img border=0 width=309 height=223
 id=Image17 src="Handleiding_ArduinoESP32Nano-NL_files/image019.gif"></span><span
 lang=NL> <img border=0 width=223 height=218 id=Image18
@@ -1027,13 +1044,12 @@ src="Handleiding_ArduinoESP32Nano-NL_files/image020.gif"></span></p>
 
 <p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>&nbsp;</span></p>
 
-<p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>&nbsp;Lukt het
-allemaal niet probeer dan de methode ‘</span><strong><span lang=NL
-style='font-family:"Segoe UI",sans-serif;font-weight:normal'>Alternatieve </span></strong><span
-lang=NL style='color:#1F2328'>softwareinstallatie’</span></p>
-
-<p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>hierna beschreven.</span><span
-lang=NL><br clear=all style='page-break-before:always'>
+<p class=MsoNoSpacing><span lang=NL style='color:#1F2328'>Lukt het niet probeer
+dan de methode ‘</span><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+font-weight:normal'>Alternatieve </span></strong><span lang=NL
+style='color:#1F2328'>softwareinstallatie’</span><strong><span lang=NL
+style='font-family:"Segoe UI",sans-serif'>.</span></strong><span lang=NL><br
+clear=all style='page-break-before:always'>
 </span></p>
 
 <p class=MsoNoSpacing><a name="_Hlk184722692"></a><strong><span lang=NL
@@ -1141,7 +1157,7 @@ SSID (WIFI-naam) en wachtwoord worden ingevoerd. </span><br>
 <span class=auto-style51>Sluit de MCU in de klok met een micro-USB- seriële
 kabel aan op een pc en gebruik een seriële terminal. <br>
 </span>Gebruik&#8203; een BLE- seriële terminal-app op een telefoon of tablet
-voor verbinding .<br>
+voor verbinding.<br>
 <br>
 </span></p>
 
@@ -1168,7 +1184,9 @@ app toont een venster en een regel waar opdrachten kunnen worden ingevoerd en
 naar de klok kunnen worden verzonden. </span><span lang=NL><br>
 - Door de letter I of i voor informatie te verzenden, wordt het menu
 weergegeven, gevolgd door de werkelijke instellingen van verschillende
-voorkeuren .</span></span></p>
+voorkeuren.<br>
+Met één i wordt het korte menu getoond. Met dubbel i (ii) verschijnt een langer
+menu met vele instelmogelijkheden van de klok. </span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
@@ -1189,16 +1207,12 @@ Informatie en het menu verschijnt </span></strong><span lang=NL>.</span></p>
 <span class=auto-style51>Voer de eerste letter in van de instelling die je wilt
 wijzigen, gevolgd door een code.</span><br>
 <span class=auto-style51>Sommige items schakelen alleen Aan en Uit. Zoals de W
-om WIFI Uit of Aan te zetten.</span></span></p>
-
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Om de SSID en het
-wachtwoord te wijzigen: <br>
+om WIFI Uit of Aan te zetten. <br>
+<br>
+<br>
+Om de SSID en het wachtwoord te wijzigen: <br>
 Verstuur de letter <b>A </b>of <b>a </b>gevolgd door de naam van het wifi
--station.</span></span><span lang=NL><br clear=all style='page-break-before:
-always'>
-</span></p>
-
-<p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
+-station en <b>B</b> of <b>b</b> gevolgd door het wachtwoord.</span></span></p>
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width="100%"
  style='border-collapse:collapse'>
@@ -1245,7 +1259,33 @@ always'>
   </td>
   <td width=280 valign=bottom style='width:209.95pt;padding:.75pt .75pt .75pt .75pt;
   height:95.8pt'>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>___________________________________</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>_</span><span
+  style='font-size:9.0pt'>___________________________________</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>F Own colour (Hex
+  FWWRRGGBB)</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>I Menu, II long menu</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>N Display off between
+  Nhhhh (N2208)</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>O Display On/Off</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>Q Display colour choice
+  (Q0)</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>R Reset settings, @
+  Restart</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>___________________________________</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>Display off between: 22h
+  - 08h</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>Display choice: Rainbow</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>RandomDisplay is OFF</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>Slope: 30     Min: 20    
+  Max: 255 </span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>BLE name: ESP32Test</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>IP-address:
+  192.168.178.172/update</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>WIFI=On NTP=On BLE=On
+  FastBLE=Off</span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>15/10/2025 09:08:18 </span></p>
+  <p class=MsoNoSpacing><span style='font-size:9.0pt'>___________________________________</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>__________________________________</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>A SSID B
   Password C BLE beacon name</span></p>
   <p class=MsoNoSpacing><span lang=FR style='font-size:9.0pt'>D Date
@@ -1258,65 +1298,58 @@ always'>
   networks</span></p>
   <p class=MsoNoSpacing><span lang=PT style='font-size:9.0pt'>H H001 rotary,
   H002 membrane (H000)</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>I To print
-  this Info menu</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>J Toggle use
-  DS3231 RTC module</span></p>
+  <p class=MsoNoSpacing><span lang=SV style='font-size:9.0pt'>I Info menu, II
+  long menu </span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>J DS3231 RTC
+  module On/Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>K LDR
-  reads/sec toggle On/Off</span></p>
+  reads/sec On/Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>N Display off
   between Nhhhh (N2208)</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>O Display
-  toggle On/Off</span></p>
+  On/Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>P Status LED
-  toggle On/Off</span></p>
+  On/Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Q Display
-  colour choice</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>  Q0 Yellow 
-  Q1 Hourly  Q2 White</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>  Q3 All Own
-  Q4 Own Q5 Wheel Q6 Dig</span></p>
+  choice (Q0) ~ Changing</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>R Reset
-  settings @ = Reset MCU</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>U Demo mode
-  (msec) (U200)</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>--Light
-  intensity settings (1-250)--</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>S Slope, L
+  settings, @ Restart</span></p>
+  <p class=MsoNoSpacing><span lang=ES style='font-size:9.0pt'>U Demo (msec)
+  (U200) Y LED test</span></p>
+  <p class=MsoNoSpacing><span lang=NO-BOK style='font-size:9.0pt'>S Slope, L
   Min, M Max  (S50 L5 M200)</span></p>
-  <p class=MsoNoSpacing><span lang=NO-BOK style='font-size:9.0pt'>W WIFI, X
-  NTP&amp;, CCC BLE, + Fast BLE</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'># Self test, !
-  See RTC, &amp; Update RTC</span></p>
+  <p class=MsoNoSpacing><span lang=NO-BOK style='font-size:9.0pt'>W WIFI X
+  NTP&amp; Z WPS CCC BLE + Fast BLE</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>#nnn Selftest,
+  RTC: ! See, &amp; Update</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>) HETISWAS
+  On/Off, ( EdSoft On/Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Ed Nieuwenhuys
-  December 2024</span></p>
+  Oct 2025</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>___________________________________</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Display off
-  between: 00h - 00h</span></p>
+  between: 22h - 08h</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Display
-  choice: All Own</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Slope: 50    
-  Min: 5     Max: 255</span></p>
+  choice: Rainbow</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>RandomDisplay
+  is OFF</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Slope: 30    
+  Min: 20     Max: 255 </span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>SSID:
   FRITZ!BoxEd</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>BLE name:
-  SteelClock-01</span></p>
+  ESP32Test</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>IP-address:
-  192.168.178.40 /update</span></p>
+  192.168.178.172/update</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Timezone:CET-1CEST,M3.5.0,M10.5.0/3</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>WIFI=On NTP=On
   BLE=On FastBLE=Off</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Rotary=Off
   Membrane=Off  DS3231=Off</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>SK6812 strip
-  with 144 LEDs (switch %)</span></p>
+  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>WS2812 strip
+  with 148 LEDs (switch %)</span></p>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>Software:
-  ESP32Arduino_WordClockV062.ino</span></p>
-  <p class=MsoNoSpacing><span lang=EN-GB style='font-size:9.0pt'>ESP32 Arduino
-  core version: 2.0.17</span></p>
-  <p class=MsoNoSpacing><span lang=NL style='font-size:9.0pt'>30/12/2024
-  15:54:14</span></p>
-  <p class=MsoNoSpacing><span lang=NL style='font-size:9.0pt'>__________________________________________</span></p>
+  ESP32_WordClockV116.ino</span></p>
   </td>
  </tr>
  <tr style='height:15.8pt'>
@@ -1326,12 +1359,12 @@ always'>
   </td>
   <td width=280 style='width:209.95pt;padding:.75pt .75pt .75pt .75pt;
   height:15.8pt'>
-  <p class=MsoNoSpacing><span lang=NL>Menuweergave in seriële uitvoer.</span></p>
+  <p class=MsoNoSpacing><span lang=NL>Korte (i) en lange (ii) menuweergave </span></p>
   </td>
  </tr>
 </table>
 
-<p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Standaard staat de
 tijdzone ingesteld op Amsterdamse tijd. <br>
@@ -1339,7 +1372,7 @@ Een reset met optie R in het menu zal de tijdzone weer terugzetten naar
 Amsterdam. <br>
 Om een andere tijdzone in te stellen, stuurt je de tijdzone-string,
 voorafgegaan door het teken E of e. </span></span><span lang=NL><br>
-<span class=auto-style51>Onderaan deze handleiding worden veel tijdzones
+<span class=auto-style51>Onderaan deze handleiding zijn veel tijdzones
 afgedrukt. </span><br>
 <span class=auto-style51>Bijvoorbeeld: als u in Australië/Sydney woont, stuurt
 u de string,</span></span></p>
@@ -1393,13 +1426,14 @@ clear=all style='page-break-before:always'>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
-<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>Bediening
-en instellingen van de klok</span></strong></p>
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>Instellingen
+van de klok</span></strong></p>
 
 <p class=MsoNoSpacing><img width=357 height=348
 src="Handleiding_ArduinoESP32Nano-NL_files/image027.jpg" align=left hspace=12><span
-class=auto-style51><span lang=NL>De klok kan bediend worden met de WIFI
-webpagina of BLE UART terminal app. </span></span><span lang=NL><br>
+class=auto-style51><span lang=NL>Instellingen van de klok kunnen bediend worden
+met de WIFI webpagina of Bluetooth BLE terminal app. </span></span><span
+lang=NL><br>
 <span class=auto-style51>Wanneer de klok is verbonden met WIFI heeft deze een
 IP -adres ontvangen van de router waarmee deze is verbonden. <br>
 Het IP-adres staat afgedrukt in het menu.</span></span></p>
@@ -1443,10 +1477,8 @@ verzenden, probeer dan de webpagina van de klok en verstuur een + teken. </span>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL><br>
 Als alles mislukt, moet u de Arduino Nano ESP32 in de klok met een USB-C-kabel
-aansluiten op een pc en met de Arduino IDE een + te verzenden of als laatste
-redmiddel R om de fabrieksinstellingen te resetten.</span></span></p>
-
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>(https://www.arduino.cc/en/software)</span></span></p>
+aansluiten op een pc en met de Arduino IDE een + te verzenden of stuur de
+letter R om de klok naar de standaardinstellingen te resetten.</span></span></p>
 
 <p class=MsoNoSpacing><b><span lang=NL style='font-family:"Verdana",sans-serif'><br>
 <br>
@@ -1462,12 +1494,11 @@ font-weight:normal'>&nbsp;</span></strong></p>
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>De
 lichtintensiteit van het display aanpassen</span></strong></p>
 
-<p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
-
 <p class=MsoNoSpacing><img width=119 height=112
-src="Handleiding_ArduinoESP32Nano-NL_files/image028.gif" align=left hspace=12><span
-lang=NL>In het menu kan de lichtintensiteit van het display met drie parameters
-worden geregeld:</span></p>
+src="Handleiding_ArduinoESP32Nano-NL_files/image028.gif" align=left hspace=12></p>
+
+<p class=MsoNoSpacing><span lang=NL>In het menu kan de lichtintensiteit van het
+display met drie parameters worden geregeld:</span></p>
 
 <p class=MsoNoSpacing><span lang=NL style='font-size:11.0pt'>--Instellingen
 voor lichtintensiteit (1-250)--</span></p>
@@ -1475,23 +1506,25 @@ voor lichtintensiteit (1-250)--</span></p>
 <p class=MsoNoSpacing><span lang=NL style='font-size:11.0pt'>S=Helling L=Min
 M=Max (S80 L5 M200)</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>Standaardwaarden worden tussen ()
-weergegeven.<br>
+<p class=MsoNoSpacing><img width=72 height=38
+src="Handleiding_ArduinoESP32Nano-NL_files/image029.gif" align=left hspace=12
+alt=LDR><span lang=NL>Standaardwaarden worden tussen () weergegeven.<br>
 <br>
 </span></p>
 
-<p class=MsoNoSpacing><span lang=NL>S Toon snel de helderheid de maximale
-helderheid bereikt.</span></p>
+<p class=MsoNoSpacing><b><span lang=NL>S</span></b><span lang=NL> Regelt hoe snel
+de lichtsterkte van de LEDs de maximale helderheid bereikt.</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>Ik Hoe helder het scherm is in volledige
-duisternis .</span></p>
+<p class=MsoNoSpacing><b><span lang=NL>L</span></b><span lang=NL> Hoe helder
+het scherm blijft in volledige duisternis.</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>M de maximale helderheid van het scherm .</span></p>
+<p class=MsoNoSpacing><b><span lang=NL>M</span></b><span lang=NL> de maximale
+helderheid van het scherm .</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>In de onderste helft van het menu worden de
 opgeslagen waarden weergegeven</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>Helling: 50   Min: 5    Max: 255</span></p>
+<p class=MsoNoSpacing><span lang=NL>Helling: 80   Min: 5    Max: 255</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
 
@@ -1500,16 +1533,20 @@ opgeslagen waarden weergegeven</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>Wanneer het donker wordt schakelt de
 display niet helemaal uit maar blijft gedimd op een minimale waarde. <br>
-Met de parameter L kan de laagste helderheid worden geregeld. Met een waarde
-tussen 0 en 255 kan deze helderheid worden ingesteld. <br>
+Met de parameter <b>L</b> kan de minimale helderheid worden geregeld. Met een
+waarde tussen 0 en 255 kan deze helderheid worden ingesteld. <br>
 L5 is de standaardwaarde.</span></p>
 
+<p class=MsoNoSpacing><span lang=NL>De maximale helderheid van het display
+wordt geregeld met de parameter <b>M</b>. Ook een waarde tussen 0 en 255.
+Standaard staat deze maximaal op 255. <br>
+Met parameter <b>S</b> kan de helling worden geregeld hoe snel de maximale
+helderheid wordt bereikt.</span></p>
+
 <p class=MsoNoSpacing><img width=396 height=306
-src="Handleiding_ArduinoESP32Nano-NL_files/image029.gif" align=left hspace=12><span
-lang=NL>De maximale helderheid van het display wordt geregeld met de parameter
-M. Ook een waarde tussen 0 en 255.<br>
-Met parameter S kan de helling worden geregeld hoe snel de maximale helderheid
-wordt bereikt.<br>
+src="Handleiding_ArduinoESP32Nano-NL_files/image030.gif" align=left hspace=12><span
+lang=NL>Ook deze waarden variëren tussen de 0 en 255. Standaard staat deze op
+80.<br>
 <br>
 <br>
 </span></p>
@@ -1546,12 +1583,12 @@ standaardinstelling door R te sturen. </span></span><span lang=NL><br>
   <td width=327 style='width:245.2pt;border-top:solid black 1.5pt;border-left:
   solid black 1.5pt;border-bottom:none;border-right:none;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNoSpacing><span lang=NL> <img border=0 width=274 height=562
-  id="Picture 4" src="Handleiding_ArduinoESP32Nano-NL_files/image030.jpg"></span></p>
+  id="Picture 4" src="Handleiding_ArduinoESP32Nano-NL_files/image031.jpg"></span></p>
   </td>
   <td width=290 style='width:217.65pt;border-top:solid black 1.5pt;border-left:
   none;border-bottom:none;border-right:solid black 1.5pt;padding:.75pt .75pt .75pt .75pt'>
   <p class=MsoNoSpacing><span lang=NL><img border=0 width=274 height=534
-  id="Picture 3" src="Handleiding_ArduinoESP32Nano-NL_files/image031.jpg"></span></p>
+  id="Picture 3" src="Handleiding_ArduinoESP32Nano-NL_files/image032.jpg"></span></p>
   </td>
  </tr>
  <tr>
@@ -1590,16 +1627,20 @@ font-weight:normal'>Voer het IP-adres van de klok in, direct, zonder spatie,
 gevolgd door /update.</span></strong></p>
 
 <p class=MsoNoSpacing><img width=203 height=268
-src="Handleiding_ArduinoESP32Nano-NL_files/image032.jpg" align=left><span
+src="Handleiding_ArduinoESP32Nano-NL_files/image033.jpg" align=left><span
 lang=NL>Zoiets als dit: 192.168.178.141/update.</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>Of gebruik BLEbroadcastname.local/update in
-plaats van het IP-adres.</span></p>
+<p class=MsoNoSpacing><span lang=NL>Of gebruik: http://BLEbroadcastname.local/update
+</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>In dit geval: redpcbv01.local/update.</span></p>
+<p class=MsoNoSpacing><span lang=NL>in plaats van het IP-adres.</span></p>
+
+<p class=MsoNoSpacing><span lang=NL>In dit geval: redpcbv01.local/update. <br>
+</span><span lang=NL style='font-size:11.0pt'>(Soms kan http:// weggelaten
+worden)</span></p>
 
 <p class=MsoNoSpacing><span lang=NL><img border=0 width=343 height=194
-id=Image29 src="Handleiding_ArduinoESP32Nano-NL_files/image033.gif"></span></p>
+id=Image29 src="Handleiding_ArduinoESP32Nano-NL_files/image034.gif"></span></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 font-weight:normal'>&nbsp;</span></strong></p>
@@ -1617,18 +1658,12 @@ font-weight:normal'>waarbij V100 het versienummer van de software is.</span></st
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 font-weight:normal'><br>
 </span></strong><span lang=NL><img border=0 width=602 height=201 id=Image30
-src="Handleiding_ArduinoESP32Nano-NL_files/image034.gif"><img border=0
+src="Handleiding_ArduinoESP32Nano-NL_files/image035.gif"><img border=0
 width=602 height=228 id=Image31
-src="Handleiding_ArduinoESP32Nano-NL_files/image035.gif"></span><strong><span
+src="Handleiding_ArduinoESP32Nano-NL_files/image036.gif"></span><strong><span
 lang=NL style='font-family:"Segoe UI",sans-serif;font-weight:normal'><br>
 <br>
 </span></strong></p>
-
-<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
-
-<span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
-clear=all style='page-break-before:always'>
-</span>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
@@ -1819,6 +1854,8 @@ intensity settings (1-250)--</span></p>
 <br clear=all style='page-break-before:always'>
 </span></p>
 
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>A
 SSID B Wachtwoord C BLE beacon naam </span></strong><span lang=NL><br>
 <span class=auto-style51>Voer de naam van de SSID en wachtwoord van de router
@@ -1849,7 +1886,7 @@ Datum instellen </span></strong><span class=auto-style51><span lang=NL>en </span
 lang=NL style='font-family:"Segoe UI",sans-serif'>T Tijd instellen</span></strong><span
 lang=NL> <br>
 <span class=auto-style51>Als er geen verbinding is met WIFI-tijd en er een RTC
-DS3231 is aangesloten, moet de datum handmatig worden ingesteld . </span><br>
+DS3231 is aangesloten, moet de datum handmatig worden ingesteld. </span><br>
 <span class=auto-style51>Voer bijvoorbeeld in: D06112022 om de datum in te
 stellen op 6 november 2022.</span></span></p>
 
@@ -1873,45 +1910,76 @@ verstuur deze beginnend met een 'E' of 'e' ervoor. </span><br>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
+<span class=auto-style51><b><span lang=NL style='font-size:12.0pt'><br
+clear=all style='page-break-before:always'>
+</span></b></span>
+
+<p class=MsoNormal><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>F Eigen kleur
-(Hex WWRRGGBB) </span></b></span><b><span lang=NL><br>
+(Hex WWRRGGBB) </span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>(Tik in een
+browser of AI 0xff00ff in om kleuren hexadecimaal te maken)</span></span><b><span
+lang=NL><br>
 </span></b><span class=auto-style51><span lang=NL>De kleur van de woorden die
-in de klok worden weergegeven, kunnen aangepast worden en zijn te selecteren
-met optie Q3 of Q4 in het menu. </span></span><s><span lang=NL><br>
+in de klok worden weergegeven kunnen aangepast worden en zijn te selecteren met
+optie Q3 of Q4 in het menu.</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL> </span></span><s><span
+lang=NL><br>
 </span></s><span class=auto-style51><span lang=NL>Het in te voeren formaat is
 hexadecimaal. 0123456789ABCDEF zijn de tekens die kunnen worden gebruikt. <br>
-Het commando bestaat uit 2 cijfers voor wit gevolgd 2 cijfers voor Rood gevolgd
-door 2 voor Groen en eindigend met 2 cijfers voor Blauw. </span></span><span
-lang=NL><br>
-<span class=auto-style51>Om de </span>letters <span class=auto-style51>intens
-Groen te kleuren, voer <b>F</b>00<span style='color:red'>00</span><span
-style='color:#00B050'>FF</span><span style='color:#0070C0'>00</span> in,
-voorafgegaan door de letter F. Om </span>de letters intens Rood te kleuren,
-voer FF0000 in, voorafgegaan door het karakter F.</span></p>
+<br>
+</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Het commando
+bestaat uit 2 cijfers voor wit gevolgd 2 cijfers voor Rood gevolgd door 2 voor
+Groen en eindigend met 2 cijfers voor Blauw. </span></span><span lang=NL><br>
+<br>
+</span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Om de </span></span><span
+lang=NL>letters <span class=auto-style51>intens Groen te kleuren, voer <b>F</b>00<span
+style='color:red'>00</span><span style='color:#00B050'>FF</span><span
+style='color:#0070C0'>00</span> in, voorafgegaan door de letter F. Om </span>de
+letters intens Rood te kleuren, voer FF0000 in, voorafgegaan door het karakter
+F.</span></p>
+
+<p class=MsoNoSpacing><span lang=NL>                                                           
+<span class=auto-style51><b>F</b>00<span style='color:red'>00</span><span
+style='color:#00B050'>00</span><span style='color:#0070C0'>FF</span></span></span></p>
 
 <p class=MsoNoSpacing><span lang=NL>Om intens blauw in te stellen, voer je
-F000000FFin.</span></p>
-
-<p class=MsoNoSpacing><span lang=NL>WS2812 LED-strips hebben geen witte LED en
-het commando om de wit aan te sturen geen effect.</span></p>
-
-<p class=MsoNoSpacing><span lang=NL>Bij SK6812 LED's kan de extra witte LED
-naast de drie RGB LED's in dezelfde behuizing worden gebruikt.</span></p>
+F000000FF in.</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>Bijvoorbeeld: F8800FF00 is 50% wit en 100%
 groen.</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>In het kort: 00 is LED uit, 44 is 25%, 88
-is 50%, BB is 75% and FF is 100%.</span></p>
+is 50%, BB is 75% en FF is 100%.</span></p>
 
-<p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
+<p class=MsoNoSpacing><img width=85 height=199
+src="Handleiding_ArduinoESP32Nano-NL_files/image037.gif" align=left hspace=12></p>
+
+<p class=MsoNoSpacing><span lang=NL style='font-size:10.0pt'>WS2812 LED-strips
+hebben geen witte LED en het commando om de wit aan te sturen geen effect. </span></p>
+
+<p class=MsoNoSpacing><span lang=NL style='font-size:10.0pt'>Bij SK6812 LEDs heeft
+een extra witte LED (geel vlakje) naast de drie RGB LEDs.</span></p>
+
+<p class=MsoNoSpacing><span lang=NL style='font-size:10.0pt'>Welke LEDs in de
+klok zijn gemonteerd staat onderin het lange menu (ii) <br>
+      WS2812 strip with 148 LEDs (switch %)</span></p>
+
+<p class=MsoNoSpacing><span lang=NL style='font-size:10.0pt'>&nbsp;</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>G
 Scannen naar WIFI netwerken in de buurt </span></strong><span lang=NL><br>
 <span class=auto-style51>Door 'G' te versturen worden de beschikbare netwerken
-in de buurt in de seriële terminal afgedrukt. </span></span></p>
+in de buurt in de Bluetooth BLE-terminal afgedrukt.</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
@@ -1938,25 +2006,32 @@ te tonen, </span></strong><br>
 <span class=auto-style51>Print het menu.</span></span></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
-color:#1F2328;font-weight:normal'>Met de optie I in het menu wordt gekozen voor
-een kort menu voor alledaags gebruik of voor een lang menu met optie II (2x i)
-voor een uitgebreid menu met alle opties.</span></strong></p>
+color:#1F2328;font-weight:normal'>Met de optie I (i) in het menu wordt gekozen
+voor een kort menu voor alledaags gebruik of voor een lang menu met optie II
+(2x i) voor een uitgebreid menu met alle opties.</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
+<strong><span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
+clear=all style='page-break-before:always'>
+</span></strong>
+
+<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>J
-Schakelen om de DS3231-module tijd te gebruiken </span></strong><span lang=NL><br>
-<span class=auto-style51>Door 'J' te verzenden, wordt het gebruik van een
+Schakelen om de tijd uit de DS3231-module te gebruiken </span></strong><span
+lang=NL><br>
+<span class=auto-style51>Door 'J' te verzenden, wordt het gebruik van de
 optionele DS3231-tijdmodule AAN of UIT gezet. <br>
-Als de klok geen internetverbinding heeft, zal de tijd waarschijnlijk snel
-verlopen. Door de DS3231-tijdmodule wordt de afwijking teruggebracht tot een
+Als de klok geen internetverbinding heeft, zal de tijd snel verlopen. <br>
+Door gebruik van de DS3231-tijdmodule wordt de afwijking teruggebracht tot een
 paar seconden per jaar. </span></span></p>
 
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>De tijd kan worden
-ingevoerd met optie T en D in het menu. </span></span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>De tijd kan in de DS3231-tijdmodule
+worden ingevoerd met optie T en D in het menu. </span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Mocht de tijd niet
-zichtbaar worden stuur dan het commando &amp; om de interne kloktijden te zien.</span></span></p>
+zichtbaar worden stuur dan het commando ! om de interne kloktijden te zien. </span></span></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
@@ -1964,8 +2039,10 @@ zichtbaar worden stuur dan het commando &amp; om de interne kloktijden te zien.<
 Reads/sec  aan/uit zetten</span></strong><span lang=NL><br>
 <span class=auto-style51>Door een K in te voeren kan het afdrukken van de
 LDR-uitlezing van de gemeten lichtintensiteit per seconde gevolgd worden<br>
-Het toont ook hoe vaak de processor per seconde door het programma loopt en
-zijn taken controleert om de klok te laten lopen.<br>
+Het toont ook hoe vaak de processor per seconde (l/s) door het programma loopt
+en zijn taken controleert om de klok te laten lopen.</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL><br>
 </span></span><a name="_Hlk186467872"><span class=auto-style51><span
 lang=EN-GB style='font-size:9.0pt;font-family:"Courier New"'>TestLDR: On </span></span></a></p>
 
@@ -2014,11 +2091,9 @@ aan. </span></span></p>
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Q Keuze van de
-weergavekleur (Q0-6) </span></b></span><b><span lang=NL><br>
-<span class=auto-style51>Q0 Geel Q1 per uur Q2 Wit Q3 Alles Eigen Q4 Eigen Q5
-Wiel Q6 Digitaal display </span></span></b><span lang=NL><br>
-<br>
-<span class=auto-style51>Q0 geeft de tijd weer met gele woorden</span></span></p>
+weergavekleur (Q0-9) </span></b></span><b><span lang=NL><br>
+</span></b><span class=auto-style51><span lang=NL>Q0 geeft de tijd weer met
+gele woorden</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>en zal HET (of IT)
 binnen een uur van groen via geel naar rood veranderen.</span></span></p>
@@ -2028,18 +2103,37 @@ van groen naar rood via geel veranderen in een minuut. </span></span><span
 lang=NL><br>
 <span class=auto-style51>Q1 zal elk uur een andere kleur tonen. </span><br>
 <span class=auto-style51>Q2 toont alle teksten wit. </span><br>
-<span class=auto-style51>Q3 en Q4 gebruiken eigen gedefinieerde kleuren. (Met
-optie F in het menu)</span><br>
-<span class=auto-style51>Q5 zal in een uur de regenboogkleuren doorlopen. </span><br>
+<span class=auto-style51>Q3 gebruikt eigen gedefinieerde kleuren.</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>    </span></span><span
+class=auto-style51><span lang=NL style='font-size:11.0pt'>(Met optie F in het
+menu zijn de kleuren in te stellen)</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q4 gebruikt eigen
+gedefinieerde kleuren. </span></span><span class=auto-style51><span lang=NL
+style='font-size:11.0pt'>(HET  IS/WAS verkleurt van groen naar rood)</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q5 zal in een uur
+de regenboogkleuren doorlopen. </span></span><span lang=NL><br>
 <span class=auto-style51>Q6 is een digitale display</span></span></p>
 
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q8 Schakelt extra
-optionele LEDs Aan/Uit</span></span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q7 zal elk uur een
+andere kleur tonen. </span></span><span class=auto-style51><span lang=NL
+style='font-size:11.0pt'>(HET  IS/WAS verkleurt van groen naar rood)</span></span></p>
 
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q9 Schakelt
-HET/IS/WAS Aan/Uit</span></span></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q8 zal in 4
+minuten de regenboogkleuren doorlopen.</span></span></p>
 
-<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Q9 zal in 15
+seconden de regenboogkleuren doorlopen.</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL> </span></span></p>
+
+<strong><span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
+clear=all style='page-break-before:always'>
+</span></strong>
+
+<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>R
 Instellingen resetten </span></strong><span lang=NL><br>
@@ -2055,8 +2149,9 @@ combinatie van de optie R en RRR.<br>
 Het type LED-strip en het gebruik van een rotary of membraanknop worden
 ongewijzigd gelaten.</span></span></p>
 
-<p class=MsoNoSpacing><span lang=NL>Voer een reset met RRRRR uit wanneer de
-schets voor de eerste keer wordt geüpload naar de Arduino Nano ESP32.</span></p>
+<p class=MsoNoSpacing><span lang=NL>Voer een reset met RRRRR uit , een totale
+reset, wanneer de sketch voor de eerste keer wordt geüpload naar de Arduino
+Nano ESP32. </span></p>
 
 <p class=MsoNoSpacing><b><span lang=NL>&nbsp;</span></b></p>
 
@@ -2082,21 +2177,6 @@ milliseconde) versnelt de klok 5 keer.</span></span></p>
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Met alleen
 versturen van een U wordt de demomodus uitgeschakeld.</span></span></p>
 
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
-
-<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Y LED-test</span></b></span></p>
-
-<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Alle LEDs gaan een
-regenboog doorlopen. <br>
-De functie stoort soms of loopt vast. Herstart de klok na gebruik van deze
-optie.</span></span></p>
-
-<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
-
-<span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
-clear=all style='page-break-before:always'>
-</span>
-
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>W=WIFI,
@@ -2111,17 +2191,69 @@ src="../../../XS4ALL/Woordklok/Pocuter/Pics/BottomMenu.gif" alt="Bottom menu"></
 verzenden wordt de NTP-tijd in de interne Nano ESP32 RTC- en DS3231-tijdmodule
 gezet.</span></span></p>
 
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Y LED-test</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Alle LEDs gaan een
+regenboog doorlopen. <br>
+<br>
+</span></span></p>
+
+<span class=auto-style51><b><span lang=NL style='font-size:12.0pt'><br
+clear=all style='page-break-before:always'>
+</span></b></span>
+
+<p class=MsoNormal><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Z WPS</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>WPS is een methode
+om het wachtwoord en de naam van het WIFI-station, de SSID, uit de router te
+krijgen. <br>
+Als er een WPS-knop op de WIFI-router aanwezig is kan de klok zonder de naam en
+het wachtwoord van de router in te hoeven vullen verbonden worden met het
+internet.</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Start WPS in de
+klok door Z in het menu in te voeren en start WPS op de WIFI-router. Als alles
+goed gaat herstart de klok en zal de tijd gelijk staan. </span></span></p>
+
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+font-weight:normal'>Soms moet je de WPS-knop op de router een paar seconden
+ingedrukt houden.</span></strong></p>
+
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+font-weight:normal'>Hoe je WPS moet starten verschilt per router.</span></strong></p>
+
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NO-BOK style='font-family:"Segoe UI",sans-serif'>+
-Fast BLE </span></strong><span lang=NO-BOK><br>
-<span class=auto-style51>Het BLE UART-protocol verzendt standaardpakketten van
-20 bytes lang. </span></span><span class=auto-style51><span lang=NL>Tussen elk
-pakket zit een vertraging van 50 msec . </span></span><span lang=NL><br>
+= Fast BLE </span></strong><span lang=NO-BOK><br>
+</span><span class=auto-style51><span lang=NL>Het BLE UART-protocol verzendt
+standaardpakketten van 20 bytes lang. Tussen elk pakket zit een vertraging van
+50 msec . </span></span><span lang=NL><br>
 <span class=auto-style51>De IOS BLEserial- app, en misschien ook andere, kan
 pakketten van 80 bytes of meer ontvangen voordat tekens worden gemist .
 Hierdoor wordt het menu sneller afgedrukt. </span><br>
 <span class=auto-style51>Optie + schakelt tussen de lange en korte pakketten.</span></span></p>
+
+<p class=MsoNoSpacing><span lang=NL style='font-size:11.0pt'>                                  </span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>~ = Verander
+display mode per minuut of uur</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>~ start de optie
+voor het wijzigen van de weergavemodus en wisselt per minuut. <br>
+~1 verandert de display mode elke minuut </span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>~2 wisselt de
+display mode elk uur. </span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>~0 of ~ schakelt
+de wisseloptie uit. </span></span></p>
 
 <p class=MsoNoSpacing><span lang=NL style='font-size:11.0pt'>&nbsp;</span></p>
 
@@ -2159,12 +2291,27 @@ LED-strip niet. <br>
 <br>
 </span></span></p>
 
-<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>$ =Haardvuur <br>
-</span></b><span lang=NL>Toont een haardvuur op en 144 LEDklok<b>.</b> Op
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>$ = Haardvuur <br>
+</span></b><span lang=NL>Toont een haardvuur op en 144 LED-klok<b>.</b> Op
 andere type klokken zal het resultaat minder mooi zijn.<b><br>
 <br>
-<br>
 </b></span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>( = Schakelt
+extra optionele LEDs Aan/Uit</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>  De klok kan
+optioneel uitgerust zijn met een extra logo tekst. </span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>) = Schakelt
+HET/IS/WAS Aan/Uit</span></b></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL> HET IS WAS
+blijven altijd uit</span></span></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>&nbsp;</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>@ = Reset MCU <br>
 </span></b><span lang=NL>@ start de MCU opnieuw op. Dit is handig als de SSID,
@@ -2199,22 +2346,29 @@ uitgeschakeld is.</span></p>
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328'>&nbsp;</span></strong></p>
 
+<strong><span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif;
+color:#1F2328;background:white'><br clear=all style='page-break-before:always'>
+</span></strong>
+
+<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+color:#1F2328;background:white'>&nbsp;</span></strong></p>
+
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328;background:white'>Tijdzones</span></strong></p>
 
-<p class=MsoNoSpacing><span lang=NL style='color:#1F2328;background:white'><br>
-Kopieer de tekst <strong><span style='font-family:"Segoe UI",sans-serif'>tussen
-de aanhalingstekens </span></strong>en plak deze na het teken E (of e) en stuur
-deze naar de klok.</span></p>
+<p class=MsoNoSpacing><span lang=NL style='color:#1F2328;background:white'>Kopieer
+de tekst <strong><span style='font-family:"Segoe UI",sans-serif'>tussen de
+aanhalingstekens </span></strong>en plak deze na het teken E (of e) en stuur
+deze naar de klok. </span></p>
 
 <p class=MsoNoSpacing><span lang=NL style='color:#1F2328;background:white'>Voor
 Nederland en België zend: eCET-1CEST,M3.5.0,M10.5.0/3 </span></p>
 
-<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=690
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0 width=704
  style='margin-left:-21.55pt;border-collapse:collapse;border:none'>
- <tr>
-  <td width=141 valign=top style='width:106.0pt;border:solid windowtext 1.0pt;
-  padding:0cm 5.4pt 0cm 5.4pt'>
+ <tr style='height:339.6pt'>
+  <td width=144 valign=top style='width:108.2pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:339.6pt'>
   <p class=MsoNoSpacing><span lang=NL style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'> Africa/Abidjan,'GMT0'</span></p>
   <p class=MsoNoSpacing><span lang=NL style='font-size:3.0pt;font-family:"Courier New";
@@ -2430,8 +2584,8 @@ Nederland en België zend: eCET-1CEST,M3.5.0,M10.5.0/3 </span></p>
   <p class=MsoNoSpacing><span lang=NL style='font-size:3.0pt;color:#1F2328;
   background:white'>&nbsp;</span></p>
   </td>
-  <td width=151 valign=top style='width:113.5pt;border:solid windowtext 1.0pt;
-  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <td width=154 valign=top style='width:115.85pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:339.6pt'>
   <p class=MsoNoSpacing><span lang=FR style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'>America/Detroit,&quot;EST5EDT,M3.2.0,M11.1.0&quot;</span></p>
   <p class=MsoNoSpacing><span lang=FR style='font-size:3.0pt;font-family:"Courier New";
@@ -2650,8 +2804,8 @@ Nederland en België zend: eCET-1CEST,M3.5.0,M10.5.0/3 </span></p>
   <p class=MsoNoSpacing><span lang=NL style='font-size:3.0pt;color:#1F2328;
   background:white'>&nbsp;</span></p>
   </td>
-  <td width=139 valign=top style='width:104.15pt;border:solid windowtext 1.0pt;
-  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <td width=142 valign=top style='width:106.3pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:339.6pt'>
   <p class=MsoNoSpacing><span lang=EN-GB style='font-size:3.0pt;font-family:
   "Courier New";color:#1F2328;background:white'>America/Tegucigalpa,
   &quot;CST6&quot;</span></p>
@@ -2873,8 +3027,8 @@ Nederland en België zend: eCET-1CEST,M3.5.0,M10.5.0/3 </span></p>
   <p class=MsoNoSpacing><span lang=NL style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'>&nbsp;</span></p>
   </td>
-  <td width=145 valign=top style='width:108.6pt;border:solid windowtext 1.0pt;
-  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <td width=148 valign=top style='width:110.85pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:339.6pt'>
   <p class=MsoNoSpacing><span lang=FI style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'>Asia/Tokyo,&quot;JST-9&quot;</span></p>
   <p class=MsoNoSpacing><span lang=FI style='font-size:3.0pt;font-family:"Courier New";
@@ -3086,8 +3240,8 @@ Nederland en België zend: eCET-1CEST,M3.5.0,M10.5.0/3 </span></p>
   <p class=MsoNoSpacing><span lang=FR style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'>&nbsp;</span></p>
   </td>
-  <td width=114 valign=top style='width:85.2pt;border:solid windowtext 1.0pt;
-  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <td width=116 valign=top style='width:86.95pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt;height:339.6pt'>
   <p class=MsoNoSpacing><span lang=FR style='font-size:3.0pt;font-family:"Courier New";
   color:#1F2328;background:white'>Indian/Antananarivo, &quot;EAT-3&quot;</span></p>
   <p class=MsoNoSpacing><span lang=FR style='font-size:3.0pt;font-family:"Courier New";
