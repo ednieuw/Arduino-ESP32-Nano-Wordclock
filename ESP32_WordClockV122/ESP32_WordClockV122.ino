@@ -23,15 +23,31 @@
  Changes V110: Use of Mem.WIFIcredentials optimized to restore WIFI connection after power loss 
  Changes V111: Made CheckRestoreWIFIconnectivity(). Removed RAINBOWFAST
  Changes V112: Tested in several clocks
- Changes V113: In Ulrich design Klok No47 --> Shirley Janssen
- Changes V114: 
+ Changes V113: In Ulrich design Klok No47 --> Shirley Janssen  NLM1M2M3M4L161
+ Changes V114: is V113
+ Changes V115: Time functions updated. You can compile now By Arduino pin (default)
+ Changes V116: Removed redundant code
+ Changes V117: Added remote control. 
+ Changes V118: OTA more stable. void SetStatusLED() changed to turn of LED completely also in ESP32 core 3
+ Changes V119: IR-Remote works. Default Time-zone is entered when ResetCredentials(). IR-remote Power ON/OFF turns ON/OFF clock display 
+ Changes V120: Mem.IRremote -> Mem.UseRotary H03. H001 and H002 -> H01 and H02. in wtekstAppend()  if(Mem.MCUrestarted == 0) Tekstprint(sptext); 
+ Changes V121: Optimized IR-remote. Use Power button to use IR-remote input for 2 minutes
+ Changes V122: Optimized SetDS3231Time()  if(DS3231Installed)   SetDS3231Time(); Removed stray input from IRremote
+
+ If remote is off and turned on --> restart ESP32
+ Power ON/OFF start entering time. Switch to DS3231
+ OK leaves learning mode. No action anymore from remote entries
+ Learning mode only from BLE or serial
+
+
 *********************
 How to compile: 
 Install ESP32 boards
-Board: Arduino Nano ESP32 core version 2.0.17 or ESP32 core version 3.3.0 
+Board: ESP32 core version >3.2.0 
 Partition Scheme: With FAT
-Pin Numbering: By GPIO number (legacy). Not 'By Arduino pin (default)'
-USM mode: Normal (Tiny USB)
+Pin Numbering: By Arduino pin (default)   
+               By GPIO number (legacy).     -- > When using NEOpixel change 
+USB mode: Normal (Tiny USB)
 **********************
 
 Select below, with only one #define selected, the clock type
@@ -65,14 +81,14 @@ Select below, with only one #define selected, the clock type
                       #ifdef USEEDSOFTLED
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
                       #else
-#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel  *** USE GPIO NUMBERING and compile By GPIO number (legacy) 
                       #endif
 #include <Preferences.h>
 #include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
 #include <WiFi.h>              // Used for web page 
 #include <WebServer.h>         // Used for web page 
-#include "esp_sntp.h"          // for NTP
-#include "esp_wps.h"           // For WPS
+#include <esp_sntp.h>          // for NTP
+#include <esp_wps.h>           // For WPS
 #include <Update.h>            // For Over-the-Air (OTA)
 #include <ESPmDNS.h>           // To show BLEname in router
 #include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
@@ -80,6 +96,7 @@ Select below, with only one #define selected, the clock type
 #include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
 #include <Encoder.h>           // For rotary encoder
 #include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
+#include <IRremote.hpp>        // IR remote control
 
 //------------------------------------------------------------------------------              //
 // ARDUINO Definition of installed language word clock
@@ -520,21 +537,27 @@ const byte WHEELCOLOR    = 5;
 const byte DIGITAL       = 6;
 const byte HOURHETISWAS  = 7;
 const byte RAINBOW       = 8;
-const byte LASTITEM      = 8;                                                                 // last displaychoice item number
+const byte LASTITEM      = 8;                                                                 // Last display choice item number
+
 //------------------------------------------------------------------------------              //
 // PIN Assigments for Arduino Nano ESP32
+// Use GPIO numbering when compiling with:  By GPIO number (legacy).
 //------------------------------------------------------------------------------ 
  
 enum DigitalPinAssignments {      // Digital hardware constants ATMEGA 328 ----
  SERRX        = D0,               // Connects to Bluetooth TX
  SERTX        = D1,               // Connects to Bluetooth RX
- encoderPinB  = 5,                // D2 left (labeled CLK on decoder)no interrupt pin (Use GPIO pin numbering for rotary encoder lib)  
- encoderPinA  = 6,                // D3 right (labeled DT on decoder)on interrupt pin
- clearButton  = 7,                // D4 switch (labeled SW on decoder)
- LED_PIN      = 8,                // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
+ encoderPinB  = D2, //5,          // D2 left (labeled CLK on decoder) no interrupt pin (Use GPIO pin numbering for rotary encoder lib)  
+ encoderPinA  = D3, //6,          // D3 right (labeled DT on decoder) on interrupt pin
+ clearButton  = D4, //7,          // D4 switch (labeled SW on decoder)
+ IRReceiverPin= D4,               // D4 Infrared receiver pin instead of rotary encoder
+ LED_PIN      = D5, //8,          // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
+ EmptyD6      = D6,               // D6 Empty
+ EmptyD7      = D7,               // D7 Empty
+ EmptyD8      = D8,               // D8Empty 
  PCB_LED_D09  = D9,               // D9
  PCB_LED_D10  = D10,              // D10
- secondsPin   = 48,               // D13  GPIO48 (#ifdef LED_BUILTIN  #undef LED_BUILTIN #define LED_BUILTIN 48 #endif)
+ secondsPin   = D13 //48,         // D13  GPIO48 (#ifdef LED_BUILTIN  #undef LED_BUILTIN #define LED_BUILTIN 48 #endif)
  };
  
 enum AnaloguePinAssignments {     // Analogue hardware constants ----
@@ -544,11 +567,11 @@ enum AnaloguePinAssignments {     // Analogue hardware constants ----
  OneWirePin   = A3,               // OneWirePin
  SDA_pin      = A4,               // SDA pin
  SCL_pin      = A5,               // SCL pin
- EmptyA6     =  A6,               // Empty
- EmptyA7     =  A7};              // Empty
+ EmptyA6      = A6,               // Empty
+ EmptyA7      = A7};              // Empty
 
 //------------------------------------------------------------------------------
-const uint32_t black    = 0x000000, darkorange    = 0xFF8C00, red        = 0xFF0000, chartreuse   = 0x7FFF00;
+const uint32_t black    = 0x000000, orangered     = 0xFF4000, red        = 0xFF0000, chartreuse   = 0x7FFF00;
 const uint32_t brown    = 0x503000, cyberyellow   = 0xFFD300, orange     = 0xFF8000; 
 const uint32_t yellow   = 0xFFFF00, cadmiumyellow = 0xFFF600, dyellow    = 0xFFAA00, chromeyellow = 0xFFA700;
 const uint32_t green    = 0x00FF00, brightgreen   = 0x66FF00, apple      = 0x80FF00, grass        = 0x00FF80;  
@@ -574,11 +597,13 @@ Adafruit_NeoPixel LED2812strip = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB  +
 EdSoftLED LEDstrip ;//    = EdSoftLED();                                                         // Use EdSoftLED with ESP32 compiler V3.x.x. Neopixel crashes
 EdSoftLED LED6812strip = EdSoftLED(NUM_LEDS, LED_PIN, SK6812WRGB);
 EdSoftLED LED2812strip = EdSoftLED(NUM_LEDS, LED_PIN, WS2812RGB);
+bool UsedEDSOFTLED = true;
                       #else
 // LED_PIN = 8;  // bug in Neopixel library. Does not translate D5 to GPIO 8
 Adafruit_NeoPixel LEDstrip;
 Adafruit_NeoPixel LED6812strip = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRBW + NEO_KHZ800); // NEO_RGBW
 Adafruit_NeoPixel LED2812strip = Adafruit_NeoPixel(NUM_LEDS, LED_PIN, NEO_GRB  + NEO_KHZ800); // NEO_RGB NEO_GRB
+bool UsedEDSOFTLED = false;
                       #endif
                       
 uint32_t MINColor      = chromeyellow;
@@ -602,7 +627,7 @@ uint32_t WheelColor    = blue;
 uint32_t HourColor[] ={  white,     darkviolet, cyberyellow, capri,         orange,        apple,
                          greenblue, cerulean,   edviolet,    cadmiumyellow, green,         edamaranth,
                          red,       yellow,     coquelicot,  pink,          apple,         hotmagenta,
-                         green,     darkorange, brightgreen, dodgerblue,    screamingreen, blue,
+                         green,     orangered,  brightgreen, dodgerblue,    screamingreen, blue,
                          white,     darkviolet, chromeyellow };     
 
 // Definition of the digits 0 - 9, 3 wide, 5 high. 
@@ -680,10 +705,31 @@ int        MaxPhotocell       = 1;                                              
 uint32_t   SumLDRreadshour    = 0;
 uint32_t   NoofLDRreadshour   = 0;
 
+//-------------------------------------------- 
+// IR-RECEIVER
+//-------------------------------------------- 
+#define NO_LED_SEND_FEEDBACK_CODE                                                             // do not flash the BUILTIN LED on Arduino
+#define MAX_BUTTONS 16                                                                        // 0-9 (10 buttons) + up, down, left, right, power, OK (6 buttons)
+
+
+String EnteredDigits = "";                                                                    // Store typed digits InputString
+String ButtonNames[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+                             "UP", "DOWN", "LEFT", "RIGHT", "POWER", "OK"};                   // Runtime button info (not saved, just for display)                                    
+int currentLearningIndex = 0;
+uint32_t IR_StartTime    = 0;                                                                 // Time IR remote Power is on turn. Off after 1 minute
+bool IR_PowerOnstate     = false;                                                             // Is the power On or Off
+bool learningMode        = false;
+struct StoredButtonMapping                                                                    // Button mapping structure for storage
+{
+  uint8_t  protocol;                                                                          // decode_type_t as byte
+  uint16_t command;
+  uint16_t address;
+  bool     learned;
+};
+
 //------------------------------------------------------------------------------              //
 // CLOCK initialysations
 //--------------------------------------------                                 
-
 static uint32_t msTick;                                                                       // Number of millisecond ticks since we last incremented the second counter
 byte      lastminute = 0, lasthour = 0, lastday = 0, sayhour = 0;
 bool      Demo                 = false;
@@ -737,7 +783,7 @@ bool OptionYRainbow        = false;
 #define ESP_MODEL_NAME    "ESPRESSIF IOT"
 #define ESP_DEVICE_NAME   "ESP STATION"
 static esp_wps_config_t config;
-//------------------------------------------------------------------------------             //
+//------------------------------------------------------------------------------              //
 // Common
 //----------------------------------------
 #define   MAXTEXT 255
@@ -755,7 +801,7 @@ struct    EEPROMstorage {                                                       
   byte LightReducer     = 0;
   int  LowerBrightness  = 0;
   int  UpperBrightness  = 0;
-  int  NVRAMmem[24];                                                                          // LDR readings
+  int  NVRAMmem[24];                                                                          // LDR or other readings
   byte BLEOn            = 1;
   byte NTPOn            = 1;
   byte WIFIOn           = 1;  
@@ -773,7 +819,7 @@ struct    EEPROMstorage {                                                       
   byte HetIsWasOff      = 0;                                                                  // Turn On or Off HET IS WAS   
   byte EdSoftLEDSOn     = 0;                                                                  // EdSoft text on/off   
   byte RandomDisplay    = 0;                                                                  // For future use 
-  byte ByteFuture4      = 0;                                                                  // For future use   
+  byte ByteFuture3      = 0;                                                                  // For future use   
   byte UseBLELongString = 0;                                                                  // Send strings longer than 20 bytes per message. Possible in IOS app BLEserial Pro 
   uint32_t OwnColour    = 0;                                                                  // Self defined colour for clock display
   uint32_t DimmedLetter = 0;
@@ -784,6 +830,15 @@ struct    EEPROMstorage {                                                       
   char Timezone[50];
   int  Checksum        = 0;
 }  Mem; 
+
+struct IRRemoteStorage
+{
+  uint16_t learnedRemoteAddress  = 0;
+  byte     learnedRemoteProtocol = 0;
+  bool     remoteIdentified      = false;
+  StoredButtonMapping buttons[30];                                                            // MAX_BUTTONS = 15 but space for 15 more
+  int      Checksum              = 0;
+} IRMem;
 //--------------------------------------------                                                //
 // Menu
 //0        1         2         3         4
@@ -795,7 +850,8 @@ char menu[][40] = {
  "E Timezone  (E<-02>2 or E<+01>-1)",
  "F Own colour (Hex FWWRRGGBB)",
  "G Scan WIFI networks",
- "H H001 rotary, H002 membrane (H000)", 
+ "H H01 rotary H02 membrane H03 remote",
+ "} Learn IR remote",  
  "I Info menu, II long menu ",
  "J DS3231 RTC module On/Off",
                         #ifdef DCF77MOD
@@ -807,13 +863,13 @@ char menu[][40] = {
  "P Status LED On/Off", 
  "Q Display choice (Q0) ~ Changing",
  "R Reset settings, @ Restart",
- "U Demo (msec) (U200) Y LED test",    // , Y LEDtest", //Option Y does not work from a WIFI page and crashes the ESP32 with Neopixel 1.12.5
+ "U Demo (msec) (U200) Y LED test",
 // "--Light intensity settings (1-250)--",
  "S Slope, L Min, M Max  (S50 L5 M200)",
  "W WIFI X NTP& Z WPS CCC BLE + Fast BLE",
  "#nnn Selftest, RTC: ! See, & Update",
- ") HETISWAS On/Off, ( EdSoft On/Off", 
- "Ed Nieuwenhuys Jul 2025" };
+ ") HETISWAS  On/Off, ( EdSoft On/Off",
+ "Ed Nieuwenhuys Oct 2025" };
  
  char menusmall[][40] = {
  "F Own colour (Hex FWWRRGGBB)",
@@ -835,18 +891,20 @@ void setup()
  SetStatusLED(10,0,0);                                                                        // Set the status LED to red
  InitStorage();                                                                               // Load settings from storage and check validity  
  StartLeds();                                                                                 // LED RainbowCycle  
- while (!Serial) {if((millis()-Tick)>3000) break; LEDstartup(edviolet); delay(512); }         // Wait max 3 sec to establish serial connection
+ while (!Serial && ( (millis()-Tick) < 3000) ) { LEDstartup(orangered); delay(512); }         // Wait max 3 sec to establish serial connection
  LEDstartup(capri); Tekstprintln("Serial started\nStored settings loaded\nLED strip started");// InitStorage and StartLEDs must be called first
  Mem.MCUrestarted++;                                                                          // MCU Restart counter     
+ if(Mem.MCUrestarted>5) { Reset();  ResetCredentials(); }                                     // If the MCU restarts during Setup() so often Reset all 
  StoreStructInFlashMemory();                                                                  // 
- if(Mem.MCUrestarted>5) { Reset();  ResetCredentials(); }                                     // If the MCU restarts so often Reset all 
+ sprintf(sptext, "Using %s LED library", UsedEDSOFTLED?"EDSOFTLED":"NEOPIXEL"); Tekstprintln(sptext);                                                             // 
  if(Mem.UseRotary==1) {LEDstartup(pink);  InitRotaryMod(); Tekstprintln("Rotary available"); }// Start the Rotary encoder
  if(Mem.UseRotary==2) {LEDstartup(grass); InitKeypad3x1(); Tekstprintln("Keypad available"); }// Start the Keypad 3x1 
- LEDstartup(dyellow);                     InitDS3231Mod(); Tekstprintln("DS3231 RTC started");// Start the DS3231 RTC-module even if not installed. It can be turned it on later in the menu
- if(Mem.BLEOn)        {LEDstartup(blue);  StartBLEService(); Tekstprintln("BLE started"); }   // Start BLE service // Set the status LED to blue
- if(Mem.WIFIOn)       {LEDstartup(purple); ConnectWIFI();    Tekstprintln("WIFI started");}   // Start WIFI and optional NTP if Mem.WIFIOn = 1 
- Previous_LDR_read = ReadLDR();                                                               // Set the initial LDR reading
- GetTijd(true);// Tekstprintln("");                                                           // Get the time and print it
+ if(Mem.BLEOn)        {LEDstartup(blue);StartBLEService(); Tekstprintln("BLE started"); }     // Start BLE service 
+ if(Mem.WIFIOn)       {LEDstartup(purple); ConnectWIFI();  Tekstprintln("WIFI started");}     // Start WIFI and optional NTP if Mem.WIFIOn = 1 
+ if(Mem.UseRotary==3) {LEDstartup(white);Init_IRreceiver();Tekstprintln("IRremote started");} // Start IR remote
+ InitTimeSystem();    {LEDstartup(yellow);          Tekstprintln("\nTime system started");}   // Initialize NTP + RTC + DS3231 sync
+ Previous_LDR_read = ReadLDR();                                                               // Set the initial LDR reading 
+ GetTijd(true); // Tekstprintln("");                                                          // Get the time and print it
  LEDstartup(green);                                                                           // Set the status LED to green
  Displaytime(); Tekstprintln("");                                                             // Print the tekst time in the display 
  SWversion();                                                                                 // Print the menu + version 
@@ -874,9 +932,10 @@ void CheckDevices(void)
 {
  CheckBLE();                                                                                  // Something with BLE to do?
  SerialCheck();                                                                               // Check serial port every second 
- if (OptionYRainbow ) { ReworkInputString("Y"); OptionYRainbow=false;}                                                // The LED library’s timing can get interrupted by background Wi-Fi interrupts, causing flicker in the strip.
- if (Mem.UseRotary==1) RotaryEncoderCheck(); 
+ if (OptionYRainbow ) { ReworkInputString("Y"); OptionYRainbow=false;}                        // The LED library’s timing can get interrupted by background Wi-Fi interrupts, causing flicker in the strip.
+ if (Mem.UseRotary==1) RotaryEncoderCheck();
  if (Mem.UseRotary==2) Keypad3x1Check();
+//  if (Mem.UseRotary==3) IrReceiverDecode();                                                 // --> Every100mSecCheck
                                   #ifdef ONEWIREKEYPAD3x4   
  OnewireKeypad3x4Check(); 
                                   #endif  //ONEWIREKEYPAD3x4
@@ -891,8 +950,10 @@ void CheckDevices(void)
 void EverySecondCheck(void)
 {
  static int Toggle = 0;
- uint32_t msLeap = millis() - msTick;                                                         // 
- if (msLeap >999)                                                                             // Every second enter the loop
+// uint32_t msLeap = millis() - msTick;                                                         // 
+ if((millis() - msTick) % 100) Every100mSecCheck();
+// msLeap = millis() - msTick;
+ if ((millis() - msTick) >999)                                                                // Every second enter the loop
  {
   msTick = millis();
   GetTijd(false);                                                                             // Get the time for the seconds 
@@ -900,12 +961,19 @@ void EverySecondCheck(void)
   UpdateStatusLEDs(Toggle);
   SetSecondColour();                                                                          // Set the colour per second of 'IS' and 'WAS' 
   DimLeds(TestLDR);                                                                           // Every second an intensity check and update from LDR reading 
-  if (shouldReboot) { delay(1000);   ESP.restart(); }                                         // After finish OTA update restart
+  if (shouldReboot) { delay(3000);   ESP.restart(); }                                         // After finish OTA update restarts after 3 seconds. 1 second is too fast
   if (timeinfo.tm_min != lastminute) EveryMinuteUpdate();                                     // Enter the every minute routine after one minute; 
   Loopcounter=0;
  }  
 }
-
+//--------------------------------------------                                                //
+// COMMON Update routine 
+// Performs tasks every second
+//--------------------------------------------
+void Every100mSecCheck(void)
+{
+ if (Mem.UseRotary==3) IrReceiverDecode();
+}
 //--------------------------------------------                                                //
 // COMMON Update routine done every minute
 //-------------------------------------------- 
@@ -914,6 +982,7 @@ void EveryMinuteUpdate(void)
  lastminute = timeinfo.tm_min;  
  CheckRestoreWIFIconnectivity();                                                              // Check if WIFI is sill connected and if not restore it
  if (Mem.RandomDisplay == 1) { ChangeRandomDisplay(); SetSecondColour();} 
+ if (IR_PowerOnstate && ((millis() - IR_StartTime) > 120000) ) ToggleIRpower();                // Turn off Power af 120 seconds 
  GetTijd(false);
  Displaytime();  
  DimLeds(true);   
@@ -945,12 +1014,7 @@ void EveryDayUpdate(void)
  Previous_LDR_read = ReadLDR();                                                               // to have a start value and reset the Min Max measurements 
  MinPhotocell      = Previous_LDR_read;                                                       // Stores minimum reading of photocell;
  MaxPhotocell      = Previous_LDR_read;                                                       // Stores maximum reading of photocell;
- if(DS3231Installed && !Mem.UseDS3231)                                                        // If on NTP time and DS3231 installed set the correct the time
-   {
-    sprintf(sptext, "Time set in external RTC module");
-    SetDS3231Time();
-    PrintDS3231Time();
-  } 
+ if(DS3231Installed && !Mem.UseDS3231) SetDS3231Time();                                       // If on NTP time and DS3231 installed set the correct the time in the DS3231
  StoreStructInFlashMemory();                                                                  // Update Mem struct once a day to store Mem.NVRAM measurements
 }
 
@@ -964,7 +1028,7 @@ void UpdateStatusLEDs(int Toggle)
     SetStatusLED((Toggle && WiFi.localIP()[0]==0) * 20, 
                  (Toggle && WiFi.localIP()[0]!=0) * 20 , 
                  (Toggle && deviceConnected) * 20);
-    SetPCBLED09(   Toggle * 10);                                                                // Left LED
+    SetPCBLED09(   Toggle * 10);                                                              // Left LED
     SetPCBLED10((1-Toggle) * 10);                                                             // Right LED
     SetNanoLED13((1-Toggle) * 50);                                                            // LED on ESP32 board
    }
@@ -978,14 +1042,15 @@ void UpdateStatusLEDs(int Toggle)
 }
 //--------------------------------------------                                                //
 // COMMON Control the RGB LEDs on the Nano ESP32
-// Analog range 0 - 512. 0 is LED On max intensity
-// 512 is LED off. Therefore the value is subtracted from 512 
+// Analog range 0 - 512. 0 is LED Off, 512 is max intensity
+// 512 is LED off. Therefore the value is subtracted from 512
+// in core 3 the value to write is 13-bit 8191 to turn off the led completely
 //--------------------------------------------
-void SetStatusLED(int Red, int Green, int Blue)
+void SetStatusLED(int Red, int Green, int Blue)                                               // If LED should be off, use digitalWrite instead of analogWrite
 {
- analogWrite(LED_RED,   512 - Red);                                                           // !Red (not Red) because 1 or HIGH is LED off
- analogWrite(LED_GREEN, 512 - Green);
- analogWrite(LED_BLUE,  512 - Blue);
+ analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red));
+ analogWrite(LED_GREEN, Green == 0 ? 8191 : (512 - Green));
+ analogWrite(LED_BLUE,  Blue  == 0 ? 8191 : (512 - Blue));
 }
 //--------------------------------------------                                                //
 // COMMON Control orange LED D13 on the Arduino 
@@ -1035,7 +1100,7 @@ void Reset(void)
  Mem.HetIsWasOff      = 0;                                                                    // Turn On or Off HET IS WAS   
  Mem.EdSoftLEDSOn     = 0;                                                                    // Turn On or Off EDSOFT LEDs
  Mem.RandomDisplay    = 0;                                                                    // Choose every day another display
- Mem.ByteFuture4      = 0;                                                                    // 
+ Mem.ByteFuture3      = 0;                                                                    // 
  Mem.BLEOn            = 1;                                                                    // default BLE On
  Mem.UseBLELongString = 0;                                                                    // Default off. works only with iPhone/iPad with BLEserial app
  Mem.NTPOn            = 0;                                                                    // NTP default off
@@ -1050,7 +1115,12 @@ void Reset(void)
  MinPhotocell         = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
  MaxPhotocell         = Previous_LDR_read;                                                    // Stores maximum reading of photocell;                                            
  TestLDR              = 0;                                                                    // If true LDR display is printed every second
+ uint16_t learnedRemoteAddress  = 0;
+ uint8_t  learnedRemoteProtocol = 0;
+ bool     remoteIdentified      = false;
+ for (int i = 0; i < MAX_BUTTONS; i++)  IRMem.buttons[i].learned = 0;
  Tekstprintln("**** Reset of preferences ****"); 
+ ResetCredentials();
  StoreStructInFlashMemory();                                                                  // Update Mem struct       
  GetTijd(false);                                                                              // Get the time and store it in the proper variables
  SWversion();                                                                                 // Display the version number of the software
@@ -1073,6 +1143,11 @@ void ResetCredentials(void)
 }
 //--------------------------------------------                                                //
 // COMMON common print routines
+// %s - String
+// %d - Integer (decimal)
+// %04X - Hex with 4 digits, uppercase, leading zeros
+// %08X - Hex with 8 digits, uppercase, leading zeros
+// PRIX32 - 32-bit hex for uint32_t values
 //--------------------------------------------
 void Tekstprint(char const *tekst)    { if(Serial) Serial.print(tekst);  SendMessageBLE(tekst); } //sptext[0]=0; } 
 void Tekstprintln(char const *tekst)  { sprintf(sptext,"%s\n",tekst); Tekstprint(sptext); }
@@ -1081,20 +1156,20 @@ void TekstSprintln(char const *tekst) { sprintf(sptext,"%s\n",tekst); TekstSprin
 //--------------------------------------------                                                //
 // COMMON Print web menu page and BLE menu
 // 0 = text to print, 1 = header of web page with menu, 2 = footer of web page
-//  html_info but be empty before starting: --> html_info[0] = 0; 
+// html_info but be empty before starting: --> html_info[0] = 0; 
 //--------------------------------------------
 void WTekstappend(char const *tekst, char const *prefixtekst, char const *suffixtekst, bool newline) 
 {
-    if (newline) { sprintf(sptext, "%s\n", tekst); } 
-    else {         sprintf(sptext, "%s", tekst);   }
-    Tekstprint(sptext);
-    size_t needed = strlen(prefixtekst) + strlen(tekst) + strlen(suffixtekst) + strlen("<br>");// Estimate how much space will be added
-    if (strlen(html_info) + needed > MAXSIZE_HTML_INFO - 1) 
-       { strcat(html_info, "<br> *** Increase MAXSIZE_HTML_INFO ***<br>");   return;  }
-    strcat(html_info, prefixtekst);                                             
-    strcat(html_info, tekst);
-    strcat(html_info, suffixtekst);
-    if (newline) { strcat(html_info, "<br>"); }   // Append to html_info
+ if (newline) { sprintf(sptext, "%s\n", tekst); } 
+ else {         sprintf(sptext, "%s", tekst);   }
+ if(Mem.MCUrestarted == 0) Tekstprint(sptext);                                                // Otherwise the menu is printed during startup proces.
+ size_t needed = strlen(prefixtekst) + strlen(tekst) + strlen(suffixtekst) + strlen("<br>");  // Estimate how much space will be added
+ if (strlen(html_info) + needed > MAXSIZE_HTML_INFO - 1) 
+     { strcat(html_info, "<br> *** Increase MAXSIZE_HTML_INFO ***<br>");   return;  }
+ strcat(html_info, prefixtekst);                                             
+ strcat(html_info, tekst);
+ strcat(html_info, suffixtekst);
+ if (newline) { strcat(html_info, "<br>"); }   // Append to html_info
 }
 
 void WTekstprintln(char const *tekst) { WTekstappend(tekst, "", "", true);}
@@ -1140,7 +1215,6 @@ void InitStorage(void)
 }
 //--------------------------------------------                                                //
 // COMMON Store mem.struct in FlashStorage or SD
-// Preferences.h  
 //--------------------------------------------
 void StoreStructInFlashMemory(void)
 {
@@ -1155,21 +1229,39 @@ void StoreStructInFlashMemory(void)
 //  myFile.close();
  }
 //--------------------------------------------                                                //
+// COMMON Save IR remote settings 
+//--------------------------------------------
+ // Save IR remote settings separately
+void StoreIRRemoteInFlashMemory(void)
+{
+  FLASHSTOR.begin("IRRemote", false);
+  FLASHSTOR.putBytes("IRRemote", &IRMem, sizeof(IRMem));
+  FLASHSTOR.end();
+}
+
+//--------------------------------------------                                                //
 // COMMON Get data from FlashStorage
-// Preferences.h
 //--------------------------------------------
 void GetStructFromFlashMemory(void)
 {
  FLASHSTOR.begin("Mem", false);
  FLASHSTOR.getBytes("Mem", &Mem, sizeof(Mem) );
  FLASHSTOR.end(); 
-
 // Can be used as alternative if no SD card
 //  File myFile = SPIFFS.open("/MemStore.txt");  FILE_WRITE); myFile.read((byte *)&Mem, sizeof(Mem));  myFile.close();
-
- sprintf(sptext,"Mem.Checksum = %d",Mem.Checksum);Tekstprintln(sptext); 
+ sprintf(sptext,"Mem.Checksum = %d",Mem.Checksum); Tekstprintln(sptext); 
 }
+//--------------------------------------------                                                //
+// COMMON  Load IR remote settings from FlashStorage
+// Preferences.h
+//--------------------------------------------
 
+void GetIRRemoteFromFlashMemory(void)
+{
+  FLASHSTOR.begin("IRRemote", true);
+  FLASHSTOR.getBytes("IRRemote", &IRMem, sizeof(IRMem));
+  FLASHSTOR.end();
+}
 //--------------------------------------------                                                //
 // COMMON Version info
 //--------------------------------------------
@@ -1183,9 +1275,7 @@ void SWversion(bool Small)
  if(Small) {for (uint8_t i = 0; i < sizeof(menusmall) / sizeof(menusmall[0]); WTekstprintln(menusmall[i++]) ); }
  else      {for (uint8_t i = 0; i < sizeof(menu) / sizeof(menu[0]);           WTekstprintln(menu[i++]) ); }                                     
  PrintLine(35);
-  sprintf(sptext,"Display off between: %02dh - %02dh",Mem.TurnOffLEDsAtHH, Mem.TurnOnLEDsAtHH);  WTekstprintln(sptext);
-//byte dp = Mem.DisplayChoice;
-//sprintf(sptext,"Display choice: %s",dp==0?"Yellow+":dp==1?"Hourly":dp==2?"White":dp==3?"All Own":dp==4?"Own+":dp==5?"Wheel":dp==6?"Digital":dp==7?"Hourly+": dp==8?"Rainbow":"NOP");
+ sprintf(sptext,"Display off between: %02dh - %02dh",Mem.TurnOffLEDsAtHH, Mem.TurnOnLEDsAtHH);  WTekstprintln(sptext);
  PrintDisplayChoice(false);                                                                     WTekstprintln(sptext);
  sprintf(sptext, "RandomDisplay is %s", Mem.RandomDisplay==1 ? "ON/min" : 
                                         Mem.RandomDisplay==2 ? "ON/hour" : "OFF");              WTekstprintln(sptext);//
@@ -1204,9 +1294,10 @@ void SWversion(bool Small)
                                Mem.UseBLELongString? "FastBLE=On":"FastBLE=Off" );              WTekstprintln(sptext);
  char fftext[20];              
  if(!Small) {sprintf(fftext,"%s", Mem.UseDS3231?" DS3231=On":" DS3231=Off"); }
- if(!Small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"Rotary=Off Membrane=Off":
-                        Mem.UseRotary==1 ?"Rotary=On Membrane=Off":
-                        Mem.UseRotary==2 ?"Rotary=Off Membrane On":"NOP",fftext);               WTekstprintln(sptext); }                           
+ if(!Small) {sprintf(sptext,"%s %s",Mem.UseRotary==0 ?"No Rotary":
+                        Mem.UseRotary==1 ?"Rotary=ON":
+                        Mem.UseRotary==2 ?"Membrane=ON":
+                        Mem.UseRotary==3 ?"IR-remote=ON":"NOP",fftext);                         WTekstprintln(sptext); }                           
  if(!Small) { sprintf(sptext,"%s strip with %d LEDs (switch %%)", 
                  Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP",(int) NUM_LEDS);       WTekstprintln(sptext); }
   if(!Small) {sprintf(sptext,"Software: %s",FILENAAM);                                          WTekstprintln(sptext);}  // VERSION);
@@ -1215,8 +1306,8 @@ void SWversion(bool Small)
  GetTijd(false);                                                                              // Get the time and store it in the proper variables
  PrintRTCTime();                                                                                
  PrintLine(35);                                                                               //
- 
 }
+
 //--------------------------------------------                                                //
 // COMMON PrintLine
 //--------------------------------------------
@@ -1225,7 +1316,7 @@ void PrintLine(byte Lengte)
  for(int n=0; n<Lengte; n++) sptext[n]='_';
  sptext[Lengte] = 0;
  WTekstprintln(sptext);
- sptext[0] = 0;
+ sptext[0] = 0;                                                                               // Suppress a second print of sptext
 }
 
 //--------------------------------------------                                                //
@@ -1235,8 +1326,8 @@ void ReworkInputString(String InputString)
 {
  if(InputString.length()> 40){Serial.printf("Input string too long (max40)\n"); return;}      // If garbage return
  InputString.trim();                                                                          // Remove CR, LF etc.
- sptext[0] = 0;   
- if(InputString[0] > 31 && InputString[0] < 127)                                               // Does the string start with a letter?
+ sptext[0] = 0;                                                                               // Suppress a second print of sptext 
+ if(InputString[0] > 31 && InputString[0] < 127)                                              // Does the string start with a letter?
   {
   char cmd = toupper(InputString[0]);                                                         // Convert to uppercase once
   bool validLength = false;
@@ -1266,14 +1357,14 @@ void ReworkInputString(String InputString)
         {
         InputString.substring(1).toCharArray(Mem.Password, len);
         sprintf(sptext, "Password set: %s\n Enter @ to reset ESP32 and connect to WIFI and NTP\n WIFI and NTP are turned ON", Mem.Password);
-        Mem.NTPOn = Mem.WIFIOn = 1;                                                          // Turn both on
+        Mem.NTPOn = Mem.WIFIOn = 1;                                                           // Turn both on
         Mem.WIFIcredentials = NOT_SET;
         WIFIwasConnected = false;
         } 
       else sprintf(sptext, "**** Length fault. Use between 5 and 40 characters ****");
       break;
 
-    case 'C':                                                                                // BLE settings
+    case 'C':                                                                                 // BLE settings
       if(InputString.equals("CCC")) 
        {
         Mem.BLEOn = 1 - Mem.BLEOn;
@@ -1296,12 +1387,7 @@ void ReworkInputString(String InputString)
         timeinfo.tm_mday = (int)SConstrainInt(InputString, 1, 3, 0, 31);
         timeinfo.tm_mon = (int)SConstrainInt(InputString, 3, 5, 0, 12) - 1;
         timeinfo.tm_year = (int)SConstrainInt(InputString, 5, 9, 2000, 9999) - 1900;
-        if(DS3231Installed) 
-         {
-          sprintf(sptext, "Time set in external RTC module");
-          SetDS3231Time();
-          PrintDS3231Time();
-         } 
+        if(DS3231Installed)   SetDS3231Time();
         else sprintf(sptext, "No external RTC module detected");
        } 
       else sprintf(sptext, "****\nLength fault. Enter Dddmmyyyy\n****");
@@ -1324,9 +1410,9 @@ void ReworkInputString(String InputString)
         sprintf(sptext, "Font colour stored: 0X%08" PRIX32, Mem.OwnColour);
         Tekstprintln("**** Own colour changed ****");
         LedsOff();
-        SetSecondColour();                                                                          // Set the colour per second of 'IS' and 'WAS' 
+        SetSecondColour();                                                                    // Set the colour per second of 'IS' and 'WAS' 
         Displaytime();
-        sptext[0]=0;
+        sptext[0]=0;                                                                          // Suppress a second print of sptext
        } 
       else sprintf(sptext, "****Length fault. Enter Frrggbb hexadecimal (0 - F)****\nStored: 0X%08" PRIX32, Mem.OwnColour);
       break;
@@ -1342,10 +1428,10 @@ void ReworkInputString(String InputString)
       break;
       
     case 'H':                                                                                 // Use rotary encoder
-      if(len == 4) 
+      if(len == 3) 
        {
-        Mem.UseRotary = (byte)SConstrainInt(InputString, 1, 0, 2);
-        if(Mem.UseRotary > 2) Mem.UseRotary = 0;
+        Mem.UseRotary = (byte)SConstrainInt(InputString, 2, 0, 3);                           // keep the range between 0 and 3
+        if(Mem.UseRotary > 3) Mem.UseRotary = 0;
         sprintf(sptext, "\nUse of rotary encoder is %s\nUse of membrane keypad is %s", 
                 Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF");
         Tekstprintln(sptext);
@@ -1353,11 +1439,12 @@ void ReworkInputString(String InputString)
         else                   {Mem.WIFIOn = Mem.NTPOn = 1; Mem.UseDS3231 = 0;}
         sprintf(sptext, "Use DS3231 is %s, WIFI is %s, NTP is %s\n *** Restart clock with @ ***", 
                 Mem.UseDS3231 ? "ON" : "OFF", Mem.WIFIOn ? "ON" : "OFF", Mem.NTPOn ? "ON" : "OFF");
-       } 
-      else sprintf(sptext, "**** Fault. Enter H000 (none), H001 (Rotary) or H002 (Membrane) ****\nUse rotary encoder is %s\nUse membrane keypad %s",
-                    Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF");
+        } 
+      else sprintf(sptext, "**** Fault. Enter H000 (none), H001=Rotary, H002=Membrane ****\nUse rotary encoder is %s\nUse membrane keypad %s\nUse IR-remote control is %s",
+                    Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF",Mem.UseRotary==3  ? "ON" : "OFF");
       break;
-      
+     
+
     case 'I':                                                                                 // Menu
       SWversion(len == 1);                                                                    // true for small menu, false for full menu
       break;
@@ -1422,7 +1509,7 @@ void ReworkInputString(String InputString)
          {
           Tekstprintln(sptext);
           lastminute = 99;                                                                    // Force display update
-          sptext[0]=0;
+          sptext[0]=0;                                                                        // Suppress a second print of sptext
          }
        } 
       else sprintf(sptext, "**** Length fault O. ****");
@@ -1450,14 +1537,15 @@ void ReworkInputString(String InputString)
         Tekstprintln("  Q8= Rainbow colour");
         if (Mem.RandomDisplay) Tekstprintln("Random Display changing in ON\nChoose a display to stop it");
         Tekstprintln("In menu: ~1 or ~ is changing per minute, ~2 changing per hour.");
-        sptext[0] = 0;
+        sptext[0] = 0;                                                                        // Suppress a second print of sptext
        } 
       else 
       {
        byte dp = (byte)InputString.substring(1, 2).toInt();
        if(dp>LASTITEM) dp=0;
        Mem.DisplayChoice = dp;
-       PrintDisplayChoice();
+       PrintDisplayChoice(); 
+       sptext[0] = 0;                                                                         // Suppress a second print of sptext
        Mem.RandomDisplay = 0;                                                                 // turn Off random changing display
       }
       lastminute = 99;                                                                        // Force a minute update
@@ -1503,12 +1591,7 @@ void ReworkInputString(String InputString)
         timeinfo.tm_hour = (int)SConstrainInt(InputString, 1, 3, 0, 23);
         timeinfo.tm_min = (int)SConstrainInt(InputString, 3, 5, 0, 59);
         timeinfo.tm_sec = (int)SConstrainInt(InputString, 5, 7, 0, 59);
-        if(DS3231Installed) 
-         {
-          sprintf(sptext, "Time set in external RTC module");
-          SetDS3231Time();
-          PrintDS3231Time();
-         } 
+        if(DS3231Installed)   SetDS3231Time();
         else sprintf(sptext, "No external RTC module detected");
        } 
       else sprintf(sptext, "**** Length fault. Enter Thhmmss ****");
@@ -1613,10 +1696,11 @@ void ReworkInputString(String InputString)
       else sprintf(sptext, "**** Length fault . ****");
       break;
 
-     case '^':                                                                                 // NOP
+     case '^':                                                                                 // *** Empty ***
       if(len == 1) 
        {
-        sprintf(sptext, "--- %s ---", Mem.ByteFuture4 ? "OFF" : "ON");
+       // sprintf(sptext, "--- %s ---", Mem.ByteFutureX ? "OFF" : "ON");
+       sprintf(sptext, "**** No Use option . ****");
        } 
       else sprintf(sptext, "**** Length fault . ****");
       break;
@@ -1627,18 +1711,37 @@ void ReworkInputString(String InputString)
         SetDS3231Time();
         SetRTCTime();
         PrintAllClockTimes();
-        sprintf(sptext,"\n");
+        sprintf(sptext,"");
        } 
       else sprintf(sptext, "**** Length fault &. ****");
       break;
       
     case '(':  
-      Mem.EdSoftLEDSOn = 1 - Mem.EdSoftLEDSOn;
+      Mem.EdSoftLEDSOn = !Mem.EdSoftLEDSOn;
       sprintf(sptext, "EDSOFT is %s", Mem.EdSoftLEDSOn ? "ON" : "OFF");
       break;
+
     case ')':
-      Mem.HetIsWasOff = 1 - Mem.HetIsWasOff;
+      Mem.HetIsWasOff = !Mem.HetIsWasOff;
       sprintf(sptext, "HET IS WAS is %s", Mem.HetIsWasOff ? "OFF" : "ON");
+      break;
+
+    case '{':  
+      if (Mem.UseRotary==3)
+       {
+         StartIRLearning();   // Initializes learning mode,Resets all button data,Prompts for first button
+         sprintf(sptext, "Learning IR started");
+       }
+      else sprintf(sptext, "IR remote is OFF (Turn on with } )\nor no IR remote installed");
+      break;
+
+    case '}':                                                                                 // *** Empty ***
+      if(len == 1) 
+       {
+       // sprintf(sptext, "--- %s ---", Mem.ByteFutureX ? "OFF" : "ON");
+       sprintf(sptext, "**** No Use option . ****");
+       } 
+      else sprintf(sptext, "**** Length fault . ****");
       break;
 
     case '~':
@@ -1652,6 +1755,7 @@ void ReworkInputString(String InputString)
         byte ff = (byte)InputString.substring(1, 2).toInt();
         if (ff < 3) Mem.RandomDisplay = ff;
        }
+      Mem.DisplayChoice = DEFAULTCOLOUR;
       sprintf(sptext, "Random display is %s", Mem.RandomDisplay==1 ? "ON/min" : Mem.RandomDisplay==2 ? "ON/hour" : "OFF");
       break;
 
@@ -1681,17 +1785,12 @@ void ReworkInputString(String InputString)
     case '0': 
     case '1': 
     case '2':                                                             // Time entry compatibility mode
-      if(len == 6) 
+      if(len == 6)                                                        // The first digit of InputString is 0, 1 or 2
        {
         timeinfo.tm_hour = (int)SConstrainInt(InputString, 0, 2, 0, 23);
         timeinfo.tm_min  = (int)SConstrainInt(InputString, 2, 4, 0, 59);
         timeinfo.tm_sec  = (int)SConstrainInt(InputString, 4, 6, 0, 59);
-        if(DS3231Installed) 
-         {
-          sprintf(sptext, "Time set in external RTC module");
-          SetDS3231Time();
-          PrintDS3231Time();
-         } 
+        if(DS3231Installed)   SetDS3231Time();
         else sprintf(sptext, "No external RTC module detected");
        }   
       else sprintf(sptext, "**** Length fault. Enter Thhmmss ****");
@@ -1717,6 +1816,23 @@ void PrintDisplayChoice(bool PrintIt)
  if (PrintIt) Tekstprintln(sptext);
 }
 //--------------------------------------------                                                //
+// COMMON Print time input method
+// Rotary, Membrane or IR-remote
+//--------------------------------------------
+ void PrintTimeInputMethod(byte Im)
+ {
+  char Method[10];
+  switch(Im)
+   {
+     case 0: strcpy(Method, "None");     break;
+     case 1: strcpy(Method, "Rotary");   break;
+     case 2: strcpy(Method, "Membrane"); break;
+     case 3: strcpy(Method, "IrRemote"); break;
+    default: strcpy(Method, "ErrorOOR"); break; 
+   }
+  sprintf(sptext, "Time inputMethod: %s", Method);
+ }
+//--------------------------------------------                                                //
 // COMMON Print permanent Mem memory
 //--------------------------------------------
 void PrintMem(void)
@@ -1737,12 +1853,13 @@ void PrintMem(void)
  sprintf(sptext,"     StatusLEDOn: %s",Mem.StatusLEDOn ? "ON" : "OFF");     Tekstprintln(sptext);
  sprintf(sptext,"    MCUrestarted: %d",Mem.MCUrestarted );                  Tekstprintln(sptext);                                              
  sprintf(sptext,"         DCF77On: %s",Mem.DCF77On  ? "ON" : "OFF");        Tekstprintln(sptext);
- sprintf(sptext,"       UseRotary: %s",Mem.UseRotary ? "ON" : "OFF");       Tekstprintln(sptext);
+ sprintf(sptext,"       UseRotary: %d",Mem.UseRotary);                      Tekstprintln(sptext);
+ PrintTimeInputMethod(Mem.UseRotary);
  sprintf(sptext,"       UseDS3231: %s",Mem.UseDS3231 ? "ON" : "OFF");       Tekstprintln(sptext);
  sprintf(sptext,"       LED strip: %s", Mem.LEDstrip?"WS2812":"SK6812" );   Tekstprintln(sptext);
  sprintf(sptext,"      FiboChrono: %s",Mem.FiboChrono ? "FIBO" : "CHRONO"); Tekstprintln(sptext);
  sprintf(sptext,"          NoExUl: %s", Mem.NoExUl ? "ON" : "OFF");         Tekstprintln(sptext);
- byte wc=Mem.WIFIcredentials; 
+ byte wc = Mem.WIFIcredentials; 
  sprintf(sptext," WIFIcredentials: %s", wc==0? "Not SET" : wc==1? "SET" : wc==2? "SET&OK": 
                                    wc==3? "in AP not SET":"Unknown code");  Tekstprintln(sptext);
  sprintf(sptext,"      IntFuture2: %d",Mem.IntFuture2 );                    Tekstprintln(sptext);
@@ -1750,17 +1867,18 @@ void PrintMem(void)
  sprintf(sptext,"      HET IS WAS: %s", Mem.HetIsWasOff ? "OFF" : "ON");    Tekstprintln(sptext);
  sprintf(sptext,"       EDSOFT is: %s", Mem.EdSoftLEDSOn ? "ON" : "OFF");   Tekstprintln(sptext);
  sprintf(sptext,"   RandomDisplay: %s", Mem.RandomDisplay? "ON" : "OFF");   Tekstprintln(sptext);
- sprintf(sptext,"     ByteFuture4: %d", Mem.ByteFuture4);                   Tekstprintln(sptext);
+ sprintf(sptext,"     ByteFuture3: %d", Mem.ByteFuture3);                   Tekstprintln(sptext);
  sprintf(sptext,"UseBLELongString: %s",Mem.UseBLELongString?"ON":"OFF");    Tekstprintln(sptext);
  sprintf(sptext,"     Font colour: 0X%08" PRIX32, Mem.OwnColour);           Tekstprintln(sptext);
- sprintf(sptext,"    DimmedLetter: 0X%08" PRIX32,Mem.DimmedLetter );        Tekstprintln(sptext);
+ sprintf(sptext,"    DimmedLetter: 0X%08" PRIX32,Mem.DimmedLetter);         Tekstprintln(sptext);
  sprintf(sptext,"      BackGround: 0X%08" PRIX32,Mem.BackGround);           Tekstprintln(sptext);
  sprintf(sptext,"            SSID: %s",Mem.SSID);                           Tekstprintln(sptext);
  // sprintf(sptext,"BackGround: %s",Mem.Password);                          Tekstprintln(sptext);
  sprintf(sptext,"BLEbroadcastName: %s",Mem.BLEbroadcastName);               Tekstprintln(sptext);
  sprintf(sptext,"        Timezone: %s",Mem.Timezone);                       Tekstprintln(sptext);
  sprintf(sptext,"        Checksum: %d",Mem.Checksum);                       Tekstprintln(sptext);
- sptext[0]=0;
+ PrintAllMappings();                                                                          // Print the IR remote keys
+ sptext[0]=0;                                                                                 // Suppress a second print of sptext
 }
 //--------------------------------------------                                                //
 // LDR reading are between 0 and 255. 
@@ -2216,8 +2334,8 @@ void ChangeRandomDisplay(void)
 if (Mem.RandomDisplay)
   {
    Mem.DisplayChoice += 1;
-   if (Mem.DisplayChoice == 6) Mem.DisplayChoice = 7;                                          // Do not display the digital clock
-   if (Mem.DisplayChoice  > 9) Mem.DisplayChoice = 0;                                          // If
+   if (Mem.DisplayChoice == 6)       Mem.DisplayChoice = 7;                                  // Do not display the digital clock
+   if (Mem.DisplayChoice > LASTITEM) Mem.DisplayChoice = 0;                                  // 
    PrintDisplayChoice();         
   }
 }
@@ -2316,141 +2434,176 @@ void WriteLightReducer(int amount)
  Tekstprintln(sptext);
 }
 //--------------------------- Time functions --------------------------
-    
-//--------------------------------------------                                                //
-// RTC Get time from NTP cq internal ESP32 RTC 
-// and store it in timeinfo struct
-// return local time in unix time format
-//--------------------------------------------
-time_t GetTijd(bool printit)
-{
  time_t now;
- if (Mem.UseDS3231) GetDS3231Time(false);                                                     // If the DS3231 is attached and used get its time in timeinfo struct
- else
-    { 
-     if(Mem.NTPOn)  getLocalTime(&timeinfo);                                                  // If NTP is running get the local time
-     else { time(&now); localtime_r(&now, &timeinfo);}                                        // Else get the time from the internal RTC and place it timeinfo
-    }
- if (printit)  PrintRTCTime();                                                                // 
- localtime(&now);                                                                             // Get the actual time and
- return now;                                                                                  // Return the unixtime in seconds
-}
-//--------------------------------------------                                                //
-// NTP print the NTP time for the timezone set 
-//--------------------------------------------
-void GetNTPtime(bool printit)
+//--------------------------------------------------------------------
+// Initialize time system (DS3231 + NTP + internal RTC)
+//--------------------------------------------------------------------
+void InitTimeSystem(void)
 {
- wait4SNTP();                                                                                 // Force a NTP time update 
- if(printit) PrintNTPtime();
-}
-//--------------------------------------------                                                //
-// NTP print the NTP time for the timezone set 
-//--------------------------------------------
-void PrintNTPtime(void)
-{
-  getLocalTime(&timeinfo); //   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  PrintRTCTime(); 
-}
-//--------------------------------------------                                                //
-// NTP print the NTP UTC time 
-//--------------------------------------------
-void PrintUTCtime(void)
-{
- time_t tmi = time(nullptr);
- struct tm* UTCtime = gmtime(&tmi);
- sprintf(sptext,"UTC: %02d:%02d:%02d %02d-%02d-%04d  ", 
-     UTCtime->tm_hour,UTCtime->tm_min,UTCtime->tm_sec,
-     UTCtime->tm_mday,UTCtime->tm_mon+1,UTCtime->tm_year+1900);
- Tekstprint(sptext);   
+  DS3231Installed = IsDS3231I2Cconnected();
+  sprintf(sptext, "External RTC module %s found", DS3231Installed ? "IS" : "NOT");
+  Tekstprintln(sptext);
+  if (DS3231Installed) RTCklok.begin();
+  if (DS3231Installed && Mem.UseDS3231)
+  {
+    GetDS3231Time(false);
+    SetSystemTime(mktime(&timeinfo));                    // Sync ESP32 RTC from DS3231
+  }
+  else if (Mem.NTPOn && WiFi.isConnected())
+  {
+    GetNTPtime(false);
+    SetSystemTime(mktime(&timeinfo));                    // Sync ESP32 RTC from NTP
+    if (DS3231Installed && Mem.UseDS3231) SetDS3231Time(); // Sync DS3231
+  }
+  else
+  {
+    time(&now);
+    localtime_r(&now, &timeinfo);
+  }
 }
 
-//--------------------------------------------                                                //
-// DS3231 Init module
-//--------------------------------------------
-void InitDS3231Mod(void)
+//--------------------------------------------------------------------
+// Get current time from best available source
+//--------------------------------------------------------------------
+time_t GetTijd(bool printit)
 {
- DS3231Installed = IsDS3231I2Cconnected();                                                    // Check if DS3231 is connected and working   
- sprintf(sptext,"External RTC module %s found", DS3231Installed?"IS":"NOT");
- RTCklok.begin();     
- Tekstprintln(sptext);                                                             
+  if (Mem.UseDS3231 && DS3231Installed)     { GetDS3231Time(false);  }
+  else if (Mem.NTPOn && WiFi.isConnected()) { getLocalTime(&timeinfo);  }
+  else  {    time(&now);                      localtime_r(&now, &timeinfo);  }
+  time_t t = mktime(&timeinfo);
+  if (printit) PrintRTCTime();
+  return t;
 }
-//--------------------------------------------                                                //
+
+//--------------------------------------------------------------------
+// NTP Return local time as RTClib DateTime
+//--------------------------------------------------------------------
+DateTime GetLocalDateTime()
+{
+  time_t t = GetTijd(false);
+  return DateTime(t);
+}
+
+//--------------------------------------------------------------------
+// NTP print the NTP time for the timezone set 
+//--------------------------------------------------------------------
+void GetNTPtime(bool printit)
+{
+  sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);  // Immediate sync mode
+  sntp_restart();                            // Triggers a fresh sync
+
+
+//  wait4SNTP();
+  getLocalTime(&timeinfo);
+  if (printit) PrintNTPtime();
+}
+
+//--------------------------------------------------------------------
+// NTP Print current local (NTP) time
+//--------------------------------------------------------------------
+void PrintNTPtime(void)
+{
+  getLocalTime(&timeinfo);
+  PrintRTCTime();
+}
+
+//--------------------------------------------------------------------
+// NTP print the NTP UTC time 
+//--------------------------------------------------------------------
+void PrintUTCtime(void)
+{
+  time(&now);
+  struct tm* UTCtime = gmtime(&now);
+  sprintf(sptext, "UTC: %02d:%02d:%02d %02d-%02d-%04d",
+          UTCtime->tm_hour, UTCtime->tm_min, UTCtime->tm_sec,
+          UTCtime->tm_mday, UTCtime->tm_mon + 1, UTCtime->tm_year + 1900);
+  Tekstprint(sptext);
+}
+
+// //--------------------------------------------                                                //
+// // DS3231 Init module
+// //--------------------------------------------
+// void InitDS3231Mod(void)
+// {
+//  DS3231Installed = IsDS3231I2Cconnected();                                                    // Check if DS3231 is connected and working   
+//  sprintf(sptext,"External RTC module %s found", DS3231Installed?"IS":"NOT");
+//  RTCklok.begin();     
+//  Tekstprintln(sptext);                                                             
+// }
+//--------------------------------------------------------------------
 // DS3231 check for I2C connection
 // DS3231_I2C_ADDRESS (= often 0X68) = DS3231 module
-//--------------------------------------------
+//--------------------------------------------------------------------
 bool IsDS3231I2Cconnected(void)
- {
-  bool DS3231Found = false;
+{
   for (byte i = 1; i < 120; i++)
   {
-   Wire.beginTransmission (i);
-   if (Wire.endTransmission () == 0)                                                       
-      {
-      sprintf(sptext,"Found I2C address: 0X%02X", i); Tekstprintln(sptext);  
-      if( i== DS3231_I2C_ADDRESS) DS3231Found = true;
-      } 
+    Wire.beginTransmission(i);
+    if (Wire.endTransmission() == 0 && i == DS3231_I2C_ADDRESS)
+      return true;
   }
-  return DS3231Found;   
-  }
-//--------------------------------------------                                                //
-// DS3231 Get temperature from DS3231 module
-//--------------------------------------------
+  return false;
+}
+
+//--------------------------------------------------------------------
+// DS3231 temperature
+//--------------------------------------------------------------------
 float GetDS3231Temp(void)
 {
- byte tMSB, tLSB;
- float temp3231;
- 
-  Wire.beginTransmission(DS3231_I2C_ADDRESS);                                                 // Temp registers (11h-12h) get updated automatically every 64s
+  Wire.beginTransmission(DS3231_I2C_ADDRESS);
   Wire.write(0x11);
   Wire.endTransmission();
   Wire.requestFrom(DS3231_I2C_ADDRESS, 2);
- 
-  if(Wire.available()) 
+
+  if (Wire.available())
   {
-    tMSB = Wire.read();                                                                       // 2's complement int portion
-    tLSB = Wire.read();                                                                       // fraction portion 
-    temp3231 = (tMSB & 0b01111111);                                                           // do 2's math on Tmsb
-    temp3231 += ( (tLSB >> 6) * 0.25 ) + 0.5;                                                 // only care about bits 7 & 8 and add 0.5 to round off to integer   
+    byte tMSB = Wire.read();
+    byte tLSB = Wire.read();
+    return (tMSB & 0b01111111) + ((tLSB >> 6) * 0.25);
   }
-  else   {temp3231 = -273; }  
-  return (temp3231);
+  return -273.0;
 }
 
-//--------------------------------------------                                                //
-// DS3231 Set time in module DS3231
-//--------------------------------------------
+//--------------------------------------------------------------------
+// DS3231 RTC ESP32 -> DS3231
+// Set time in module DS3231
+//--------------------------------------------------------------------
 void SetDS3231Time(void)
 {
-RTCklok.adjust(DateTime(timeinfo.tm_year+1900, timeinfo.tm_mon+1, timeinfo.tm_mday, 
-                        timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec));
+  DateTime tNow(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday,
+                timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+  RTCklok.adjust(tNow);
+  Tekstprintln("Time set in DS3231 RTC module");
+  PrintDS3231Time();
+  if(!Mem.UseDS3231 && !Mem.NTPOn ) Tekstprintln("*** Not using DS3231");
 }
 
-//--------------------------------------------                                                //
+//--------------------------------------------------------------------
 // DS3231 reads time in module DS3231
 // and store it in Word clock time structure
-//--------------------------------------------
+//--------------------------------------------------------------------
 void GetDS3231Time(bool printit)
 {
- DateTime Inow    = RTCklok.now();                                                           // Be sure to get the latest DS3231 RTC clock time
- timeinfo.tm_hour = Inow.hour();
- timeinfo.tm_min  = Inow.minute();
- timeinfo.tm_sec  = Inow.second();
- timeinfo.tm_year = Inow.year() - 1900;                                                      // Inow.year() is years since 2000 tm_year is years since 1900
- timeinfo.tm_mon  = Inow.month() - 1;
- timeinfo.tm_mday = Inow.day();
- if (printit) PrintRTCTime(); 
+  DateTime Inow = RTCklok.now();
+  timeinfo.tm_year = Inow.year() - 1900;
+  timeinfo.tm_mon  = Inow.month() - 1;
+  timeinfo.tm_mday = Inow.day();
+  timeinfo.tm_hour = Inow.hour();
+  timeinfo.tm_min  = Inow.minute();
+  timeinfo.tm_sec  = Inow.second();
+  if (printit) PrintDS3231Time();
 }
 
-//--------------------------------------------                                                //
-// DS3231 prints time to serial
-// reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
-//--------------------------------------------
+//--------------------------------------------------------------------
+// DS3231 Print DS3231 time
+//--------------------------------------------------------------------
 void PrintDS3231Time(void)
 {
- DateTime Inow = RTCklok.now();                                                                        // Be sure to get the lates DS3231 RTC clock time
- sprintf(sptext,"%02d/%02d/%04d %02d:%02d:%02d ", Inow.day(),Inow.month(),Inow.year(),
-                                                  Inow.hour(),Inow.minute(),Inow.second());
- Tekstprint(sptext);
+ DateTime Inow = RTCklok.now();
+ sprintf(sptext, "%02d/%02d/%04d %02d:%02d:%02d ",
+          Inow.day(), Inow.month(), Inow.year(),
+          Inow.hour(), Inow.minute(), Inow.second());
+ Tekstprintln(sptext);
 }
 
 //--------------------------------------------                                                //
@@ -2464,6 +2617,7 @@ void PrintRTCTime(void)
  WTekstprint(sptext,"<!--"," -->");                                                         // Hide the time on the HTML page <!-- This text won't appear at all -->
  Tekstprintln("");
 }
+
 //--------------------------------------------                                                //
 // RTC Fill sptext with time
 //--------------------------------------------
@@ -2478,33 +2632,35 @@ void PrintTimeHMS(byte format)
   case 2: Tekstprintln(sptext); break;  
  }
 }
+
 //--------------------------------------------                                                //
 // RTC Set time using global timeinfo struct
 //--------------------------------------------
 void SetRTCTime(void) 
 { 
  time_t t = mktime(&timeinfo);                                                                // t= unixtime
- SetRTCTime(t);
-}  
+ SetSystemTime(t);
+}
+
 //--------------------------------------------                                                //
 // RTC Set RTC time using Unix timestamp
 //--------------------------------------------
-void SetRTCTime(time_t t)
+void SetSystemTime(time_t t)
 { 
- snprintf(sptext, sizeof(sptext), "Setting time: %s", asctime(&timeinfo));                    // Safer than sprintf to avoid buffer overflows
- Tekstprintln(sptext); 
- struct timeval now = { .tv_sec = t , .tv_usec = 0};
- settimeofday(&now, NULL);
- GetTijd(false);                                                                              // Sync global timeinfo with RTC                                                                    // Synchronize time with RTC clock
- Displaytime();                                                                               // Show time on clock
- PrintTimeHMS();                                                                              // Print time in HH:MM:SS format
+  struct timeval tv = { .tv_sec = t, .tv_usec = 0 };
+  settimeofday(&tv, nullptr);
+  localtime_r(&t, &timeinfo);
+  Tekstprint("RTC time set: ");
+  PrintTimeHMS();
+  Displaytime(); 
 }
+
 //--------------------------------------------                                                //
-// Print all the times available 
+// CLOCK Print all the times available 
 //--------------------------------------------
 void PrintAllClockTimes(void)
 {
- Tekstprint(" Clock time: ");
+ Tekstprint("\n Clock time: ");
  PrintRTCTime();
  if(WiFi.localIP()[0] != 0)                                                                   // If no WIFI then no NTP time printed
    {
@@ -2517,8 +2673,8 @@ void PrintAllClockTimes(void)
     PrintDS3231Time();
    }
 }
-//                                                                                            //
-// ------------------- End  Time functions 
+
+//--------------------------- End Time functions --------------------------
 
 //--------------------------------------------                                                //
 //  CLOCK Convert Hex to uint32
@@ -3535,7 +3691,7 @@ if( (strlen(Mem.Password)<5 || strlen(Mem.SSID)<3))   // If WIFI required and no
 // WIFI Check if WIFI is sill connected and if not restore it
 //-------------------------------------------- 
 void CheckRestoreWIFIconnectivity(void)
- {
+{
  if(Mem.WIFIOn && WIFIwasConnected)                                                           // If WIFI switch is On and there was a connection.
    {
     if(WiFi.localIP()[0] == 0) 
@@ -3691,80 +3847,137 @@ return  SNTPtimeValid;
 void WebPage(void)
 {
  int i = 0, n;
-// String DelayedRework = "";
-
- SWversion();                                                                                 // Update version/menu info used in html_info
- for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = index_html_top[n];             // Start building the HTML page
+ static bool updateSuccess = false;                                                          // Track update status
+ SWversion();
+ for (n = 0; n < strlen(index_html_top); n++) HTML_page[i++] = index_html_top[n];
  if (i > MAXSIZE_HTML_PAGE - 999) 
     { strcat(HTML_page, "<br> *** INCREASE MAXSIZE_HTML_PAGE in Webpage.h ***<br><br><br>"); } 
  else 
     {
-     sprintf(sptext, "<head><title>%s</title></head>",Mem.BLEbroadcastName);                  // insert the BLE name to the title of the web page
+     sprintf(sptext, "<head><title>%s</title></head>",Mem.BLEbroadcastName);
      for (n = 0; n < strlen(sptext); n++)            HTML_page[i++] = sptext[n];
      for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = html_info[n];
      for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = index_html_footer[n];
-     HTML_page[i] = 0;                                                                        // Null-terminate
+     HTML_page[i] = 0;
     }
  
- server.on("/", HTTP_GET, []() { server.send(200, "text/html", HTML_page);  });               // Root page handler
-
- server.on("/get", HTTP_GET, []()                                                             // GET handler for input parameter
+ server.on("/", HTTP_GET, []() { server.send(200, "text/html", HTML_page);  });
+ server.on("/get", HTTP_GET, []()
    {
     String inputMessage;
-    
     if (server.hasArg(PARAM_INPUT_1)) { inputMessage = server.arg(PARAM_INPUT_1); } 
     else { inputMessage = ""; }
-  //  DelayedRework = inputMessage;                                                             // DelayedRework needs to be global to be used inside a lambda or use [&] insteds of [] in server.on("/get", HTTP_GET, []()
-   if (!inputMessage.equalsIgnoreCase("Y") ) ReworkInputString(inputMessage);                 // Option Y the LEDstrip rainbow can not operate inside this 
-   if (inputMessage.equalsIgnoreCase("Y") ) OptionYRainbow = true;                              // The LED library’s timing can get interrupted by background Wi-Fi interrupts, causing flicker in the strip.
-
+    if (!inputMessage.equalsIgnoreCase("Y") ) ReworkInputString(inputMessage);
+    if (inputMessage.equalsIgnoreCase("Y") ) OptionYRainbow = true;
     SWversion();
     int i = 0, n;
-    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = index_html_top[n];       // index_HTML_top is define
-    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = html_info[n];            // html_info is made in WTekstappend()
-    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = index_html_footer[n];    // index_html_footer in OTAhtml.h
+    for (n = 0; n < strlen(index_html_top); n++)    HTML_page[i++] = index_html_top[n];
+    for (n = 0; n < strlen(html_info); n++)         HTML_page[i++] = html_info[n];
+    for (n = 0; n < strlen(index_html_footer); n++) HTML_page[i++] = index_html_footer[n];
     HTML_page[i] = 0;
     server.send(200, "text/html", HTML_page);
     });
 
- server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });           // OTA update page
- server.on("/update", HTTP_POST, []() {                                                       // OTA upload handler
-         shouldReboot = true;
-         server.send(200, "text/html",
-        "<!DOCTYPE html><html><body>"
-        "<h2>Update successful. Rebooting...</h2>"
-        "<p>You will be redirected shortly.</p>"
-        "<script>setTimeout(()=>{location.href='/'}, 7000);</script>"
-        "</body></html>");  }, []() 
-     {
+ server.on("/update", HTTP_GET, []() { server.send(200, "text/html", OTA_html); });
+ server.on("/update", HTTP_POST, 
+    [](){                                                                                     // Response handler - called after upload completes
+         if (updateSuccess) {
+           server.send(200, "text/html",
+            "<!DOCTYPE html><html><body>"
+            "<h2>Update successful. Rebooting...</h2>"
+            "<p>Device will restart in 10 seconds.</p>"
+            "<script>setTimeout(()=>{location.href='/'}, 12000);</script>"
+            "</body></html>");
+           delay(3000);  // Let response send
+           shouldReboot = true;
+         } else {
+           server.send(500, "text/html",
+            "<!DOCTYPE html><html><body>"
+            "<h2>Update Failed!</h2>"
+            "<p>Please try again or check serial output for errors.</p>"
+            "<script>setTimeout(()=>{location.href='/update'}, 5000);</script>"
+            "</body></html>");
+         }
+    }, 
+    [](){ // Upload handler
       HTTPUpload& upload = server.upload();
+      
       if (upload.status == UPLOAD_FILE_START) 
         {
-         Serial.printf("OTA Start: %s\n", upload.filename.c_str());
-         if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { Update.printError(Serial); }
+         updateSuccess = false;
+         Serial.printf("\n=== OTA Update Started ===\n");
+         Serial.printf("Filename: %s\n", upload.filename.c_str());
+         Serial.printf("Free Sketch Space: %u bytes\n", ESP.getFreeSketchSpace());
+         
+         // Validate filename
+         if (!upload.filename.endsWith(".bin")) {
+           Serial.println("ERROR: Invalid file type. Must be .bin");
+           Update.abort();
+           return;
+         }
+         
+         // Begin update with maximum available size
+         uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
+         if (!Update.begin(maxSketchSpace)) {
+           Serial.println("ERROR: Not enough space for OTA update");
+           Update.printError(Serial);
+           return;
+         }
+         
+         Serial.println("Update begin successful");
         } 
       else if (upload.status == UPLOAD_FILE_WRITE) 
         {
-        size_t written = Update.write(upload.buf, upload.currentSize);
-        if (written != upload.currentSize) 
-          {
-           Serial.printf("OTA Write Failed: written %u != %u\n", written, upload.currentSize);
+         // Write firmware chunk
+         size_t written = Update.write(upload.buf, upload.currentSize);
+         if (written != upload.currentSize) {
+           Serial.printf("ERROR: Write failed - written %u != %u bytes\n", 
+                        written, upload.currentSize);
            Update.printError(Serial);
-          }
+           Update.abort();
+           return;
+         }
+         
+         // Progress feedback (optional - remove if it causes issues)
+         static uint32_t lastPrint = 0;
+         if (millis() - lastPrint > 1000) {
+           Serial.printf("Progress: %u bytes\n", upload.totalSize + upload.currentSize);
+           lastPrint = millis();
+         }
         } 
       else if (upload.status == UPLOAD_FILE_END) 
         {
-         if (Update.end(true)) { Serial.printf("OTA Success: %u bytes\n", upload.totalSize);} 
-         else { Serial.printf("OTA End Failed\n");      Update.printError(Serial);   }
+         // Finalize update with MD5 verification
+         if (Update.end(true)) {
+           Serial.printf("\n=== OTA Update Successful ===\n");
+           Serial.printf("Total size: %u bytes\n", upload.totalSize);
+           
+           // Verify MD5 if available
+           if (Update.hasError()) {
+             Serial.println("WARNING: Update completed but has errors");
+             Update.printError(Serial);
+             updateSuccess = false;
+           } else {
+             Serial.println("Firmware verification passed");
+             updateSuccess = true;
+           }
+         } else {
+           Serial.println("\n=== OTA Update Failed ===");
+           Serial.printf("Bytes received: %u\n", upload.totalSize);
+           Update.printError(Serial);
+           updateSuccess = false;
+         }
         } 
       else if (upload.status == UPLOAD_FILE_ABORTED) 
-        {  Update.end();    Serial.println("OTA Aborted");      }
-      }  );                                                                                   // END OTA upload handler
+        {
+         Update.end();
+         Serial.println("\n=== OTA Update Aborted ===");
+         updateSuccess = false;
+        }
+    });
 
-
- server.onNotFound([]() {  server.send(404, "text/plain", "Not found");  });                  // WIFI WEBPAGE 404 handler
+ server.onNotFound([]() {  server.send(404, "text/plain", "Not found");  });
  server.begin();
-
 }
 //--------------------------------------------                                                //
 // WIFI WEBPAGE Login credentials Access Point page with 192.168.4.1
@@ -3843,7 +4056,7 @@ String wpspin2string(uint8_t a[])
 //--------------------------------------------
 void OnewireKeypad3x4Check(void)
 {
- int keyvalue=99;;
+ int keyvalue=99;
  int Key=0;
  int sensorValue = analogRead(OneWirePin); // read the value from the sensor:
  switch(sensorValue)
@@ -4025,7 +4238,7 @@ void ProcessKeyPressTurn(int encoderPos)
         }    
       if (encoderPos == -1)                                                                   // Decrease
        {
-       if (ChangeLightIntensity)   { WriteLightReducer(-5); }    // If time < 60 sec then adjust light intensity factor
+       if (ChangeLightIntensity)   { WriteLightReducer(-5); }                                 // If time < 60 sec then adjust light intensity factor
        if (ChangeTime)     
           {
            if (NoofRotaryPressed == 1)                                                        // Change hours
@@ -4039,7 +4252,6 @@ void ProcessKeyPressTurn(int encoderPos)
            }          
         } 
       SetDS3231Time();  
-      PrintDS3231Time();
       Displaytime();
       Looptime = millis();    
      }                                                     
@@ -4070,3 +4282,293 @@ void ProcessKeyPressTurn(int encoderPos)
    }
  }
 
+//--------------------------------------------                                                //
+// IR-RECEIVER Init
+//--------------------------------------------
+void Init_IRreceiver(void)
+{
+ IrReceiver.begin(IRReceiverPin);
+ if (Mem.UseRotary == 3)  {  GetIRRemoteFromFlashMemory(); }                                  // Load IR settings (only if IR remote is enabled)
+ if (IRMem.remoteIdentified && IRMem.buttons[0].learned)                                      // Check if we already have learned buttons
+  {
+   learningMode = false;
+   PrintAllMappings();
+  }
+}
+//--------------------------------------------                                                //
+// IR-RECEIVER Decode received signal,
+// routes to learning or recognition mode and return code
+//--------------------------------------------
+uint16_t IrReceiverDecode(void)
+{
+  uint16_t command = 0; 
+  if (IrReceiver.decode())
+  {
+                   command = IrReceiver.decodedIRData.command;
+    uint16_t address       = IrReceiver.decodedIRData.address;
+    decode_type_t protocol = IrReceiver.decodedIRData.protocol;
+    if (!(IrReceiver.decodedIRData.flags & IRDATA_FLAGS_IS_REPEAT))                           // Ignore repeat codes
+    {
+      if (learningMode)  { ProcessLearningMode(protocol, command, address);  }
+      else               { ProcessRecognitionMode(protocol, command, address);  }
+    }
+    delay(100);
+    IrReceiver.resume();
+  }
+  return command;
+}
+
+//============================================
+// IR-RECEIVER Internal function - Handles learning mode
+// Validates remote matches, Saves when complete
+//============================================
+void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t address)
+{
+  // First button press - identify the remote control
+  if (!IRMem.remoteIdentified)
+  {
+    IRMem.learnedRemoteAddress = address;
+    IRMem.learnedRemoteProtocol = (uint8_t)protocol;
+    IRMem.remoteIdentified = true;
+    sprintf(sptext, "Remote identified - Protocol: %s, Address: 0x%04X", getProtocolString(protocol), address);
+    Tekstprintln(sptext);
+  }
+  else
+  {
+    if (address != IRMem.learnedRemoteAddress || protocol != (decode_type_t)IRMem.learnedRemoteProtocol)    // Check if this is from the same remote
+    {
+      Tekstprintln("⚠ Wrong remote! Please use the same remote control.");
+      sprintf(sptext, "Expected Address: 0x%04X, Got: 0x%04X", IRMem.learnedRemoteAddress, address);
+      Tekstprintln(sptext);
+      return;
+    }
+  }
+  IRMem.buttons[currentLearningIndex].protocol = (uint8_t)protocol;                           // Store the button mapping
+  IRMem.buttons[currentLearningIndex].command = command;
+  IRMem.buttons[currentLearningIndex].address = address;
+  IRMem.buttons[currentLearningIndex].learned = true;
+  
+  sprintf(sptext, "✓ Learned '%s' - Protocol: %s, Command: 0x%04X, Address: 0x%04X", 
+          ButtonNames[currentLearningIndex], getProtocolString(protocol), command, address);
+  Tekstprintln(sptext);
+  currentLearningIndex++;
+  if (currentLearningIndex < MAX_BUTTONS)
+  {
+    sprintf(sptext, "\nPlease press button: %s", ButtonNames[currentLearningIndex]);
+    Tekstprintln(sptext);
+  }
+  else
+  {
+    learningMode = false;                                                                     // Learning complete
+    StoreIRRemoteInFlashMemory();
+    Tekstprintln("\n=== Learning Complete & Saved! ===");
+    Tekstprintln("\nStored Button Mappings:");
+    PrintAllMappings();
+    Tekstprintln("\n=== Now in Recognition Mode ===");
+    sprintf(sptext, "Only responding to remote with Address: 0x%04X", IRMem.learnedRemoteAddress);
+    Tekstprintln(sptext);
+    Tekstprintln("Press any learned button to test...\nPress OK to quit test mode\n");
+  }
+}
+
+//============================================
+// IR-RECEIVER Internal function - handles recognition mode
+// Validates remote address Calls RecognizeButton
+//============================================
+void ProcessRecognitionMode(decode_type_t protocol, uint16_t command, uint16_t address)
+{
+  if (address != IRMem.learnedRemoteAddress || 
+     protocol != (decode_type_t) IRMem.learnedRemoteProtocol)                                 // Check if it's from the learned remote
+  {
+    sprintf(sptext, "⚠ Ignored - Wrong remote (Address: 0x%04X)", address);
+    if (address!=0) Tekstprintln(sptext);                                                                     // Stray input detected
+  }
+  else {RecognizeButton(protocol, command, address);  }                                       // Correct remote - identify which button was pressed
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Initializes learning mode
+// Resets all button data, Prompts for first button
+//--------------------------------------------
+void StartIRLearning()
+{
+  Tekstprintln("\n=== Starting Learning Mode ===");
+  currentLearningIndex = 0;
+  learningMode = true;
+  IRMem.remoteIdentified = false;
+  for (int i = 0; i < MAX_BUTTONS; i++) {IRMem.buttons[i].learned = false; }
+  Tekstprintln("Please press button: 0");
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Shows learned buttons
+//--------------------------------------------
+void PrintAllMappings(void)
+{
+ if (!IRMem.remoteIdentified) {Tekstprintln("No remote learned yet!");  return; }
+ PrintLine(35);
+ sprintf(sptext, "Remote Address: 0x%04X", IRMem.learnedRemoteAddress);
+ Tekstprintln(sptext);
+ sprintf(sptext, "Remote Protocol: %s", getProtocolString( (decode_type_t) IRMem.learnedRemoteProtocol));
+ Tekstprintln(sptext);
+ PrintLine(35);
+  for (int i = 0; i < MAX_BUTTONS; i++)
+  {
+   if (IRMem.buttons[i].learned)
+    {
+     sprintf(sptext, "%s\t-> Cmd: 0x%04X", ButtonNames[i], IRMem.buttons[i].command);
+     Tekstprintln(sptext);     
+    }
+  }
+ PrintLine(35);
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Reset all settings
+//--------------------------------------------
+void ResetAllIRremoteSettings()
+{
+ Tekstprintln("\n=== Resetting All IR remote Data ===");
+ IRMem.remoteIdentified = false;
+ IRMem.learnedRemoteAddress = 0;
+ IRMem.learnedRemoteProtocol = 0;
+ for (int i = 0; i < MAX_BUTTONS; i++)
+  {
+    IRMem.buttons[i].learned = false;
+    IRMem.buttons[i].protocol = 0;
+    IRMem.buttons[i].command = 0;
+    IRMem.buttons[i].address = 0;
+  }
+  
+  StoreIRRemoteInFlashMemory();
+  Tekstprintln("✓ IR remote reset complete.");   
+  learningMode = false;
+}
+
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Identifies button pressed
+//--------------------------------------------
+int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)
+{
+  bool found = false;
+  for (int i = 0; i < MAX_BUTTONS; i++)
+  {
+    if (IRMem.buttons[i].learned && 
+        IRMem.buttons[i].protocol == (uint8_t)protocol &&
+        IRMem.buttons[i].command == command && 
+        IRMem.buttons[i].address == address)
+    {
+      sprintf(sptext, "Button pressed: %s", ButtonNames[i]);
+      Tekstprintln(sptext);
+      found = true;
+      ReworkIRremoteValue(i);
+      return i;
+    }
+  }
+  
+  if (!found)
+  {
+    sprintf(sptext, "Unknown button - Protocol: %s, Command: 0x%04X, Address: 0x%04X", getProtocolString(protocol), command, address);
+    Tekstprintln(sptext);
+    ReworkIRremoteValue(-1);
+    return -1;
+  } 
+ return -1;
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER ReworkRemoteValue
+// String ButtonNames[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+//                        "UP", "DOWN", "LEFT", "RIGHT", "POWER", "OK"};
+//--------------------------------------------
+void ReworkIRremoteValue(int ButtonNamesNr)
+{
+ if (ButtonNamesNr == -1)  {Tekstprintln("Unknown button - ignored");  return;  }
+ if (IR_PowerOnstate == false && ButtonNamesNr != 14 ) return;                               // Button "POWER"
+
+ String ButtonName = ButtonNames[ButtonNamesNr];
+ switch(ButtonNamesNr)
+  {
+    case 0:                                                                                   // Button "0"
+    case 1:                                                                                   // Button "1"
+    case 2:                                                                                   // Button "2"
+    case 3:                                                                                   // Button "3"
+    case 4:                                                                                   // Button "4"
+    case 5:                                                                                   // Button "5"
+    case 6:                                                                                   // Button "6"
+    case 7:                                                                                   // Button "7"
+    case 8:                                                                                   // Button "8"
+    case 9:                                                                                   // Button "9"
+      EnteredDigits += ButtonName;                                                            // Add digit to entered string  
+      if (EnteredDigits.length() > 6) {EnteredDigits = EnteredDigits.substring(0, 6); }      // Limit to 6 digits (HHMMSS)
+      if (EnteredDigits.length() == 6)
+      {
+        sprintf(sptext, "Time entered: %c%c:%c%c:%c%c (press OK)", 
+                EnteredDigits[0], EnteredDigits[1], EnteredDigits[2], 
+                EnteredDigits[3], EnteredDigits[4], EnteredDigits[5]);
+      }
+      else sprintf(sptext, "Digits: %s (Need 6 for HHMMSS)", EnteredDigits.c_str());
+      Tekstprintln(sptext);
+      break;
+    case 10:                                                                                  // Button "UP"
+      AdjustTime(1, 0, 0);                                                                    // +1 hour
+      break;
+    case 11:                                                                                  // Button "DOWN"
+      AdjustTime(-1, 0, 0);                                                                   // -1 hour
+      break;
+    case 12:                                                                                  // Button "LEFT"
+      AdjustTime(0, -1, 0);                                                                   // -1 minute
+      break;
+    case 13:                                                                                  // Button "RIGHT"
+      AdjustTime(0, 1, 0);                                                                    // +1 minute
+      break;
+    case 14:                                                                                  // Button "POWER"
+      ToggleIRpower();
+      break;
+    case 15: 
+      learningMode = false;                                                                  // Button "OK"
+//    Serial.println(EnteredDigits.length());   
+      if (EnteredDigits.length() == 6) {ReworkInputString(EnteredDigits); EnteredDigits = "";}
+      else  { Tekstprintln("⚠ Need 6 digits (HHMMSS) before OK");  }
+      break;
+    default:
+      sprintf(sptext, "Button '%s' not yet assigned", ButtonName.c_str());
+      Tekstprintln(sptext);
+      break;
+  }
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Adjust current time by hours/minutes/seconds
+//--------------------------------------------
+void AdjustTime(int DeltaHours, int DeltaMinutes, int DeltaSeconds)
+{
+ timeinfo.tm_hour += DeltaHours;
+ timeinfo.tm_min  += DeltaMinutes;
+ timeinfo.tm_sec  += DeltaSeconds;
+ time_t t = mktime(&timeinfo);
+ if(DS3231Installed)   SetDS3231Time();
+ Displaytime();       
+}
+
+//--------------------------------------------                                                //
+// IR-RECEIVER Turn On or off Remote control
+// Turns off after 60 seconds
+//--------------------------------------------
+void ToggleIRpower()
+{
+ static bool powerState = false;                                                              //
+ powerState = !powerState;
+ if (powerState)
+  {
+   IR_PowerOnstate = true;                                                                    // React on IR-remote input
+   Tekstprintln("✓ IR-remote is ON");
+   IR_StartTime = millis();
+  }
+ else
+  {
+    Tekstprintln("X IR-remote is OFF");
+    IR_PowerOnstate = false;                                                                  // Do not react on IR-remote input
+  } 
+}

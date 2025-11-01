@@ -33,6 +33,7 @@ void PrintLine(byte Lengte)                      // COMMON PrintLine
 void ReworkInputString(String InputString)       // COMMON Input from Bluetooth, Serial or HTML page
 void PrintDisplayChoice()                        // COMMON Print Display choice with Printit is TRUE
 void PrintDisplayChoice(bool PrintIt)            // COMMON Print Display choice
+void PrintTimeInputMethod(byte Im)               // COMMON Print time input method. Rotary, Membrane or IR-remote
 void PrintMem(void)                              // COMMON Print permanent Mem memory
 int ReadLDR(void)                                // LDR reading are between 0 and 255. 
 void SetSecondColour(void)                       // CLOCK Set second colour
@@ -66,14 +67,16 @@ void StartLeds(void)                             // DISPLAY Initialyse the LEDst
 void ChangeRandomDisplay(void)                   // DISPLAY change display choice
 void RainbowCycle(uint8_t wait)                  // DISPLAY RainbowCycle
 void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength )    // DISPLAY WhiteOverRainbow
-void Zet_Pixel(byte Cijfer,byte Pos_X, byte Pos_Y)// DISPLAY Place digits 0 - 9 in Matrix display
+void Zet_Pixel(byte Cijfer,byte Pos_X,byte Pos_Y)// DISPLAY Place digits 0 - 9 in Matrix display
 void TimePlaceDigit(byte uur, byte minuut)       // DISPLAY Time in four digits in display
 void WriteLightReducer(int amount)               // CLOCK In- or decrease light intensity value i.e. Slope
+void InitTimeSystem(void)                        // Initialize time system (DS3231 + NTP + internal RTC)  
 time_t GetTijd(bool printit)                     // RTC Get time from NTP cq internal ESP32 RTC 
+DateTime GetLocalDateTime()                      // NTP Return local time as RTClib DateTime
 void GetNTPtime(bool printit)                    // NTP print the NTP time for the timezone set 
 void PrintNTPtime(void)                          // NTP print the NTP time for the timezone set 
 void PrintUTCtime(void)                          // NTP print the NTP UTC time 
-void InitDS3231Mod(void)                         // DS3231 Init module
+//void InitDS3231Mod(void)                       // DS3231 Init module
 bool IsDS3231I2Cconnected(void)                  // DS3231 check for I2C connection
 float GetDS3231Temp(void)                        // DS3231 Get temperature from DS3231 module
 void SetDS3231Time(void)                         // DS3231 Set time in module DS3231
@@ -104,6 +107,7 @@ bool CheckforWIFINetwork(void)                   // WIFI Check for WIFI Network
 bool CheckforWIFINetwork(bool PrintIt)           // WIFI Check for WIFI Network and print it
 void ScanWIFI(void)                              // WIFI Scan for WIFI stations
 void ConnectWIFI(void)                           // WIFI Check for WIFI router SSID and password 
+void CheckRestoreWIFIconnectivity(void)          // WIFI Check if WIFI is sill connected and if not restore it
 void StartWIFI_NTP(void)                         // WIFI Start WIFI connection and NTP service
 void WebServerTask(void *pvParameters)           // WIFI WebServerTask  on core 1
 void NTPnotify(struct timeval* t)                // NTP time synchronized
@@ -123,5 +127,14 @@ void Keypad3x1Check(void)                        // KEYPAD check for Keypad inpu
 void InitRotaryMod(void)                         // KY-040 ROTARY encoder Init 
 void RotaryEncoderCheck(void)                    // KY-040 ROTARY check if the rotary is moving
 void ProcessKeyPressTurn(int encoderPos)         // KY-040 Rotary or Membrane 3x1 processing input
+void Init_IRreceiver(void)                                                               // IR-RECEIVER Init
+uint16_t IrReceiverDecode(void)                                                          // IR-RECEIVER Decode received signal
+void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t address)     // IR-RECEIVER Internal function - Handles learning mode
+void ProcessRecognitionMode(decode_type_t protocol, uint16_t command, uint16_t address)  // IR-RECEIVER Internal function - handles recognition mode
+void StartIRLearning()                                                                   // IR-RECEIVER Initializes learning mode
+int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)          // IR-RECEIVER Identifies button pressed
+void ReworkIRremoteValue(int ButtonNamesNr)                                              // IR-RECEIVER ReworkRemoteValue
+void AdjustTime(int DeltaHours, int DeltaMinutes, int DeltaSeconds)                      // IR-RECEIVER Adjust current time by hours/minutes/seconds
+void TogglePower()                                                                       // IR-RECEIVER Toggle power/display on or off
 
 
