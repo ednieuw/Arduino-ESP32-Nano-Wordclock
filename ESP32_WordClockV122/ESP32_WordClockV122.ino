@@ -32,7 +32,7 @@
  Changes V119: IR-Remote works. Default Time-zone is entered when ResetCredentials(). IR-remote Power ON/OFF turns ON/OFF clock display 
  Changes V120: Mem.IRremote -> Mem.UseRotary H03. H001 and H002 -> H01 and H02. in wtekstAppend()  if(Mem.MCUrestarted == 0) Tekstprint(sptext); 
  Changes V121: Optimized IR-remote. Use Power button to use IR-remote input for 2 minutes
- Changes V122: Optimized SetDS3231Time()  if(DS3231Installed)   SetDS3231Time(); Removed stray input from IRremote
+ Changes V122: Optimized SetDS3231Time()  if(DS3231Installed)   SetDS3231Time(); Removed stray input from IRremote and added ONOFF
 
  If remote is off and turned on --> restart ESP32
  Power ON/OFF start entering time. Switch to DS3231
@@ -709,12 +709,11 @@ uint32_t   NoofLDRreadshour   = 0;
 // IR-RECEIVER
 //-------------------------------------------- 
 #define NO_LED_SEND_FEEDBACK_CODE                                                             // do not flash the BUILTIN LED on Arduino
-#define MAX_BUTTONS 16                                                                        // 0-9 (10 buttons) + up, down, left, right, power, OK (6 buttons)
-
-
+                                                                                              // 0-9 (10 buttons) + up, down, left, right, power, OK (6 buttons)
+byte NOOFBUTTONS = 1;                                                                         // Actual number Is calculated in Init_IRreceiver()
 String EnteredDigits = "";                                                                    // Store typed digits InputString
 String ButtonNames[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
-                             "UP", "DOWN", "LEFT", "RIGHT", "POWER", "OK"};                   // Runtime button info (not saved, just for display)                                    
+                       "UP", "DOWN", "LEFT", "RIGHT", "POWER", "OK","ONOFF"};                 // Runtime button info (not saved, just for display)                                    
 int currentLearningIndex = 0;
 uint32_t IR_StartTime    = 0;                                                                 // Time IR remote Power is on turn. Off after 1 minute
 bool IR_PowerOnstate     = false;                                                             // Is the power On or Off
@@ -836,7 +835,7 @@ struct IRRemoteStorage
   uint16_t learnedRemoteAddress  = 0;
   byte     learnedRemoteProtocol = 0;
   bool     remoteIdentified      = false;
-  StoredButtonMapping buttons[30];                                                            // MAX_BUTTONS = 15 but space for 15 more
+  StoredButtonMapping buttons[30];                                                            // NOOFBUTTONS = 15 but space for 15 more
   int      Checksum              = 0;
 } IRMem;
 //--------------------------------------------                                                //
@@ -982,7 +981,7 @@ void EveryMinuteUpdate(void)
  lastminute = timeinfo.tm_min;  
  CheckRestoreWIFIconnectivity();                                                              // Check if WIFI is sill connected and if not restore it
  if (Mem.RandomDisplay == 1) { ChangeRandomDisplay(); SetSecondColour();} 
- if (IR_PowerOnstate && ((millis() - IR_StartTime) > 120000) ) ToggleIRpower();                // Turn off Power af 120 seconds 
+ if (IR_PowerOnstate && ((millis() - IR_StartTime) > 290000) ) ToggleIRpower();                // Turn off Power after 300 seconds 
  GetTijd(false);
  Displaytime();  
  DimLeds(true);   
@@ -1118,7 +1117,7 @@ void Reset(void)
  uint16_t learnedRemoteAddress  = 0;
  uint8_t  learnedRemoteProtocol = 0;
  bool     remoteIdentified      = false;
- for (int i = 0; i < MAX_BUTTONS; i++)  IRMem.buttons[i].learned = 0;
+ for (int i = 0; i < NOOFBUTTONS; i++)  IRMem.buttons[i].learned = 0;
  Tekstprintln("**** Reset of preferences ****"); 
  ResetCredentials();
  StoreStructInFlashMemory();                                                                  // Update Mem struct       
@@ -1432,15 +1431,15 @@ void ReworkInputString(String InputString)
        {
         Mem.UseRotary = (byte)SConstrainInt(InputString, 2, 0, 3);                           // keep the range between 0 and 3
         if(Mem.UseRotary > 3) Mem.UseRotary = 0;
-        sprintf(sptext, "\nUse of rotary encoder is %s\nUse of membrane keypad is %s", 
-                Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF");
+        sprintf(sptext, "\nUse of rotary encoder is %s\nUse of membrane keypad is %s\nUse of IR remote is %s", 
+                Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF",Mem.UseRotary == 3 ? "ON" : "OFF");
         Tekstprintln(sptext);
         if(Mem.UseRotary > 0)  {Mem.NTPOn = 0;              Mem.UseDS3231 = 1;  }             // Configure related settings based on rotary use 
         else                   {Mem.WIFIOn = Mem.NTPOn = 1; Mem.UseDS3231 = 0;}
         sprintf(sptext, "Use DS3231 is %s, WIFI is %s, NTP is %s\n *** Restart clock with @ ***", 
                 Mem.UseDS3231 ? "ON" : "OFF", Mem.WIFIOn ? "ON" : "OFF", Mem.NTPOn ? "ON" : "OFF");
         } 
-      else sprintf(sptext, "**** Fault. Enter H000 (none), H001=Rotary, H002=Membrane ****\nUse rotary encoder is %s\nUse membrane keypad %s\nUse IR-remote control is %s",
+      else sprintf(sptext, "**** Enter H00 (none), H01=Rotary, H02=Membrane, H03 IR-remote ****\nUse rotary encoder is %s\nUse membrane keypad %s\nUse IR-remote control is %s",
                     Mem.UseRotary == 1 ? "ON" : "OFF", Mem.UseRotary == 2 ? "ON" : "OFF",Mem.UseRotary==3  ? "ON" : "OFF");
       break;
      
@@ -1732,7 +1731,7 @@ void ReworkInputString(String InputString)
          StartIRLearning();   // Initializes learning mode,Resets all button data,Prompts for first button
          sprintf(sptext, "Learning IR started");
        }
-      else sprintf(sptext, "IR remote is OFF (Turn on with } )\nor no IR remote installed");
+      else sprintf(sptext, "IR remote is OFF (Turn on with H03 )\nOr no IR remote is installed");
       break;
 
     case '}':                                                                                 // *** Empty ***
@@ -4288,6 +4287,7 @@ void ProcessKeyPressTurn(int encoderPos)
 void Init_IRreceiver(void)
 {
  IrReceiver.begin(IRReceiverPin);
+ NOOFBUTTONS = sizeof(ButtonNames) / sizeof(ButtonNames[0]); 
  if (Mem.UseRotary == 3)  {  GetIRRemoteFromFlashMemory(); }                                  // Load IR settings (only if IR remote is enabled)
  if (IRMem.remoteIdentified && IRMem.buttons[0].learned)                                      // Check if we already have learned buttons
   {
@@ -4352,7 +4352,7 @@ void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t addr
           ButtonNames[currentLearningIndex], getProtocolString(protocol), command, address);
   Tekstprintln(sptext);
   currentLearningIndex++;
-  if (currentLearningIndex < MAX_BUTTONS)
+  if (currentLearningIndex < NOOFBUTTONS)
   {
     sprintf(sptext, "\nPlease press button: %s", ButtonNames[currentLearningIndex]);
     Tekstprintln(sptext);
@@ -4367,7 +4367,9 @@ void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t addr
     Tekstprintln("\n=== Now in Recognition Mode ===");
     sprintf(sptext, "Only responding to remote with Address: 0x%04X", IRMem.learnedRemoteAddress);
     Tekstprintln(sptext);
-    Tekstprintln("Press any learned button to test...\nPress OK to quit test mode\n");
+    Tekstprintln("Press any learned button to test....");
+    Tekstprintln("Press POWER to process the key presses to a time. POWER ON");
+    Tekstprintln("Press POWER again to stop time entry. POWER OFF");       
   }
 }
 
@@ -4381,7 +4383,7 @@ void ProcessRecognitionMode(decode_type_t protocol, uint16_t command, uint16_t a
      protocol != (decode_type_t) IRMem.learnedRemoteProtocol)                                 // Check if it's from the learned remote
   {
     sprintf(sptext, "⚠ Ignored - Wrong remote (Address: 0x%04X)", address);
-    if (address!=0) Tekstprintln(sptext);                                                                     // Stray input detected
+    if (address!=0) Tekstprintln(sptext);                                                     // Stray input detected
   }
   else {RecognizeButton(protocol, command, address);  }                                       // Correct remote - identify which button was pressed
 }
@@ -4396,7 +4398,7 @@ void StartIRLearning()
   currentLearningIndex = 0;
   learningMode = true;
   IRMem.remoteIdentified = false;
-  for (int i = 0; i < MAX_BUTTONS; i++) {IRMem.buttons[i].learned = false; }
+  for (int i = 0; i < NOOFBUTTONS; i++) {IRMem.buttons[i].learned = false; }
   Tekstprintln("Please press button: 0");
 }
 
@@ -4412,7 +4414,7 @@ void PrintAllMappings(void)
  sprintf(sptext, "Remote Protocol: %s", getProtocolString( (decode_type_t) IRMem.learnedRemoteProtocol));
  Tekstprintln(sptext);
  PrintLine(35);
-  for (int i = 0; i < MAX_BUTTONS; i++)
+  for (int i = 0; i < NOOFBUTTONS; i++)
   {
    if (IRMem.buttons[i].learned)
     {
@@ -4432,7 +4434,7 @@ void ResetAllIRremoteSettings()
  IRMem.remoteIdentified = false;
  IRMem.learnedRemoteAddress = 0;
  IRMem.learnedRemoteProtocol = 0;
- for (int i = 0; i < MAX_BUTTONS; i++)
+ for (int i = 0; i < NOOFBUTTONS; i++)
   {
     IRMem.buttons[i].learned = false;
     IRMem.buttons[i].protocol = 0;
@@ -4452,7 +4454,7 @@ void ResetAllIRremoteSettings()
 int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)
 {
   bool found = false;
-  for (int i = 0; i < MAX_BUTTONS; i++)
+  for (int i = 0; i < NOOFBUTTONS; i++)
   {
     if (IRMem.buttons[i].learned && 
         IRMem.buttons[i].protocol == (uint8_t)protocol &&
@@ -4485,7 +4487,7 @@ int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)
 void ReworkIRremoteValue(int ButtonNamesNr)
 {
  if (ButtonNamesNr == -1)  {Tekstprintln("Unknown button - ignored");  return;  }
- if (IR_PowerOnstate == false && ButtonNamesNr != 14 ) return;                               // Button "POWER"
+ if (IR_PowerOnstate == false && ButtonNamesNr < 14 ) return;                               // Button "POWER" and "ONOFF" can work without POWER ON
 
  String ButtonName = ButtonNames[ButtonNamesNr];
  switch(ButtonNamesNr)
@@ -4500,42 +4502,45 @@ void ReworkIRremoteValue(int ButtonNamesNr)
     case 7:                                                                                   // Button "7"
     case 8:                                                                                   // Button "8"
     case 9:                                                                                   // Button "9"
-      EnteredDigits += ButtonName;                                                            // Add digit to entered string  
-      if (EnteredDigits.length() > 6) {EnteredDigits = EnteredDigits.substring(0, 6); }      // Limit to 6 digits (HHMMSS)
-      if (EnteredDigits.length() == 6)
-      {
-        sprintf(sptext, "Time entered: %c%c:%c%c:%c%c (press OK)", 
-                EnteredDigits[0], EnteredDigits[1], EnteredDigits[2], 
-                EnteredDigits[3], EnteredDigits[4], EnteredDigits[5]);
-      }
-      else sprintf(sptext, "Digits: %s (Need 6 for HHMMSS)", EnteredDigits.c_str());
-      Tekstprintln(sptext);
-      break;
+            EnteredDigits += ButtonName;                                                      // Add digit to entered string  
+            if (EnteredDigits.length() > 6) {EnteredDigits = EnteredDigits.substring(0, 6); } // Limit to 6 digits (HHMMSS)
+            if (EnteredDigits.length() == 6)
+              {
+               sprintf(sptext, "Time entered: %c%c:%c%c:%c%c (press OK)", 
+                 EnteredDigits[0], EnteredDigits[1], EnteredDigits[2], 
+                 EnteredDigits[3], EnteredDigits[4], EnteredDigits[5]);
+              }
+            else sprintf(sptext, "Digits: %s (Need 6 for HHMMSS)", EnteredDigits.c_str());
+            Tekstprintln(sptext);
+            break;
     case 10:                                                                                  // Button "UP"
-      AdjustTime(1, 0, 0);                                                                    // +1 hour
-      break;
+            AdjustTime(1, 0, 0);                                                              // +1 hour
+            break;
     case 11:                                                                                  // Button "DOWN"
-      AdjustTime(-1, 0, 0);                                                                   // -1 hour
-      break;
+            AdjustTime(-1, 0, 0);                                                             // -1 hour
+            break;
     case 12:                                                                                  // Button "LEFT"
-      AdjustTime(0, -1, 0);                                                                   // -1 minute
-      break;
+            AdjustTime(0, -1, 0);                                                             // -1 minute
+            break;
     case 13:                                                                                  // Button "RIGHT"
-      AdjustTime(0, 1, 0);                                                                    // +1 minute
-      break;
+            AdjustTime(0, 1, 0);                                                              // +1 minute
+            break;
     case 14:                                                                                  // Button "POWER"
-      ToggleIRpower();
-      break;
+            ToggleIRpower();
+            break;
     case 15: 
-      learningMode = false;                                                                  // Button "OK"
-//    Serial.println(EnteredDigits.length());   
-      if (EnteredDigits.length() == 6) {ReworkInputString(EnteredDigits); EnteredDigits = "";}
-      else  { Tekstprintln("⚠ Need 6 digits (HHMMSS) before OK");  }
-      break;
+            learningMode = false;                                                             // Button "OK"
+//          Serial.println(EnteredDigits.length());   
+            if (EnteredDigits.length() == 6) {ReworkInputString(EnteredDigits); EnteredDigits = "";}
+            else  { Tekstprintln("⚠ Need 6 digits (HHMMSS) before OK");  }
+            break;
+    case 16:                                                                                  // Button "ONOFF"
+            ReworkInputString("O");                                                           // Turn On OFF display
+            break;
     default:
-      sprintf(sptext, "Button '%s' not yet assigned", ButtonName.c_str());
-      Tekstprintln(sptext);
-      break;
+            sprintf(sptext, "Button '%s' not yet assigned", ButtonName.c_str());
+            Tekstprintln(sptext);
+            break;
   }
 }
 
@@ -4563,12 +4568,12 @@ void ToggleIRpower()
  if (powerState)
   {
    IR_PowerOnstate = true;                                                                    // React on IR-remote input
-   Tekstprintln("✓ IR-remote is ON");
+   Tekstprintln("IR-remote is ON");
    IR_StartTime = millis();
   }
  else
   {
-    Tekstprintln("X IR-remote is OFF");
+    Tekstprintln("IR-remote is OFF");
     IR_PowerOnstate = false;                                                                  // Do not react on IR-remote input
   } 
 }
