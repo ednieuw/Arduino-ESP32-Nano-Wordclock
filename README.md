@@ -422,19 +422,32 @@ Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
-### F Own colour  (Hex FWWRRGGBB <br>
-With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
-The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
-The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
-To colour the characters intense red enter FF0000 prefixed with the character F. <br>
-To set intense blue enter: F0000FF or FFF.<br>
-To set the dimmed character to dark gray enter for example: F191919. <br>
+### F Own colour  (Hex FWWRRGGBB or FWRGB 0-9<br>
+With option Q3 and Q4 from the menu individual colours for the clock to display can be set.
+WS2812 LEDs have 3 three LEDs Red Green Blue. SK6812 LEDs have an additional extra white LED.
+The format to enter is white, red, green, blue (WRGB).<br>
+the value entered for white will have no effecr when WS2812 LEDs are installed.
+The format to be entered is hexadecimal (0123456789ABCDEF) with two digits per colour resulting in 255 possibilities per colour<br>
+or simpler with one decimal digit per colour 0 - 9.<br>
+The hexadecimal command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
+With the digits 0 - 9 the colour can not be set very precise but for most users simpler to use.<br> 
+To colour the characters intense red enter 00FF0000 prefixed with the character F.<br>
+Or decimal F0900. 0 white, 9 red, 0 green, 0 blue
+To set intense blue enter: F000000FF or F0009.<br>
+To set the dimmed character to dark gray enter for example: F00191919 (F0111). (<br>
 You get gray if red, green and blue has the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
 For example: F8800FF00 is 50% white with 100% green.
 
-### I To print this Info menu<br>
-Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
+### I Info menu, II long Info menu<br>
+Print the simple user menu to Bluetooth and the serial monitor when connected with an USB-cable.
+II print the long menu with all possibilities.
+
+### J DS3231 RTC module On/Off<br>
+Print the menu to Bluetooth and the serial monitor when connected with an USB-cable.<br>
+When the use of the DS3231 module is turned on NTP will be turn Off. <br>
+Turn NTP on manually (option X) when the use of the DS3231 is turned off!!
+When the DS3231 is active the orange LED on the Nano ESP32 will stop flashing.<br>
 
 ### K LDR reads/sec toggle On/Off<br>
 Prints the LDR-readings and the calculated intensity output.
@@ -443,7 +456,7 @@ Prints the LDR-readings and the calculated intensity output.
 With N2208 the display will be turned off between 22:00 and 08:00. 
 
 ### O Display toggle On/Off<br>
- O toggles the display off and on.
+O toggles the display off and on.
  
 ###  Q Display colour choice (Q0-9)<br>
 Q0 will show the time with yellow words., HETISWAS changing. <br>
@@ -470,7 +483,9 @@ M200 (200 millisecond) will speed up the clock 5*60 times.
 Sending an U will turn off the demo mode or if not in demo mode start demo mode with 200 ms/min.
 
 ### Y Play lights
-To test the functionality of the LEDs.
+To test the functionality of the LEDs.<br>
+All the LEDs will be turned on showing a flowing rainbow.<br>
+Use a large enought power supply when turning on this test.<br>
 
 ### Light intensity (1-250)
 S=Slope L=Min M=Max (S100 L5 M200)
