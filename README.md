@@ -27,6 +27,37 @@ See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nR
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
 Clock with Corten steel face
 
+
+---
+## Table of Contents
+
+- [Hardware](#hardware)
+  - [PCB Connections](#pcb-connections)
+  - [The LED Ground Plate](#the-led-ground-plate)
+- [Software](#software)
+  - [Select one of the three word clock builds](#select-one-of-the-three-word-clock-builds)
+  - [Libraries and OTA](#libraries-and-ota)
+- [How to Compile](#how-to-compile)
+- [Before Starting](#before-starting)
+  - [Connect to Wi‑Fi](#connect-to-wi-fi)
+  - [Connect via Bluetooth](#connect-via-bluetooth)
+- [Control of the Clock](#control-of-the-clock)
+  - [Control & Menu (Detailed)](#control--menu-detailed)
+  - [Common Commands (detailed)](#common-commands-detailed)
+- [Wi‑Fi / Web interface](#wi-fi--web-interface)
+- [BLE specifics](#ble-specifics)
+- [Light intensity explained](#light-intensity-explained)
+- [Example Serial/BLE Session](#example-serialble-session)
+- [Program explanation, code snippets, advanced options & Timezones](#program-explanation-code-snippets-advanced-options--timezones)
+  - [Program overview](#program-overview)
+  - [Important code snippets (high‑level)](#important-code-snippets-high-level)
+  - [Storage and preferences](#storage-and-preferences)
+  - [Web page & OTA](#web-page--ota)
+- [Troubleshooting hints](#troubleshooting-hints)
+- [Advanced options](#advanced-options)
+- [Full Timezone list (copy-and-paste tokens)](#full-timezone-list-copy-and-paste-exact-token-after-e)
+- [Final notes](#final-notes)
+
 ---
 
 # Hardware
