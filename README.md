@@ -39,7 +39,7 @@ Clock with Corten steel face
   - [Libraries and OTA](#libraries-and-ota)
 - [How to Compile](#how-to-compile)
 - [Before Starting](#before-starting)
-  - [Connect to Wi‑Fi](#connect-to-wi-fi)
+  - [Connect to Wi‑Fi](#connect-to-wifi)
   - [Connect via Bluetooth](#connect-via-bluetooth)
 - [Control of the Clock](#control-of-the-clock)
   - [Control & Menu (Detailed)](#control--menu-detailed)
@@ -225,7 +225,7 @@ If a DS3231 RTC module is not installed, the clock synchronizes time via NTP. If
 
 To connect to the internet you must provide your Wi‑Fi SSID and password to the clock software.
 
-## Connect to Wi‑Fi
+## Connect to WiFi
 
 Enter the Wi‑Fi SSID and password once; the credentials are stored in the microcontroller's memory.
 
