@@ -57,7 +57,6 @@ Clock with Corten steel face
 - [Advanced options](#advanced-options)
 - [Full Timezone list (copy-and-paste tokens)](#full-timezone-list-copy-and-paste-exact-token-after-e)
 - [Final notes](#final-notes)
-
 ---
 
 # Hardware
