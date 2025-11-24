@@ -25,6 +25,8 @@ Not with characteristic FFE0 but 6e400001-b5a3-... et cetera in your serial term
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
+An user manual in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
+
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
 Clock with Corten steel face
 
@@ -142,6 +144,8 @@ Place the spacer plate over the LEDs, then a sheet of white paper and finally th
 # Software
 
 The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
+
+An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
 The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.
 Several designs can be selected before compiling.  (If you have a word plate, of course.)
