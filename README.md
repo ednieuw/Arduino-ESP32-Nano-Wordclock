@@ -396,9 +396,6 @@ Reset to default setting by send R.<br><br>
 </table>
 
 ## Detailed description
-<pre>
-	
-</pre>
 
 With the menu many preferences can be set. <br>
 These preferences are permanently stored in the Arduino Nano ESP32 storage space. 
@@ -411,9 +408,9 @@ Change the name of the SSID of the router to be connected to.<br>
 aFRITZ!Box or AFRITZ!Box<br>
 Then enter the password. For example: BSecret_pass <br>
 and cMywordclock as a name of the BLE beacon that will be shown in your phone. (default after a reset:  wordclock )
+Restart the MCU by sending @.
 
-Restart the MCU by sending @. <br>
-### CCC  
+### CCC<br>
 Entering CCC or ccc will toggle BLE on or off. Be careful turning it off. When BLE is off the clock can only be controlled with WIFI or the USB serial port.
 
 ### D Set Date and T Set Time <br>
@@ -428,7 +425,7 @@ Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
-### F Own colour  (Hex FWWRRGGBB <br>
+### Own colour (FWWRRGGBB or Fwrgb) <br>
 With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
 The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
 The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
@@ -439,8 +436,23 @@ You get gray if red, green and blue have the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
 For example: F8800FF00 is 50% white with 100% green.
 
-### I To print this Info menu<br>
+### G Scan WIFI networks
+Scan available Wi‑Fi networks (prints SSIDs found).
+
+### H H01 rotary encoder, H02 buttons H03/04 remote.
+Turning on will also Turn off NTP and on use of DS3231. Check DS3231 and NTP setting when turning off (H00)
+
+### } Learn IR remote
+Start learning the keys of a new infrared remote.
+  
+### Info menu, II long menu
 Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
+`i` prints the short info menu.
+`ii` prints the extended menu (long help).
+
+### J DS3231 RTC module On/Off
+When DS3231 is enabled, NTP may be turned off. Use option `X` to toggle NTP if needed.<>r>
+The flashing orange status LED on the board will turn off when the DS3231 time is used.
 
 ### K LDR reads/sec toggle On/Off<br>
 Prints the LDR-readings and the calculated intensity output.
@@ -449,9 +461,12 @@ Prints the LDR-readings and the calculated intensity output.
 With N2208 the display will be turned off between 22:00 and 08:00. 
 
 ### O Display toggle On/Off<br>
- O toggles the display off and on.
- 
-###  Q Display colour choice (Q0-9)<br>
+Toggles the display off and on.
+
+### P Display toggle On/Off<br>
+Toggle status LEDs on the board On/Off.. 
+
+###  Q Display choice (Q0-9)<br>
 Q0 will show the time with yellow words., HETISWAS changing. <br>
 HET will change from green to red via yellow in an hour and IS/WAS with change from green to red in a minute.<br>
 Q1 will show every hour another colour. <br>
@@ -466,20 +481,19 @@ Q9= Rainbow fast colour changing in 4 seconds.
 Send an 'I' to display the latest's settings in the menu. 
 
 ### R Reset settings <br>
-R will set all preferences to default settings. The SSID and password, timezone, the LED-strip type and use a rotary will be kept.<br>
+R will set all preferences to default settings. The SSID and password, timezone, the LED-strip type and rotary/IR usage will be kept.<br>
 RRR will clear SSID, password, set Time zone to Amsterdam (CET-1) and turn WIFI, NTP and BLE on.<br>
 RRRRR is a total reset. A combination of R and RRR
 
-### U Demo mode (msec) (U200)
+### Unnn Demo (U200 msec)
 Enter U followed with the duration of a second in milli seconds. 
 M200 (200 millisecond) will speed up the clock 5*60 times.  
-Sending an U will turn off the demo mode or if not in demo mode start demo mode with 200 ms/min.
+Sending an U will turn off the demo mode or if not in demo mode start demo mode with 800 ms/min.
 
 ### Y Play lights
 To test the functionality of the LEDs.
 
-### Light intensity (1-250)
-S=Slope L=Min M=Max (S100 L5 M200)
+### S Slope, L Min, M Max (S50 L5 M200)
 
 <table style="width: 100%">
 <tr>
@@ -504,10 +518,10 @@ or display. </td>
 <td> 
 
 <br>
-W=WIFI, X=NTP, Y=BLE<br>
+### W=WIFI, X=NTP, Y=BLE<br>
 Toggle WIFI, NTP and BLE on and off.<br>
 Sending the character will toggle it on or off. <br>
-At the bottom of the menu the state is printed.<br>
+At the bottom of the long menu (ii) the state is printed.<br>
  </td>
 <td>
 <img alt="Bottom menu" class="auto-style4" src="Pics/BottomMenu.gif" /></td>
