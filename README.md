@@ -897,38 +897,39 @@ if (InputString.length() >5 )
 Read the LDR and divide it with 16 to get the values from 0 - 4096 between 0 and 255.<br>
 Not all boards has a 12 bit AD converter like.  
 
-<pre>
+```cpp
 //-------------------------------------------- 
 // LDR reading are between 0 and 255.  
 // ESP32 analogue read is between 0 - 4096 --   is: 4096 / 8 
 //-------------------------------------------- 
 int ReadLDR(void) {  return analogRead(PhotoCellPin)/16;} 
-</pre>
+```
 
 Control the color and intensity of the LED on the boards in one command <br>
-<pre>//
+```cpp
+//
 --------------------------------------------
 // CLOCK Control the LEDs on the ESP32 
 // 0 Low is LED off. Therefore the value is inversed with the ! Not 
 //-------------------------------------------- 
 void SetStatusLED(bool Red, bool Green, bool Blue) 
 {
-</pre>
+```
 
 Here we print and colour the characters in the display or light up to proper LEDs in a String of RGB(W) LEDs.<br>
 The #define executes this functions with the proper parameters for every language and prints the texts in the serial connections.<br>
 #define QUARTER ColorLeds("quarter", 32, 38, LetterColor);
 
-<pre>
+```cpp
 //--------------------------------------------    / 
  / LED Set color for LED. 
 //--------------------------------------------   
 void ColorLeds(char const *Texkst, int FirstLed, int LastLed, uint32_t RGBColor)  
 {  } 
-</pre>
+```
 
 Every display or strip uses other commands to regulate the brightness. Therefore for all LED/Display commands a function.
-<pre>
+```cpp
 //------------------------------------------------------------------------------ 
 // LED Set brightness of backlight 
 //------------------------------------------------------------------------------ 
@@ -936,20 +937,20 @@ void SetBrightnessLeds(byte Bright)
 { 
  SetBackLight(Bright);                        // Set brightness of LEDs 
 } 
-</pre>
+```
 
 A place to turn off all LEDs or clear the display<br>
-<pre>
+```cpp
 /-------------------------------------------- 
 // LED Clear the character string 
 //-------------------------------------------- 
 void LedsOff(void)  
-</pre>
+```
 
 Here the colours are set for the characters.<br>
 It is also used to change the colours of HET IS WAS used in some display choices
 
-<pre>
+```cpp
 //--------------------------------------------  <br>
 // LED Set second color <br>
 //-------------------------------------------- <br>
@@ -964,11 +965,11 @@ switch (Mem.DisplayChoice)
     case DEFAULTCOLOUR: LetterColor = C_YELLOW;  
 <br>
 ... 
-</pre>
+```
 
 
 Subroutine for the Self test of the clock. Default there is a 900 ms delay.
-<pre>
+```cpp
 //------------------------------------------------------------------------------
 // CLOCK Self test sequence
 //------------------------------------------------------------------------------
@@ -979,11 +980,11 @@ void Selftest(int Delayms)
  LedsOff(); 
 ...
 }
-</pre>
+```
 
 Displaytime() prints the time to the serial monitor as text and control which language is printed.<br>
 It also sends the appropriate sequence of colour and intensities to a RGB(W) LED strip. 
-<pre>
+```cpp
 //--------------------------------------------  
 // CLOCK Say the time and load the LEDs 
 // with the proper colour and intensity
@@ -1008,25 +1009,24 @@ LedsOff();                                                                      
    }  
  ShowLeds();                                                                                  // And turn on the LEDs
 }
-</pre>
+```
 
 DimLeds() reads the analog port and calculates an output intensity to a display or LED-strip.<br>
 The readings are squared to get a hyperbolic curve that resembles you eye correction for dark and light better than a linear range.<br>
 It works wonderfully well.<br>
 
-<pre>
+```cpp
 //--------------------------------------------  
 // LED Dim the LEDs measured by the LDR and print values  
 // LDR reading are between 0 and 255. The Brightness send to the LEDs is between 0 and 255  
 //--------------------------------------------  
 void DimLeds(bool print) { ... } 
-</pre>
-
+```
 
 A list of subroutine follows used for several LED operations follows including the initialisations of the WS2812 or SK6812 LED-strip
 The SK6812 LED-strip also has a white LED whicht intensity is controlled with the highest bytes (WW) in the 32-bit integer (0XWWRRGGBB)
 
-<pre>
+```cpp
 //--------------------------------------------                                                //
 //  LED Start LEDs
 //--------------------------------------------
@@ -1048,12 +1048,14 @@ void StartLeds(void)
 ...
 }
 
-</pre>
+```
  
 
 A series of functions to get and store time.<br>
 The NTP time server puts the retrieved time in the standard C time structures.<br>
-<pre>/--------------------------- Time functions -------------------------- 
+
+```cpp
+/--------------------------- Time functions -------------------------- 
 
 void GetTijd(byte printit) 
 void Print_RTC_tijd(void) 
@@ -1062,15 +1064,16 @@ void PrintUTCtijd(void)
 void Print_tijd(void) 
 void SetRTCTime(void) 
 
-</pre>
+```
 
 Convert a HEX string to a unsigned 32-bits integer<br>
 
-<pre>
+```cpp
 //--------------------------------------------
 // CLOCK Convert Hex to uint32 
 //-------------------------------------------- 
-uint32_t HexToDec(String hexString)  </pre>
+uint32_t HexToDec(String hexString) 
+```
 
 
 <h2>Functions to let the clocks speak the time in four languages</h2>
@@ -1078,7 +1081,7 @@ There is also a lot of slang in languages. <br>
 'Half nine' sometimes means 8:30 but can also be 9:30. (-:<br>
 <br>
 
-<pre>
+```cpp
 //--------------------------------------------                                                //
 //  CLOCK Dutch clock display
 //--------------------------------------------
@@ -1110,7 +1113,7 @@ switch (timeinfo.tm_min)
 
 
 
-</pre>
+```
 
 <br>
 
@@ -1121,7 +1124,8 @@ chipsets like the HM-10, HM16, JDY-08 et cetera.<br>
 <br>
 
 
-<pre>/----------------------------- 
+```cpp
+/----------------------------- 
 // BLE SendMessage by BLE Slow in packets of 20 chars 
 //------------------------------ 
 void SendMessageBLE(std::string Message) 
@@ -1139,11 +1143,15 @@ void StartBLEService(void)
 /----------------------------- 
 // BLE CheckBLE 
 //------------------------------ 
-void CheckBLE(void) </pre>
+void CheckBLE(void) 
+```
+
 <br>
 Functions to start a WIFI connection and use the webpage<br>
 <br>
-<pre>/-------------------------------------------- 
+
+```cpp
+/-------------------------------------------- 
 // WIFI WEBPAGE  
 //-------------------------------------------- 
 void StartWIFI_NTP(void) 
@@ -1157,7 +1165,7 @@ void WebPage(void)
 // WIFI WEBPAGE Not found message 
 //-------------------------------------------- 
 void notFound(AsyncWebServerRequest *request) 
-</pre>
+```
 <br>
 
 
@@ -1168,7 +1176,8 @@ void notFound(AsyncWebServerRequest *request)
  Copy the text between the quotes and paste them after the character E 
   
 
-<pre> Africa/Abidjan,"GMT0" 
+<pre> 
+ Africa/Abidjan,"GMT0" 
  Africa/Accra,"GMT0" 
  Africa/Addis_Ababa,"EAT-3" 
  Africa/Algiers,"CET-1" 
