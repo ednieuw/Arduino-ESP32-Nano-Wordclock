@@ -189,10 +189,10 @@ It generates the smallest binary code (V2.0.18 = 1.0 Mb vs V3.20 = 1.3 Mb)
 
 ![image](https://github.com/user-attachments/assets/1f4eeec5-ebc5-47fb-b513-2514f5ff6ecd)
 
-There are two compiler pin numbering methods: One method uses the GPIO numbering of the ESP32-S3 and the other  by Arduino pin numbering.<br>
-This code works fine with GPIO numbering selected.<br>
+There are two compiler pin numbering methods: One method uses the GPIO pin numbering of the ESP32-S3 and the other by Arduino pin numbering.<br>
+This code works fine with GPIO pin numbering selected.<br>
 The Neopixel library generates an error when this is not selected. 
-The EdSoftLED library uses RMT to control the LEDs but with Espressif ESP32 core 3.3.3 I sometimes see a LED flicker.   
+The EdSoftLED library can use both pin numberings.   
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
