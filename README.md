@@ -779,7 +779,14 @@ void EveryDayUpdate(void)
 ```
 <br>
 Update the LEDs on the Nano and the PCB. 
-On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON
+On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON<br>
+With ESP32 core 3 the resolution of the of the RMT channel is from 8 - 10 bits default. <br>
+This prevents that the LED does not turn off completely when compiling with core 3: 
+
+```cpp
+analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red)); 
+```
+
 ```cpp
 //--------------------------------------------                                                //
 // COMMON Update routine for the status LEDs
@@ -788,15 +795,46 @@ void UpdateStatusLEDs(int Toggle)
 {
  if(Mem.StatusLEDOn)   
    {
-...
-void SetStatusLED(int Red, int Green, int Blue)
-{
- analogWrite(LED_RED,   512 - Red);                                                                 // !Red (not Red) because 1 or HIGH is LED off
- analogWrite(LED_GREEN, 512 - Green);
- analogWrite(LED_BLUE,  512 - Blue);
+    SetStatusLED((Toggle && WiFi.localIP()[0]==0) * 20, 
+                 (Toggle && WiFi.localIP()[0]!=0) * 20 , 
+                 (Toggle &&      deviceConnected) * 20);
+    SetPCBLED09( Toggle * 10);                                                                // Left LED
+    SetPCBLED10((!Toggle) * 10);                                                             // Right LED
+    SetNanoLED13((!Toggle) * (!Mem.UseDS3231 * 50));                                         // LED on ESP32 board. IF DS3231 in use then it is off
+   }
+   else
+   {
+    SetStatusLED(0, 0, 0); 
+    SetPCBLED09(0);                                                                           //
+    SetPCBLED10(0);                                                                           //
+    SetNanoLED13(0);      
+   }
 }
+//--------------------------------------------                                                //
+// COMMON Control the RGB LEDs on the Nano ESP32
+// Analog range 0 - 512. 0 is LED Off, 512 is max intensity
+// 512 is LED off. Therefore the value is subtracted from 512
+// in core 3 the value to write is 13-bit 8191 to turn off the led completely
+//  rgbLedWrite(512-Red,512-Green,512-Blue);
+//--------------------------------------------
+void SetStatusLED(int Red, int Green, int Blue)                                               // If LED should be off, use digitalWrite instead of analogWrite
+{
+ analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red));
+ analogWrite(LED_GREEN, Green == 0 ? 8191 : (512 - Green));
+ analogWrite(LED_BLUE,  Blue  == 0 ? 8191 : (512 - Blue));
+}
+//--------------------------------------------                                                //
+// COMMON Control orange LED D13 on the Arduino 
+//--------------------------------------------
+void SetNanoLED13(int intensity) {analogWrite(secondsPin, intensity);}
+//--------------------------------------------                                                //
+// COMMON Control the RGB LED on the PCB
+//--------------------------------------------
+void SetPCBLED09(int intensity) {analogWrite(PCB_LED_D09, intensity);}
+void SetPCBLED10(int intensity) {analogWrite(PCB_LED_D10, intensity);}
 
 ```
+
 
 Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
 ```cpp
