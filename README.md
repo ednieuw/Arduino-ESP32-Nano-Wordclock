@@ -661,7 +661,7 @@ The Struct EEPROMstorage is stored with the function StoreStructInFlashMemory an
 The menu displayed in the serial monitor and BLE app is defined here.<br>
 Strings may not be longer than 40 characters what can be checked with the 'ruler' string. <br>
 
-<pre>
+```cpp
 // Menu 
 //0        1         2         3         4 
 //1234567890123456789012345678901234567890  
@@ -670,9 +670,10 @@ char menu[][40] = {
 "D Date (D15012021) T Time (T132145)", 
 ... 
 "W=WIFI, X=NTP, Y=BLE, Z=Fast BLE",  
-"Nov 2022" }; </pre>
+"Nov 2022" };
+```
  The Setup happens here: 
-<pre>
+```cpp
 //-------------------------------------------- 
 // ARDUINO Setup
 //-------------------------------------------- 
@@ -683,12 +684,12 @@ Serial.begin(115200); Tekstprintln("Serial started"); // Setup the serial port t
 ... 
 msTick = millis();  
 }
-</pre>
+```
 
 The loop is kept almost empty and the program starts in Every SecondCheck.<br>
 There is nothing in this program that should be executes every millisecond or less
  
-<pre>
+```cpp
 //-------------------------------------------- 
 // ARDUINO Loop
 //-------------------------------------------- 
@@ -699,7 +700,7 @@ void loop()
  else              EverySecondCheck();                 // Let the second led tick and run the clock program
  CheckDevices();
 } 
-</pre>
+```
 
 The following routines check if something must happen every second, minute, hour and day.<br>
 This flow handling of the program keeps the processor for 99% free for other uses.<br>
@@ -707,7 +708,7 @@ In this program that is almost nothing but for other purposes this can be needed
 In the serial monitor the number of loops per second is printed. This can be handy to check if the program spends too much time elsewhere in the program. At the moment (V056) of writing it is around 200,000 l/s.
 <br>
 
-<pre>
+```cpp
 //--------------------------------------------                //
 // COMMON Check connected input devices
 //--------------------------------------------
@@ -756,12 +757,12 @@ if (timeinfo.tm_mday != lastday) EveryDayUpdate();
 void EveryDayUpdate(void) 
 {
 ... 
-}</pre>
+}
+```
 <br>
-
 Update the LEDs on the Nano and the PCB. 
 On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON
-<pre>
+```cpp
 //--------------------------------------------                                                //
 // COMMON Update routine for the status LEDs
 //-------------------------------------------- 
@@ -777,10 +778,10 @@ void SetStatusLED(int Red, int Green, int Blue)
  analogWrite(LED_BLUE,  512 - Blue);
 }
 
-</pre>
+```
 
 Check for serial input from the serial monitor and pass the command to ReworkInputString()&nbsp;  
-<pre>
+```cpp
 //-------------------------------------------- 
 // Common check for serial input 
 //-------------------------------------------- 
@@ -790,10 +791,10 @@ void SerialCheck(void)
 ReworkInputString(SerialString+"\n"); // Rework ReworkInputString(); 
 ... 
 }
-</pre>
+```
 
 Restore all the default values. 
-<pre>
+```cpp
 //------------------------------------------------------------------------------ 
 // Common Reset to default settings 
 //------------------------------------------------------------------------------ 
@@ -801,14 +802,14 @@ void Reset(void)
 {
 Mem.Checksum = 25065;
 ...
- }</pre>
+ }
+ ```
 
 Common print routines.<br>
 
 To keep all the print commands in one places it is easy to change these routines 
 for other boards with a different 'slang'. <br>
-<pre>
-
+```cpp
 //-------------------------------------------- 
 // Common common print routines 
 //-------------------------------------------- 
@@ -822,22 +823,22 @@ void TekstSprintln(char const tekst[]){ sprintf(sptext,"%s\n",tekst); TekstSprin
 //------------------------------------------------------------------------------ 
 int SConstrainInt(String s,byte first,byte last,int low,int up){return constrain(s.substring(first, last).toInt(), low, up);} 
 int SConstrainInt(String s,byte first, int low,int up){return constrain(s.substring(first).toInt(), low, up);} 
-</pre>
+```
 
 The setup of storage space and control of the validity of the settings.<br>
 In the checksum is invalid a reset() will restore the default settings 
 
-<pre>
+```cpp
 //-------------------------------------------- 
 // Common Init and check contents of EEPROM 
 //-------------------------------------------- 
 void InitStorage(void) 
-</pre>
+```
 
 Store and retrieve the settings from SPIFFS or SD or EEPROM.
 The several possibilities are stored here. EEPROM becomes outdated but still works. 
 
-<pre>
+```cpp
 -------------------------------------------- 
 // COMMON Store mem.struct in FlashStorage or SD 
 //-------------------------------------------- 
@@ -850,13 +851,13 @@ void StoreStructInFlashMemory(void)
 void GetStructFromFlashMemory(void) 
 {
 }
-</pre>
+```
 
 SWversion() prints the menu and the settings of several preferences.<br>
 
 PrintLine() prints the horizontal lines in the menu.<br>
 
-<pre>
+```cpp
 //-------------------------------------------- 
 // COMMON Version info
 //-------------------------------------------- 
@@ -871,14 +872,14 @@ PrintLine(35);
 
 void PrintLine(byte Lengte) 
 {... } 
-</pre>
+```
 
 
 Get the commands from the strings entered in the serial monitor, Bluetooth or the webpage and perform the command in an action.<br>
 The menu letters are almost used but it possible to distinguish between lower and uppercase when more commands are needed.<br>
 (That is why there is no conversion to UpperCase or LowerCase). 
 
-<pre>
+```cpp
 /-------------------------------------------- 
 //  COMMON Input from Bluetooth or Serial
 //--------------------------------------------
@@ -891,7 +892,7 @@ case 'A':
 case 'a':  
 if (InputString.length() >5 ) 
 ... 
-</pre>
+```
 
 Read the LDR and divide it with 16 to get the values from 0 - 4096 between 0 and 255.<br>
 Not all boards has a 12 bit AD converter like.  
