@@ -7,7 +7,7 @@ Build your own word clock with one or four languages using an Arduino ESP32 Nano
 
 The clock can be controlled via a phone app, a web page in a browser, a serial cable connected to your PC, a rotary encoder, an IR remote controller, or membrane keyboards.<br>
 
-<img src="https://github.com/user-attachments/assets/0b566154-2bc8-415f-927c-ea496154f767" style="width:50%;">
+<img src="https://github.com/user-attachments/assets/0b566154-2bc8-415f-927c-ea496154f767" style="width:30%;">
 
 To connect the clock to Wi‑Fi, enter the SSID and password of your router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
@@ -19,14 +19,15 @@ An LDR (light‑dependent resistor) is used to adjust the LED brightness for opt
 
 The older Arduino MKR1000, Nano BLE 33 and similar variants with both Bluetooth and Wi‑Fi have the disadvantage that only Wi‑Fi or BLE can be used — not both simultaneously.
 
-The ESP32 features an Espressif BLE/Wi‑Fi module. Bluetooth LE uses a Nordic nRF52 chip (not the TI CC2541).  
+The ESP32 features an Espressif BLE/Wi‑Fi module. Bluetooth LE uses a Nordic nRF52 chip (not the TI CC2541 like the HM-10).  
 This means you must use a different BLE service for serial communication: not characteristic FFE0, but 6e400001‑b5a3‑... etc., in your serial terminal app to communicate with the clock's settings.<br>
 
 See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
 
+An user manual in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
+
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
 Clock with Corten steel face
-
 
 ---
 ## Table of Contents
@@ -170,6 +171,7 @@ Place the spacer plate over the LEDs, then a sheet of white paper, and finally t
 # Software
 
 The `ESP32Arduino_WordClockVxxx.ino` turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock, connects to your Wi‑Fi router, and receives time from an NTP server.
+[In this repositry](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions) an operation manual is placed in Dutch and a by Google translated English manual.
 
 The software can be controlled via Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.  
 Several designs can be selected before compiling (if you have a word plate available).  
@@ -177,7 +179,7 @@ Use a word plate design [from this repository](WordPlateFrontCovers), or use you
 
 ![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
 
-Select one of the three word clock builds:
+Select one of the word clock builds:
 ```cpp
 //#define FOURLANGUAGECLOCK
 #define NL144CLOCK
@@ -202,7 +204,7 @@ Or use this OTA web-updater: [Upload `.bin` files to the ESP32 using wifimanager
 
 # How to Compile
 
-At the time of writing (June 2025), the Espressif ESP32 Arduino core v3.2 compiles to a working program when the Arduino Nano ESP32 board is selected and ESP32WordclockV100.ino (or newer) is used.  
+At the time of writing (nov 2025), the Espressif ESP32 Arduino core v3.3 compiles to a working program when the Arduino Nano ESP32 board is selected and ESP32WordclockV132.ino (or newer) is used.  
 The Arduino ESP32 core versions 2.0.17 / 2.0.18 compile without errors and are recommended — they generate smaller binaries (v2.0.18 ≈ 1.0 MB vs v3.2 ≈ 1.3 MB).
 
 There are two compiler pin-numbering options: one uses GPIO numbering (recommended/legacy for this code), the other uses Arduino macro pin numbering.  
@@ -213,7 +215,8 @@ Install the Arduino Nano ESP32 board in the Arduino IDE and configure:
 - Partition Scheme: With FAT  
 - Pin Numbering: By GPIO number (legacy) — CHANGE THIS setting if different
 
-If you use the Arduino-style pin numbering, the LED library (Adafruit NeoPixel or EdSoftLED) can behave incorrectly on this board — causing the LEDs not to light.
+If you use the Arduino-style pin numbering, the LED library (Adafruit NeoPixel) can behave incorrectly on this board — causing the LEDs not to light.
+The EdsoftLED library is insensitive for pin numbering but sometimes (core 3.3.3) I see a LED light up incorrectly.  
 
 ![image](https://github.com/user-attachments/assets/1f4eeec5-ebc5-47fb-b513-2514f5ff6ecd)
 
@@ -354,7 +357,8 @@ Example info output (serial/BLE):
   - Example: `eAEST-10AEDT,M10.1.0,M4.1.0/3`
 
 - F + Own colour (LED character colour)
-  - Hex WRGB: `FWWRRGGBB` (two hex digits per channel) or short decimal `FWRGB` (digits 0–9).
+  - Hex WRGB: `FWWRRGGBB` (two hex digits per channel).
+  - Dec WRGB: `FWRGB` (one decimal digit per channel, digits 0–9).
   - Examples:
     - `F00FF000` → intense red (no white)
     - `F0900` → decimal shorthand (white 0, red 9, green 0, blue 0)
@@ -364,11 +368,15 @@ Example info output (serial/BLE):
   - Scan available Wi‑Fi networks (prints SSIDs found).
 
 - H
-  - Toggle use of rotary encoder (or 3×1 membrane keypad).
+  - Toggle use of H01 rotary encoder H02 buttons H03/04 remote.
+  - Turning on will also Turn off NTP and on use of DS3231. Check DS3231 and NTP setting when turning off (H00)
 
+- } Learn IR remote
+  - Start learning the keys of a new infrared remote.
+  
 - I / II
-  - `I` prints the short info menu.
-  - `II` prints the extended menu (long help).
+  - `i` prints the short info menu.
+  - `ii` prints the extended menu (long help).
 
 - J
   - Toggle use of the DS3231 RTC module.
@@ -418,12 +426,19 @@ Example info output (serial/BLE):
 - X
   - Toggle NTP On/Off.
 
+- Y
+  - Start a rainbow LED-test. Use a large enough power supply because all LEDs will turn on
+ 
+- Z
+  - Start WPS. Also press WPS on your router
+
+
 - + / Z (Fast BLE)
   - `+` toggles fast BLE mode in some apps.
-  - `Z` toggles between long and short BLE packet modes.
+
 
 - #
-  - Self test, e.g., `#900`.
+  - Self test, e.g., `#900` starts a self test with 0.9 second delay between words.
 
 - !
   - Show NTP, RTC, and DS3231 times.
@@ -476,19 +491,6 @@ The web interface provides the same settings as BLE/serial and includes an uploa
 
 ---
 
-## Light intensity explained
-
-Three parameters control light behaviour:
-- Min: minimum brightness to avoid flicker
-- Max: maximum brightness (0–255)
-- Slope: sensitivity (percentage multiplier)
-
-Suggested values: Min 5–20, Max 200–255. When no LDR is attached set Min = 255.
-
-The LDR reading is scaled to 0–255: read = analogRead(PhotoCellPin) / 16 (ESP32 analog is 0–4096).
-
----
-
 ## Example Serial/BLE Session
 
 1. Connect via BLE or USB serial.
@@ -503,6 +505,26 @@ The LDR reading is scaled to 0–255: read = analogRead(PhotoCellPin) / 16 (ESP3
 
 ---
 
+## Light intensity explained
+<img width="450" alt="image" src="https://github.com/user-attachments/assets/ddeac697-d5a1-4128-ab52-89f1de84f266" />
+
+Three parameters control light behaviour:
+- Min: minimum brightness to avoid flicker
+- Max: maximum brightness (0–255)
+- Slope: sensitivity (percentage multiplier)
+
+Suggested values: Min 5–20, Max 200–255. When no LDR is attached set Min = 255.
+
+The LDR reading is scaled to 0–255: read = analogRead(PhotoCellPin) / 16 (ESP32 analog is 0–4096).
+
+The clock responds to light with its LDR (light dependent resistor).
+When it gets dark, the display doesn't turn off completely but remains dimmed at a minimum value. 
+The L parameter controls the minimum brightness. This brightness can be set between 0 and 255. 
+L5 is the default value.
+The maximum display brightness is controlled by the M parameter . It also has a value between 0 and 255. By default, it is set to a maximum of 255. 
+Parameter S controls the slope of how quickly the display reaches maximum brightness.
+
+---
 # Program explanation, code snippets, advanced options & Timezones
 
 This final section describes the program flow, key routines, helper functions, storage handling, and includes the timezone strings you can copy/paste into the menu with the `E` command.
