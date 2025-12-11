@@ -15,21 +15,12 @@ The clock can be controlled with an app on your phone, a web page in a browser o
 To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 
-<img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224"  style="width:30%;" /> Full menu
+
+| | |
+|---|---|
+| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and daylight-saving corrections.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>A user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
 
 
-It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and day light saving corrections.<br>
-
-If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br>
-A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
-
-The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
-That means you have to use a different BLE service for the serial communication. 
-Not with characteristic FFE0 but 6e400001-b5a3-... et cetera in your serial terminal app that communicates with the clock's settings.<br>
-
-See here: [Use BLE on mobile to control the ESP32](https://github.com/ednieuw/nRF-ESP32)
-
-An user manual in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
 Clock with Corten steel face
