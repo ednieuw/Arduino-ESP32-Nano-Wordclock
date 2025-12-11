@@ -15,6 +15,9 @@ The clock can be controlled with an app on your phone, a web page in a browser o
 To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 
+<img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224"  style="width:30%;" /> Full menu
+
+
 It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and day light saving corrections.<br>
 
 If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br>
