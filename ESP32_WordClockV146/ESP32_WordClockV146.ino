@@ -77,14 +77,14 @@ Select below, with only one #define selected, the clock type
 // =============================================================================================================================
 // ------------------>   Define only one clock type
 //#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
-//#define NL144CLOCK              // Dutch display for 12 x 12 Front
+#define NL144CLOCK              // Dutch display for 12 x 12 Front
 //#define NL92CLOCK               // Dutch display for one LED behind every character
 //#define NLM1M2M3M4L161          // NL EdSoft Qclock design
 //#define DE144CLOCK              // German display for 12 x 12 Front
 //#define NLM1M2M3M4L94           // NL clock with four extra LEDs for the minutes to light up 
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
-#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
+//#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
 
 //------------------------------------------------------------------------------              //
 // ESP32 Definition of installed modules
@@ -148,14 +148,14 @@ const byte LASTITEM      = 8;                                                   
 enum DigitalPinAssignments {      // Digital hardware constants ATMEGA 328 ----
  SERRX        = D0,               // Connects to Bluetooth TX
  SERTX        = D1,               // Connects to Bluetooth RX
- encoderPinB  = D2,               //5,  // D2 left (labeled CLK on decoder)no interrupt pin (Use GPIO pin numbering for rotary encoder lib)  
- encoderPinA  = D3,               //6,  // D3 right (labeled DT on decoder)on interrupt pin
- clearButton  = D4,               //7,  // D4 switch (labeled SW on decoder)
+ encoderPinB  = D2, //5,          // D2 left (labeled CLK on decoder) *** D8 on large PCB !!! no interrupt pin (Use GPIO pin numbering for rotary encoder lib)  
+ encoderPinA  = D3, //6,          // D3 right (labeled DT on decoder) on interrupt pin
+ clearButton  = D4, //7,          // D4 switch (labeled SW on decoder)
  IRReceiverPin= D4,               // D4 Infrared receiver pin instead of rotary encoder
  LED_PIN      = D5, //8,          // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
  EmptyD6      = D6,               // D6 Empty
  EmptyD7      = D7,               // D7 Empty
- EmptyD8      = D8,               // D8 Empty 
+ encoderPinBL = D8,               // D8 *** If large PCB is used change pin D2 to D8 !!
  PCB_LED_D09  = D9,               // D9
  PCB_LED_D10  = D10,              // D10
  secondsPin   = D13 //48,         // D13  GPIO48 (#ifdef LED_BUILTIN  #undef LED_BUILTIN #define LED_BUILTIN 48 #endif)

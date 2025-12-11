@@ -4,23 +4,23 @@
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Build your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
+The sketch will also work with other ESP32 boards but with different pin numbering.<br>
+[See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
-The clock can be controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC, a rotary encoder, an IR-remote controller or membrane keyboards.<br>
+The clock can be controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC, a rotary encoder, an IR-remote controller (>version V130) or membrane keyboards.<br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 
 To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 
-<img  alt="image" src="https://github.com/user-attachments/assets/1361f2ac-c5c9-4447-bb83-372980d948a1" style="width:35%;" />
+<img  alt="image" src="https://github.com/user-attachments/assets/1361f2ac-c5c9-4447-bb83-372980d948a1" style="width:35%;"
 
 It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and day light saving corrections.<br>
 
-If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary or membrane pad time can be set.<br>
+If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br>
 A LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br>
-
-The older Arduino MKR1000, Nano BLE 33 and all its variants with Bluetooth and WIFI have the disadvantage that only WIFI or BLE could be used.
 
 The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>
 That means you have to use a different BLE service for the serial communication. 
@@ -87,6 +87,7 @@ The large PCB has connections to: (from top right clock wise)
 - LDR to pin A2 and 3V3
 - RTC-clock to pin  GND, 3V3, A4 and A5
 - Rotary encoder or 3-button switch to pin D8, D3, D4 3V3 and GND
+- IR-remote D4 3V3 and GND
 - LEDs to pin D10 and D9
 - Connector to pin D12, D11, D10 and D9
 - D7 with 5V via 3V3 -> 5V level switcher
@@ -104,7 +105,8 @@ The small PCB has connections to: (from top left clock wise)
 - LDR to pin A2 and 3V3
 - 5V power input to to 5V-USB on ESP32 and to LED-strip
 - Connector for LED-strip SK6812/WS2812 to 5V, D5 and GND
-- Rotary encoder or 3-button switch to pin D8, D3, D4 3V3 and GND
+- Rotary encoder or 3-button switch to pin D2, D3, D4 3V3 and GND
+- IR-remote D4 3V3 and GND
 - RTC-clock to pin  GND, 3V3, A4 and A5
 
 ![image](https://github.com/user-attachments/assets/f2919fb4-b571-4a1d-8264-4e227d4b104e) 
