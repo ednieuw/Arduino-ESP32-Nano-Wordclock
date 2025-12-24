@@ -591,13 +591,12 @@ void Every100mSecCheck(void)
 //-------------------------------------------- 
 void EveryMinuteUpdate(void)
 {   
-static byte NoConnectionCounter = 0;  
-lastminute = timeinfo.tm_min;  
- CheckRestoreWIFIconnectivity();                                                              // Check if WIFI is still connected and if not restore it
+ lastminute = timeinfo.tm_min;  
+ if (Mem.RandomDisplay == 1) { ChangeRandomDisplay(); SetSecondColour();} 
  if (IR_PowerOnstate && ((millis() - IR_StartTime) > 290000) ) ToggleIRpower();               // Turn off Power after 300 seconds 
  GetTijd(false);
- Displaytime();  
- DimLeds(true);   
+ Displaytime();                                                                               // If Mem.TimeMinute == 0 the time (controlled in ColorLeds()
+ DimLeds(!Mem.TimeMinute);                                                                    // and DimLEDs are used to print the time every minute
  if(timeinfo.tm_hour != lasthour) EveryHourUpdate(); 
 }
 //--------------------------------------------                                                //
@@ -767,8 +766,8 @@ void TekstSprintln(char const *tekst) { snprintf(sptext, sizeof(sptext),"%s\n",t
 
 //--------------------------------------------                                                //
 // Usage:
-// Tekstprintlnf("Log buffer allocated: %u bytes", (unsigned) LogBufferSize);
-// Tekstprintf("Log buffer allocated: %u bytes\n", (unsigned) LogBufferSize);
+// COMMON Tekstprintlnf("Log buffer allocated: %u bytes", (unsigned) LogBufferSize);
+// COMMON Tekstprintf("Log buffer allocated: %u bytes\n", (unsigned) LogBufferSize);
 //--------------------------------------------
 void Tekstprintf(const char* fmt, ...) 
  {
@@ -1550,6 +1549,16 @@ void PrintMem(void)
  Tekstprintlnf("        Checksum: %d",Mem.Checksum);                        
  sptext[0]=0;                                                                                 // Suppress a second print of sptext
 }
+
+//--------------------------------------------                                                //
+// COMMON Print memory space
+//--------------------------------------------
+void printHeaps(void)
+{
+ Tekstprintlnf("8-bit capable heap: %7.3f Mbytes", heap_caps_get_free_size(MALLOC_CAP_8BIT)   / (1024.0 * 1024.0));
+ Tekstprintlnf("  DMA capable heap: %7.3f Kbytes", heap_caps_get_free_size(MALLOC_CAP_DMA)    / 1024.0);
+ Tekstprintlnf(" SPRAM/SPIRAM heap: %7.3f Mbytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / (1024.0 * 1024.0));
+}
 //--------------------------------------------                                                //
 // LDR reading are between 0 and 255. 
 // ESP32 analogue read is between 0 - 4096 --   is: 4096 / 8
@@ -1726,10 +1735,10 @@ void DimLeds(bool print)
   {
   // snprintf(sptext, sizeof(sptext),"LDR:%3d Avg:%3d (%3d-%3d) Out:%3d=%2d%% Loop(%ld) ",
   //      LDRread,LDRavgread,MinPhotocell,MaxPhotocell,OutPhotocell,(int)(OutPhotocell/2.55),Loopcounter);    
- if (Mem.UseDS3231)   snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %5lu l/s %0.0fC ",
-               LDRread,(int)(OutPhotocell*100/255),Loopcounter,RTCklok.getTemperature()); 
- else                 snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %5lu l/s M %0.2f kB ",
-               LDRread,(int)(OutPhotocell*100/255),Loopcounter, (float)ESP.getFreeHeap()/1024);   
+ if (Mem.UseDS3231) snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %5lu l/s %0.0fC ",
+                     LDRread,(int)(OutPhotocell*100/255),Loopcounter,RTCklok.getTemperature()); 
+ else               snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %5lu l/s ",
+                     LDRread,(int)(OutPhotocell*100/255),Loopcounter);   
    Tekstprint(sptext);
    PrintTimeHMS();    
   }
@@ -4149,7 +4158,7 @@ void PrintAllMappings(void)
 //--------------------------------------------                                                //
 // IR-RECEIVER Reset all settings
 //--------------------------------------------
-void ResetAllIRremoteSettings()
+void ResetAllIRremoteSettings(void)
 {
  Tekstprintln("\n=== Resetting All IR remote Data ===");
  IRMem.remoteIdentified = false;
@@ -4361,7 +4370,7 @@ void AdjustTime(int DeltaHours, int DeltaMinutes, int DeltaSeconds)
 // IR-RECEIVER Turn On or off Remote control
 // Turns off after 60 seconds
 //--------------------------------------------
-void ToggleIRpower()
+void ToggleIRpower(void)
 {
  static bool powerState = false;                                                              //
  powerState = !powerState;
@@ -4476,12 +4485,3 @@ void HandleTekstDownload(AsyncWebServerRequest *request)
 }
 
 /// ringbuffer
-//--------------------------------------------                                                //
-// Print memory space
-//--------------------------------------------
-void printHeaps(void)
-{
- Tekstprintlnf("8-bit capable heap: %7.3f Mbytes", heap_caps_get_free_size(MALLOC_CAP_8BIT)   / (1024.0 * 1024.0));
- Tekstprintlnf("  DMA capable heap: %7.3f Kbytes", heap_caps_get_free_size(MALLOC_CAP_DMA)    / 1024.0);
- Tekstprintlnf(" SPRAM/SPIRAM heap: %7.3f Mbytes", heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / (1024.0 * 1024.0));
-}

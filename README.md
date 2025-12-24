@@ -119,6 +119,7 @@ Be sure to paint the insides bright white, otherwise the white light will become
 It is better to use foamed PVC white 10 MM RAL 9003. It cuts easily, is white and does not discolour. (Often paint does discolours)
  
 Stick/glue the strips starting from left to right on the odd lines and from right to left on the even lines. <br>
+
 ### Follow the arrows on the strip.<br> 
 (You have to turn the strip upside down every second row!)<br>
 This avoids long data lines going from the right end of the strip to the left end on the next row of a LED strip.<br>
@@ -300,42 +301,40 @@ For example, if you live in Australia/Sydney send the string: eAEST-10AEDT,M10.1
 
 <pre>
 ___________________________________
-A SSID B Password C BLE beacon name
-D Date (D15012021) T Time (T132145)
-E Timezone  (E<-02>2 or E<+01>-1)
-F Own colour  (Hex FWWRRGGBB)
+A SSID, B Password, C BLE beacon name
+D Date (D15012021), T Time (T132145)
+E Timezone (E<-02>2 or E<+01>-1)
+F Own colour (FWWRRGGBB or Fwrgb)
 G Scan WIFI networks
-H Toggle use rotary encoder
-I To print this Info menu
-J Toggle use DS3231 RTC module
-K LDR reads/sec toggle On/Off
+H H01 rotary H02 buttons H03/04 remote
+} Learn IR remote, + Fast BLE
+I Info menu, II long menu
+J DS3231 RTC module On/Off
+K LDR reads/s, K1 Time/min On/Off
 N Display off between Nhhhh (N2208)
-O Display toggle On/Off
-P Status LED toggle On/Off
-Q Display colour choice
-  Q0 Yellow  Q1 Hourly  Q2 White
-  Q3 All Own Q4 Own     Q5 Wheel
-  Q6 Digital
-R Reset settings @ = Reset MCU
-U Demo mode (msec) (U200)
---Light intensity settings (1-250)--
-S Slope, L Min, M Max  (S80 L5 M200)
-W WIFI, X NTP&, CCC BLE, + Fast BLE
-# Self test, ! See RTC, & Update RTC
-Ed Nieuwenhuys November 2024
+O Display On/Off, P StatusLED On/Off
+Q Display choice (Q0-9), ~ Changing
+R Reset settings,  @ Restart
+S Slope, L Min, M Max (S50 L5 M200)
+Unnn Demo (U200 msec), Y LED test
+) HETISWAS  On/Off, ( EdSoft On/Off
+#nnn Selftest,  RTC: ! See, & Update
+W WIFI, X NTP, Z WPS, CCC BLE
+Ed Nieuwenhuijs Dec 2025
 ___________________________________
-Display off between: 23h - 08h
-Display choice: Yellow  
-Slope: 10     Min: 5     Max: 255 
-SSID: FRITZ!Box
-BLE name: wordclock
-IP-address: 192.168.178.141 (/update)
+Display off between: 22h - 08h
+Display choice: Yellow+
+RandomDisplay is Off
+Slope: 50     Min: 2     Max: 9 
+SSID: FRITZ!BoxEd
+BLE name: ESPRedPCB
+IP-address: 192.168.178.172/update
 Timezone:CET-1CEST,M3.5.0,M10.5.0/3
 WIFI=On NTP=On BLE=On FastBLE=Off
-LED strip: WS2812 (Send % to switch)
-Software: ESP32Arduino_WordClockV056.ino
-ESP32 Arduino core version: 2.0.17
-17/11/2024 16:01:22 
+IR-remote = ON  DS3231=Off
+WS2812 strip with 148 LEDs (switch %)
+Software: ESP32_WordClockV150.ino
+ESP32 Arduino core version: 3.3.5
 ___________________________________
 </pre>
 
@@ -438,6 +437,11 @@ Scan available Wi‑Fi networks (prints SSIDs found).
 
 ### H H01 rotary encoder, H02 buttons H03/04 remote.
 Turning on will also Turn off NTP and on use of DS3231. Check DS3231 and NTP setting when turning off (H00)
+The options are:
+H01 Rotary encoder
+H02 Keypad
+H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER
+H04 Tiny IR-remote with six buttons
 
 ### } Learn IR remote
 Start learning the keys of a new infrared remote.
@@ -474,7 +478,6 @@ Q5 will follow rainbow colours every hour. <br>
 Q6 is the digital clock if you have used 12x12 = 144 LEDs in the clock. <br>
 Q7= Hourly colour, HETISWAS changing.
 Q8= Rainbow colour changing in a minute.
-Q9= Rainbow fast colour changing in 4 seconds.
 Send an 'I' to display the latest's settings in the menu. 
 
 ### R Reset settings <br>
@@ -545,7 +548,7 @@ Same as & option but this option will not update from the internet NTP server bu
 ### #= Self test
 Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
-#nnnn were nnnn is the delay between minutes in milli seconds.
+#nnnn were nnnn is the delay between minutes in milliseconds.
   
 
 ### % = Switch between SK6812 and WS2812 LED strip
@@ -591,7 +594,7 @@ Remember to install the ESP32 boards as explained above.<br>
 //------------------------------------------------------------------------------              //
 // ESP32 Includes defines and initialisations
 //-------------------------------------------
-#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (3, 2, 0)                                  //Use EdSoftLED with ESP32 compiler.
+#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (5, 2, 0)  // Disabled. Change to 3,2,0 to Use EdSoftLED  with ESP32 compiler.
 #define USEEDSOFTLED
 #endif
 
@@ -601,18 +604,22 @@ Remember to install the ESP32 boards as explained above.<br>
                       #else
 #include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
                       #endif
-#include <NimBLEDevice.h>      // For BLE communication.
+#include <Preferences.h>
+#include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
 #include <WiFi.h>              // Used for web page 
-#include <WebServer.h>         // Used for web page 
-#include "esp_sntp.h"          // for NTP
-#include "esp_wps.h"           // For WPS
+#include <esp_sntp.h>          // for NTP
+#include <esp_wps.h>           // For WPS
+#include <ESPAsyncWebServer.h> // Used for webpage  https://github.com/ESP32Async 
 #include <Update.h>            // For Over-the-Air (OTA)
 #include <ESPmDNS.h>           // To show BLEname in router
 #include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
 #include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
-#include <RTClib.h>            // Used for connected DS3231 RTC 
+#include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
 #include <Encoder.h>           // For rotary encoder
 #include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
+#include <IRremote.hpp>        // IR remote control
+
+#include "ClockFaces.h"           // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
 
 </pre>
 
