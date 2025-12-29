@@ -435,6 +435,7 @@ For example: F8800FF00 is 50% white with 100% green.
 
 ### G Scan WIFI networks
 Scan available Wi‑Fi networks (prints SSIDs found).
+This option does not work from the menu web page.
 
 ### H H01 rotary encoder, H02 buttons H03/04 remote.
 Turning on will also Turn off NTP and on use of DS3231. Check DS3231 and NTP setting when turning off (H00)
@@ -458,6 +459,11 @@ The flashing orange status LED on the board will turn off when the DS3231 time i
 
 ### K LDR reads/sec toggle On/Off<br>
 Prints the LDR-readings and the calculated intensity output.
+K1 Turn On and Off the display of time every minute.
+K2 Turn On and Off the display of time every hour.
+In the long menu the K1 or K2 status is shown. 
+If time is printed every minute or hour the log buffer fills up very fast.
+If time is not printed more revelant info remains in the logging.
 
 ### N Display off between Nhhhh (N2208)<br>
 With N2208 the display will be turned off between 22:00 and 08:00. 
@@ -493,6 +499,7 @@ Sending an U will turn off the demo mode or if not in demo mode start demo mode 
 
 ### Y Play lights
 To test the functionality of the LEDs.
+This option does not work from the menu web page.
 
 ### S Slope, L Min, M Max (S50 L5 M200)
 
