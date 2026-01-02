@@ -1,0 +1,10 @@
+{
+  "additionalFiles": "..\\..,..\\..,..\\..,..\\..,..\\..",
+  "builtInLibrariesFolders": "C:\\Users\\ednie\\AppData\\Local\\Arduino15\\libraries",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:nano_nora:USBMode=default,PartitionScheme=default,DebugLevel=none,PinNumbers=byGPIONumber",
+  "hardwareFolders": "c:\\Users\\ednie\\AppData\\Local\\Arduino15\\packages",
+  "otherLibrariesFolders": "c:\\Users\\ednie\\Documents\\Files\\Arduino\\libraries",
+  "sketchLocation": "C:\\Users\\ednie\\Documents\\Files\\Arduino\\Arduino_Nano-ESP32-WordClock\\ESP32_WordClockV153"
+}
