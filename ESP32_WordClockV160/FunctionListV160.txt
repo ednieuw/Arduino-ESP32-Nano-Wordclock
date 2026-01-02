@@ -1,0 +1,237 @@
+const byte DEFAULTCOLOUR = 0;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte HOURLYCOLOUR  = 1;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte WHITECOLOR    = 2;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte OWNCOLOUR     = 3;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte OWNHETISWAS   = 4;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte WHEELCOLOR    = 5;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte DIGITAL       = 6;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte HOURHETISWAS  = 7;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte RAINBOW       = 8;                                                               // COLOURS stored in Mem.DisplayChoice.
+const byte LASTITEM      = 8;                                                                 // Last display choice item number    // COLOURS stored in Mem.DisplayChoice.
+const uint32_t black    = 0x000000, orangered     = 0xFF4000, red        = 0xFF0000, chartreuse   = 0x7FFF00;   // PIN Assigments for Arduino Nano ESP32.
+const uint32_t brown    = 0x503000, cyberyellow   = 0xFFD300, orange     = 0xFF8000;        // PIN Assigments for Arduino Nano ESP32.
+const uint32_t yellow   = 0xFFFF00, cadmiumyellow = 0xFFF600, dyellow    = 0xFFAA00, chromeyellow = 0xFFA700;   // PIN Assigments for Arduino Nano ESP32.
+const uint32_t green    = 0x00FF00, brightgreen   = 0x66FF00, apple      = 0x80FF00, grass        = 0x00FF80;   // PIN Assigments for Arduino Nano ESP32.
+const uint32_t amaranth = 0xE52B50, edamaranth    = 0xFF0050, amber      = 0xFF7E00;        // PIN Assigments for Arduino Nano ESP32.
+const uint32_t marine   = 0x0080FF, darkviolet    = 0x800080, pink       = 0xFF0080, purple       = 0xFF00FF;   // PIN Assigments for Arduino Nano ESP32.
+const uint32_t blue     = 0x0000FF, cerulean      = 0x007BA7, sky        = 0x00FFFF, capri        = 0x00BFFF;   // PIN Assigments for Arduino Nano ESP32.
+const uint32_t edviolet = 0X7500BC, frenchviolet  = 0X8806CE, coquelicot = 0xFF3800;        // PIN Assigments for Arduino Nano ESP32.
+const uint32_t greenblue= 0x00F2A0, hotmagenta    = 0xFF00BF, dodgerblue = 0x0073FF, screamingreen= 0x70FF70;   // PIN Assigments for Arduino Nano ESP32.
+bool UsedEDSOFTLED = true;                                                                  // LED.
+bool UsedEDSOFTLED = false;                                                                 // LED.
+uint32_t MINColor      = chromeyellow;                                                      // LED.
+uint32_t SECColor      = chromeyellow;                                                      // LED.
+uint32_t DefaultColor  = white;                                                             // LED.
+uint32_t LetterColor   = white;                                                             // LED.
+uint32_t UKLetterColor = green;                                                             // LED.
+uint32_t DELetterColor = red;                                                               // LED.
+uint32_t FRLetterColor = yellow;                                                            // LED.
+uint32_t UKDefaultColor= UKLetterColor;                                                     // LED.
+uint32_t DEDefaultColor= DELetterColor;                                                     // LED.
+uint32_t FRDefaultColor= FRLetterColor;                                                     // LED.
+uint32_t DefaultColor  = chromeyellow;                                                      // LED.
+uint32_t LetterColor   = chromeyellow;                                                      // LED.
+uint32_t OwnColour     = 0X002345DD;        // Blueish                                      // LED.
+uint32_t WheelColor    = blue;                                                              // LED.
+uint32_t HourColor[] =                                                                      // LED.
+const byte PROGMEM Getal[10][3][5]  =                                                       // LED.
+bool DS3231Installed = false;                                                                 // True if the DS3231 is detected     // LED.
+bool     ChangeLightIntensity = false;                                                        // Increase or decrease slope light intensity   // KY-040 ROTARY.
+uint32_t RotaryPressTimer     = 0;                                                          // KY-040 ROTARY.
+bool     ChangeTime           = false;                                                        // Flag to change time within 60 seconds        // One-wire keypad.
+String   KeypadString         = "";                                                         // One-wire keypad.
+const byte ROWS   = 3;                                                                      // KEYPAD 3x1.
+const byte COLS   = 1;                                                                      // KEYPAD 3x1.
+const byte COLPIN = D12;                                                                      // Column that is always LOW. Mimic with a not used pin   // KEYPAD 3x1.
+const byte SLOPEBRIGHTNESS    = 50;                                                           // Steepness of with luminosity of the LED increases      // LDR PHOTOCELL.
+const int  MAXBRIGHTNESS      = 255;                                                          // Maximum value in bits  for luminosity of the LEDs (1 - 255)      // LDR PHOTOCELL.
+const byte LOWBRIGHTNESS      = 5;                                                            // Lower limit in bits of Brightness ( 0 - 255) // LDR PHOTOCELL.
+int        OutPhotocell;                                                                      // stores reading of photocell;       // LDR PHOTOCELL.
+int        MinPhotocell       = 999;                                                          // stores minimum reading of photocell;         // LDR PHOTOCELL.
+int        MaxPhotocell       = 1;                                                            // stores maximum reading of photocell;         // LDR PHOTOCELL.
+uint32_t   SumLDRreadshour    = 0;                                                          // LDR PHOTOCELL.
+uint32_t   NoofLDRreadshour   = 0;                                                          // LDR PHOTOCELL.
+String EnteredDigits     = "";                                                                // Store typed digits InputString     // LDR PHOTOCELL.
+String ButtonLNames[]    =                                                                  // LDR PHOTOCELL.
+String ButtonTNames[]    =                                                                  // LDR PHOTOCELL.
+int currentLearningIndex = 0;                                                               // LDR PHOTOCELL.
+uint32_t IR_StartTime    = 0;                                                                 // Time IR remote Power is on turn. Off after 1 minute    // LDR PHOTOCELL.
+bool IR_PowerOnstate     = false;                                                             // Is the power On or Off   // LDR PHOTOCELL.
+bool learningMode        = false;                                                           // LDR PHOTOCELL.
+bool      Demo                 = false;                                                     // CLOCK initialysations.
+bool      FireDisplay          = false;                                                     // CLOCK initialysations.
+bool      Zelftest             = false;                                                     // CLOCK initialysations.
+bool      Is                   = true;                                                        // Toggle of displaying Is or Was     // CLOCK initialysations.
+bool deviceConnected    = false;                                                            // BLE   //#include <NimBLEDevice.h>.
+bool oldDeviceConnected = false;                                                            // BLE   //#include <NimBLEDevice.h>.
+bool WIFIwasConnected       = false;                                                          // Is WIFI connected?       // WIFI and webserver.
+bool InApMode               = false;                                                        // WIFI and webserver.
+const char* AP_SSID         = "StartWordclock";                                             // WIFI and webserver.
+const char* AP_PASSWORD     = "wordclock";                                                  // WIFI and webserver.
+bool shouldReboot           = false;                                                        // WIFI and webserver.
+bool OptionYRainbow         = false;                                                        // WIFI and webserver.
+bool DoNotLog               = false;                                                          // Use this flag to suspress Logging to Logviewer         // WIFI and webserver.
+bool   LogWrapped     = false;                                                                                        // Did we wrap?         // Ring Buffer Logger.
+bool      LEDsAreOff        = false;                                                          // If true LEDs are off except time display     // Common.
+bool      NoTextInLeds      = false;                                                          // Flag to control printing of the text in function ColorLeds()     // Common.
+int       Previous_LDR_read = 512;                                                            // The actual reading from the LDR + 4x this value /5     // Common.
+uint16_t  MilliSecondValue  = 10;                                                             // The duration of a second  minus 1 ms. Used in Demo mode          // Common.
+uint32_t  Loopcounter       = 100;                                                            // ESP will restart if <10. so start with a larger start value      // Common.
+bool LastMenuformat = true;                                                                   // Small=true of full=false menu      // Menu.
+const char *menu[] =                                                                        // Menu.
+void setup()                                                                                // ARDUINO Setup.
+void loop()                                                                                 // ARDUINO Loop.
+void CheckDevices(void)                                                                     // COMMON Check connected input devices.
+void EverySecondCheck(void)                                                                 // COMMON Update routine.
+void Every100mSecCheck(void)                                                                // COMMON Update routine.
+void EveryMinuteUpdate(void)                                                                // COMMON Update routine done every minute.
+void EveryHourUpdate(void)                                                                  // COMMON Update routine done every hour.
+void EveryDayUpdate(void)                                                                   // COMMON Update routine done every day.
+void UpdateStatusLEDs(bool Toggle)                                                          // COMMON Update routine for the status LEDs.
+void SetStatusLED(int Red, int Green, int Blue)                                             // COMMON Control the RGB LEDs on the Nano ESP32.
+void SetNanoLED13(int intensity)                                                            // COMMON Control orange LED D13 on the Arduino.
+void SetPCBLED09(int intensity)                                                             // COMMON Control the RGB LED on the PCB.
+void SetPCBLED10(int intensity)                                                             // COMMON Control the RGB LED on the PCB.
+void SerialCheck(void)                                                                      // COMMON check for serial input.
+void Reset(void)                                                                            // COMMON Reset to default settings. BLE On, WIFI NTP Off.
+void ResetCredentials(void)                                                                 // COMMON Reset to empty credential settings WIFI, NTP, BLE ON.
+void Tekstprint(char const *tekst)                                                          // COMMON common print routines.
+void Tekstprintln(char const *tekst)                                                        // COMMON common print routines.
+void TekstSprint(char const *tekst)                                                         // COMMON common print routines.
+void TekstSprintln(char const *tekst)                                                       // COMMON common print routines.
+void Tekstprintf(const char* fmt, ...)                                                      // COMMON Formatted Tekst print.
+void Tekstprintlnf(const char* fmt, ...)                                                    // COMMON Formatted Tekstprintln.
+void WTekstappend(char const *tekst, char const *prefix, char const *suffix, bool newline)  // COMMON Print web menu page and BLE menu.
+void WTekstprintln(char const *tekst)                                                       // COMMON Print web menu page and BLE menu.
+void WTekstprintln(char const *tekst, char const *prefix, char const *suffix)               // COMMON Print web menu page and BLE menu.
+void WTekstprint(char const *tekst)                                                         // COMMON Print web menu page and BLE menu.
+void WTekstprint(char const *tekst, char const *prefix, char const *suffix)                 // COMMON Print web menu page and BLE menu.
+int SConstrainInt(String s,byte first,byte last,int low,int up)                             // COMMON Constrain a string with integers.
+int SConstrainInt(String s,byte first,          int low,int up)                             // COMMON Constrain a string with integers.
+void InitStorage(void)                                                                      // COMMON Init and check contents of EEPROM.
+void StoreStructInFlashMemory(void)                                                         // COMMON Store mem.struct in FlashStorage or SD.
+void StoreIRRemoteInFlashMemory(void)                                                       // COMMON Save IR remote settings.
+void GetStructFromFlashMemory(void)                                                         // COMMON Get data from FlashStorage.
+void GetIRRemoteFromFlashMemory(void)                                                       // COMMON Load IR remote settings from FlashStorage.
+const char* SoftwareName(void)                                                              // COMMON Print Software naam without path.
+void SWversion(void)                                                                        // COMMON Version info.
+void SWversion(bool Small)                                                                  // COMMON Version info.
+void PrintLine(byte Lengte)                                                                 // COMMON Print a _ line of n length.
+void ReworkInputString(String InputString)                                                  // COMMON Input from Bluetooth, Serial or HTML page.
+void PrintDisplayChoice()                                                                   // COMMON Print Display choice.
+void PrintDisplayChoice(bool PrintIt)                                                       // COMMON Print Display choice.
+void PrintTimeInputMethod(byte Im)                                                          // COMMON Print time input method.
+void PrintMem(void)                                                                         // COMMON Print permanent Mem memory.
+void StoredStartHeaps()                                                                     // COMMON Print memory space.
+void StoredStartHeaps(bool Store)                                                           // COMMON Print memory space.
+void PrintHeaps(void)                                                                       // COMMON Print memory space.
+int ReadLDR(void)                                                                           // COMMON LDR reading are between 0 and 255.
+void SetSecondColour(void)                                                                  // CLOCK Set second colour.
+void SetColours(void)                                                                       // CLOCK Set second for 4 language clock.
+void Selftest(void)                                                                         // CLOCK Set second for 4 language clock.
+void Selftest(int Delayms)                                                                  // CLOCK Set second for 4 language clock.
+void Displaytime(void)                                                                      // CLOCK Say the time and load the LEDs.
+void DimLeds(bool print)                                                                    // CLOCK Dim the leds measured by the LDR and print values.
+void Play_Lights()                                                                          // CLOCK Turn On en Off the LED's.
+void BlinkUUR(int NoofBlinks, int Delayms)                                                  // CLOCK Turn On en Off the LED's.
+void BlinkHETISWAS (int NoofBlinks, int Delayms)                                            // CLOCK Blink ES IST WAR.
+void BlinkTWAALF(int NoofBlinks, int Delayms)                                               // CLOCK Blink ZWOLF.
+void BlinkUUR(int NoofBlinks, int Delayms)                                                  // CLOCK Blink UUR.
+void BlinkHETISWAS (int NoofBlinks, int Delayms)                                            // CLOCK Blink HET IS WAS.
+void BlinkTWAALF(int NoofBlinks, int Delayms)                                               // CLOCK Blink TWAALF.
+void ColorLeds(char const *Tekst, int FirstLed, int LastLed, uint32_t RGBWColor)            // LED Set color for LEDs in strip and print tekst.
+void ColorLed(int Lednr, uint32_t RGBWColor)                                                // LED Set color for LEDs in strip and print tekst.
+void LedsOff(void)                                                                          // LED Clear display settings of the LEDs.
+void Laatzien(int Delaymsec)                                                                // LED Turn On and the LEDs off after Delaymsec milliseconds.
+void ShowLeds(void)                                                                         // LED Push data in LED strip to commit the changes.
+void SetBrightnessLeds(byte Bright)                                                         // LED Set brighness of LEDs.
+void Stripfill(uint32_t RGBWColor, int FirstLed, int NoofLEDs)                              // LED Set brighness of LEDs.
+uint32_t StripGetPixelColor(int Lednr)                                                      // LED Set brighness of LEDs.
+void LEDstartup(uint32_t LEDColour)                                                         // LED Synchronize the colour of the LEDstrip with the Status LED.
+uint32_t HSVToRGB(double H, double S, double V)                                             // LED convert HSV to RGB  h is from 0-360, s,v values are 0-1.
+uint32_t FuncCRGBW( uint32_t Red, uint32_t Green, uint32_t Blue, uint32_t White)            // LED function to make RGBW colour.
+void ClearScreen(void)                                                                      // DISPLAY Clear the display.
+uint32_t Wheel(byte WheelPos)                                                               // DISPLAY Wheel The colours are a transition r - g - b - back to r.
+void StartLeds(void)                                                                        // DISPLAY Initialyse the LEDstrip for WS2812 or SK6812 LEDs.
+void ChangeRandomDisplay(void)                                                              // DISPLAY change display choice.
+void RainbowCycle(uint8_t wait)                                                             // DISPLAY RainbowCycle.
+void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength )             // DISPLAY WhiteOverRainbow.
+void Zet_Pixel(byte Cijfer,byte Pos_X, byte Pos_Y)                                          // DISPLAY Place digits 0 - 9 in Matrix display.
+void TimePlaceDigit(byte uur, byte minuut)                                                  // DISPLAY Time in four digits in display.
+void WriteLightReducer(int amount)                                                          // CLOCK In- or decrease light intensity value i.e. Slope.
+void InitTimeSystem(void)                                                                   // TIME Initialize time system (DS3231 + NTP + internal RTC).
+void SetSystemTimeToCompileTime(void)                                                       // TIME Set system time to compile time using basic functions.
+time_t GetTijd(bool printit)                                                                // TIME Get current time from best available source.
+DateTime GetLocalDateTime()                                                                 // NTP Return local time as RTClib DateTime.
+bool GetNTPtime(bool printit)                                                               // NTP print the NTP time for the timezone set.
+const char* PrintNTPtime(void)                                                              // NTP Print current local (NTP) time.
+const char* PrintUTCtime(void)                                                              // NTP print the NTP UTC time.
+bool IsDS3231I2Cconnected(void)                                                             // DS3231 check for I2C connection.
+float GetDS3231Temp(void)                                                                   // DS3231 temperature.
+void SetDS3231Time(void)                                                                    // DS3231 RTC ESP32 -> DS3231.
+void GetDS3231Time(bool printit)                                                            // DS3231 reads time in module DS3231.
+const char* PrintDS3231Time(void)                                                           // DS3231 Print DS3231 time.
+const char* PrintRTCTime()                                                                  // RTC prints the ESP32 internal RTC time to sptext and web page.
+void PrintTimeHMS()                                                                         // RTC Fill sptext with time.
+void PrintTimeHMS(byte format)                                                              // RTC Fill sptext with time.
+void SetRTCTime(void)                                                                       // RTC Set time in ESP32 using global timeinfo struct.
+void SetSystemTime(time_t t)                                                                // RTC Set RTC time using Unix timestamp.
+void PrintAllClockTimes(void)                                                               // CLOCK Print all the times available.
+uint32_t HexToDec(const String& hexString)                                                  // CLOCK Convert Hex to uint32.
+void Demomode(void)                                                                         // CLOCK Demo mode.
+void FireMode(void)                                                                         // CLOCK Fire display on MATRIX_HEIGHT MATRIX_WIDTH.
+uint8_t heat[MATRIX_HEIGHT][MATRIX_WIDTH];  // 2D heat map                                  // FIRE.
+uint8_t clamp_sub(uint8_t val, uint8_t sub)                                                 // FIRE Utils.
+uint8_t clamp_add(uint8_t val, uint8_t add)                                                 // FIRE Utils.
+void HeatColor(uint8_t temperature, uint8_t &r, uint8_t &g, uint8_t &b)                     // FIRE Utils.
+uint16_t XY(uint8_t x, uint8_t y)                                                           // FIRE Utils.
+void Fire2023_2D()                                                                          // FIRE ==== Fire Logic ====.
+void Dutch(void)                                                                            // CLOCK Dutch clock display for NL144 & NL92 clock.
+void Dutch(void)                                                                            // CLOCK Dutch clock display for NLM1M2M3M4 clock.
+void English(void)                                                                          // CLOCK English clock display.
+void German(void)                                                                           // CLOCK German clock display.
+void French(void)                                                                           // CLOCK French clock display.
+void DitLeHeure(void)                                                                       // CLOCK French clock display.
+void SendMessageBLE(std::string Message)                                                    // BLE SendMessage by BLE Slow in packets of 20 chars.
+class MyServerCallbacks: public NimBLEServerCallbacks                                       // BLE Start BLE Classes NimBLE Version 2.x.x.
+class MyCallbacks: public NimBLECharacteristicCallbacks                                     // BLE Start BLE Classes NimBLE Version 2.x.x.
+void StartBLEService(void)                                                                  // BLE Start BLE Service.
+void CheckBLE(void)                                                                         // BLE Start BLE Service.
+void WiFiEvent(WiFiEvent_t event)                                                           // WIFI WIFIEvents.
+void ScanWIFI(void)                                                                         // WIFI Scan for WIFI stations and print a list of networks found.
+void ConnectWIFI(void)                                                                      // WIFI Check for WIFI router SSID and password.
+void CheckRestoreWIFIconnectivity(void)                                                     // WIFI Check if WIFI is still connected and if not restore it.
+bool StartWIFI_NTP(void)                                                                    // WIFI Start WIFI connection and NTP service.
+void NTPnotify(struct timeval* tv)                                                          // NTP functions.
+void CheckandPrintNTPsynced(void)                                                           // NTP functions.
+void setTimezone()                                                                          // NTP functions.
+void initSNTP()                                                                             // NTP functions.
+bool wait4SNTP()                                                                            // NTP Get a NTP time and wait max 2.5 sec.
+void WebPage(void)                                                                          // WIFI WEBPAGE.
+void notFound(AsyncWebServerRequest *request)                                               // WIFI WEBPAGE.
+void StartAPMode(void)                                                                      // WIFI WEBPAGE Login credentials Access Point page with 192.168.4.1.
+void wpsInitConfig()                                                                        // WIFI WPS functions.
+void wpsStart()                                                                             // WIFI WPS functions.
+void wpsStop()                                                                              // WIFI WPS functions.
+String wpspin2string(uint8_t a[])                                                           // WIFI WPS functions.
+void OnewireKeypad3x4Check(void)                                                            // KEYPAD check for Onewire Keypad input.
+void OnewireKeypad3x1Check(void)                                                            // KEYPAD check for Onewire Keypad input with 5V and 1.1, 4.7, 4.7, 4.7 kOhm resistors.
+void Keypad3x1Check(void)                                                                   // KEYPAD 3x1 Init.
+void RotaryEncoderCheck(void)                                                               // KY-040 ROTARY check if the rotary is moving.
+void ProcessKeyPressTurn(int encoderPos)                                                    // CLOCK KY-040 Rotary or Membrane 3x1 processing input.
+void Start_IRreceiver(void)                                                                 // IR-RECEIVER Start alarge or tiny IR-RECEIVER.
+void Init_IRreceiver(String* ButtonTempNames, byte numButtons)                              // IR-RECEIVER Init.
+uint16_t IrReceiverDecode(void)                                                             // IR-RECEIVER Decode received signal,.
+void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t address)        // IR-RECEIVER Decode received signal,.
+void ProcessRecognitionMode(decode_type_t protocol, uint16_t command, uint16_t address)     // IR-RECEIVER Decode received signal,.
+void StartIRLearning(void)                                                                  // IR-RECEIVER Initializes learning mode.
+void PrintAllMappings(void)                                                                 // IR-RECEIVER Shows learned buttons.
+void ResetAllIRremoteSettings(void)                                                         // IR-RECEIVER Reset all settings.
+int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)             // IR-RECEIVER Identifies button pressed.
+void ReworkIRremoteValue(int ButtonNamesNr)                                                 // IR-RECEIVER ReworkRemoteValue.
+void AdjustTime(int DeltaHours, int DeltaMinutes, int DeltaSeconds)                         // IR-RECEIVER Adjust current time by hours/minutes/seconds.
+void ToggleIRpower(void)                                                                    // IR-RECEIVER Turn On or off Remote control.
+void InitLogBuffer()                                                                        // LOGBUFFER Initialize circular logging buffer.
+void AddLog(const char* msg)                                                                // LOGBUFFER Add a log line (raw C-string). Always ends with '\n'.
+void HandleTekstPrint(AsyncWebServerRequest *request)                                       // LOGBUFFER Stream the last 500 lines circular log buffer directly to the client                                 //.
+void HandleTekstDownload(AsyncWebServerRequest *request)                                    // LOGBUFFER Stream all the circular log buffer directly to the client                                      //.
