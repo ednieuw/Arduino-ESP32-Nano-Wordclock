@@ -570,18 +570,10 @@ void EveryMinuteUpdate(void)
  if (IR_PowerOnstate && ((millis() - IR_StartTime) > 290000) ) ToggleIRpower();               // Turn off Power after 300 seconds 
  GetTijd(false);
  bool ff = NoTextInLeds; 
-  if (Mem.TimeMinute == 0 || Mem.TimeMinute == 2)                                              // Do not print time but do update the display                                                              // do not Print the time string every minute
-   {
-    NoTextInLeds = true; 
-    DimLeds(false); 
-    Displaytime();                           
-   }
- if (Mem.TimeMinute == 1)                                                                      // Print the time string every minute
-   {
-    NoTextInLeds = false; 
-    DimLeds(true); 
-    Displaytime(); Tekstprintln("");                                                        
-   }
+ if (Mem.TimeMinute == 0 || Mem.TimeMinute == 2)                                              // Do not print time but do update the display                                                              // do not Print the time string every minute
+    { NoTextInLeds = true; DimLeds(false); Displaytime(); }
+ if (Mem.TimeMinute == 1)                                                                     // Print the time string every minute
+    { NoTextInLeds = false; DimLeds(true);  Displaytime(); Tekstprintln(""); }
  NoTextInLeds = ff;   
  DimLeds(false);                                                                              // 
  if(timeinfo.tm_hour != lasthour) EveryHourUpdate(); 
@@ -595,18 +587,14 @@ void EveryHourUpdate(void)
  if (!Mem.StatusLEDOn) SetStatusLED(0,0,0);                                                   // If for some reason the LEDs are ON and after a MCU restart turn them off.  
  bool ff = NoTextInLeds; 
  if (Mem.TimeMinute == 2)                                                                     // Print the time string every hour
-   {
-    NoTextInLeds = false; 
-    DimLeds(true); 
-    Displaytime(); Tekstprintln("");                                                          // Print time per hour
-   }
-  NoTextInLeds = true; 
-  Displaytime(); 
-  NoTextInLeds = ff;  
- if( (timeinfo.tm_hour == Mem.TurnOffLEDsAtHH) && (Mem.TurnOffLEDsAtHH != Mem.TurnOnLEDsAtHH))
-       { LEDsAreOff = true;  ClearScreen(); }                                                 // Is it time to turn off the LEDs?
- if(timeinfo.tm_hour == Mem.TurnOnLEDsAtHH)
-   { LEDsAreOff = false;   lastminute = 99;     Displaytime(); Tekstprintln("");}                              // Force a minute update
+    { NoTextInLeds = false; DimLeds(true); Displaytime(); Tekstprintln(""); }
+ NoTextInLeds = true; 
+ Displaytime(); 
+ NoTextInLeds = ff;  
+ if ((timeinfo.tm_hour == Mem.TurnOffLEDsAtHH) && (Mem.TurnOffLEDsAtHH != Mem.TurnOnLEDsAtHH))
+    { LEDsAreOff = true;  ClearScreen(); }                                                 // Is it time to turn off the LEDs?
+ if (timeinfo.tm_hour == Mem.TurnOnLEDsAtHH)
+    { LEDsAreOff = false;   lastminute = 99;     Displaytime(); Tekstprintln("");}                              // Force a minute update
  CheckRestoreWIFIconnectivity();                                                              // Check if WIFI is still connected and if not restore it
  Mem.NVRAMmem[lasthour] =(byte)((SumLDRreadshour / NoofLDRreadshour?NoofLDRreadshour:1));     // Update the average LDR readings per hour. Avoids dividing by zero
  SumLDRreadshour  = 0;
@@ -804,7 +792,6 @@ void WTekstappend(char const *tekst, char const *prefix, char const *suffix, boo
 void WTekstprintln(char const *tekst) { WTekstappend(tekst, "", "", true);}
 void WTekstprintln(char const *tekst, char const *prefix, char const *suffix) 
                                       { WTekstappend(tekst, prefix, suffix, true); }
-
 void WTekstprint(char const *tekst)   { WTekstappend(tekst, "", "", false);}
 void WTekstprint(char const *tekst, char const *prefix, char const *suffix) 
                                       { WTekstappend(tekst, prefix, suffix, false);}
@@ -892,7 +879,7 @@ const char* SoftwareName(void)
  if (!end) return path;
  const char* p = end;
  while (p > path && *(p - 1) != '/' && *(p - 1) != '\\')   p--;
- return p;   // points to "ESP32_RTCcheckV012.ino"
+ return p;
 }
 //--------------------------------------------                                                //
 // COMMON Version info
@@ -940,7 +927,6 @@ void SWversion(bool Small)
   if(!Small) {snprintf(sptext, sizeof(sptext),"ESP32 Arduino core version: %d.%d.%d", 
           ESP_ARDUINO_VERSION_MAJOR,ESP_ARDUINO_VERSION_MINOR,ESP_ARDUINO_VERSION_PATCH);       WTekstprintln(sptext); }
  GetTijd(false);                                                                              // Get the time and store it in the proper variables
-//  Tekstprintln(PrintRTCTime());                                                                              
  PrintLine(35);                                                                               //
 }
 
@@ -1074,7 +1060,6 @@ void ReworkInputString(String InputString)
     case 'G':                                                                                 // Scan WIFI stations
       if(len == 1) 
        {
-        //ScanWIFI();
         CheckforWIFINetwork(true);
         if(WIFIwasConnected) WiFi.reconnect();
        } 
@@ -1376,7 +1361,6 @@ void ReworkInputString(String InputString)
      case '^':                                                                                 // *** Empty ***
       if(len == 1) 
        {
-       // snprintf(sptext, sizeof(sptext), "--- %s ---", Mem.ByteFutureX ? "OFF" : "ON");
        snprintf(sptext, sizeof(sptext), "**** No Use option . ****");
        } 
       else snprintf(sptext, sizeof(sptext), "**** Length fault . ****");
@@ -1416,10 +1400,9 @@ void ReworkInputString(String InputString)
 
     case '}':                                                                                 // *** Empty ***
       if(len == 1) 
-       {
-       // snprintf(sptext, sizeof(sptext), "--- %s ---", Mem.ByteFutureX ? "OFF" : "ON");
-       snprintf(sptext, sizeof(sptext), "**** No Use option . ****");
-       } 
+        {
+          snprintf(sptext, sizeof(sptext), "**** No Use option . ****");
+        } 
       else snprintf(sptext, sizeof(sptext), "**** Length fault . ****");
       break;
 
@@ -1597,7 +1580,6 @@ void StoredStartHeaps(bool Store)
   Tekstprintlnf(" SPRAM/SPIRAM heap: %7.1f Kbytes", f / (1024.0  ));
   PrintLine(35);
   }
-
 }
 //--------------------------------------------                                                //
 // COMMON Print memory space
@@ -1778,25 +1760,25 @@ void Displaytime(void)
 //--------------------------------------------
 void DimLeds(bool print) 
 { 
-  int LDRread = ReadLDR();                                                                    // ESP32 analoge read is between 0 - 4096, reduce it to 0-1024                                                                                                   
-  int LDRavgread = (4 * Previous_LDR_read + LDRread ) / 5;                                    // Read lightsensor and avoid rapid light intensity changes
-  Previous_LDR_read = LDRavgread;                                                             // by using the previous reads
-  OutPhotocell = (uint32_t)((Mem.LightReducer * sqrt(255*LDRavgread))/100);                   // Linear --> hyperbolic with sqrt. Result is between 0-255
-  MinPhotocell = min(MinPhotocell, LDRavgread);                                               // Lowest LDR measurement
-  MaxPhotocell = max(MaxPhotocell, LDRavgread);                                               // Highest LDR measurement
-  OutPhotocell = constrain(OutPhotocell, Mem.LowerBrightness, Mem.UpperBrightness);           // Keep result between lower and upper boundery en calc percentage
-  SumLDRreadshour += LDRavgread;    NoofLDRreadshour++;                                       // For statistics LDR readings per hour
-  if(print)
-    {
-     PrintTimeHMS(1);  // No lf  
-     if (Mem.UseDS3231) snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %3lu kl/s %0.0fC ",
+ int LDRread = ReadLDR();                                                                     // ESP32 analoge read is between 0 - 4096, reduce it to 0-1024                                                                                                   
+ int LDRavgread = (4 * Previous_LDR_read + LDRread ) / 5;                                     // Read lightsensor and avoid rapid light intensity changes
+ Previous_LDR_read = LDRavgread;                                                              // by using the previous reads
+ OutPhotocell = (uint32_t)((Mem.LightReducer * sqrt(255*LDRavgread))/100);                    // Linear --> hyperbolic with sqrt. Result is between 0-255
+ MinPhotocell = min(MinPhotocell, LDRavgread);                                                // Lowest LDR measurement
+ MaxPhotocell = max(MaxPhotocell, LDRavgread);                                                // Highest LDR measurement
+ OutPhotocell = constrain(OutPhotocell, Mem.LowerBrightness, Mem.UpperBrightness);            // Keep result between lower and upper boundery en calc percentage
+ SumLDRreadshour += LDRavgread;    NoofLDRreadshour++;                                        // For statistics LDR readings per hour
+ if(print)
+   {
+    PrintTimeHMS(1);  // No lf  
+    if (Mem.UseDS3231) snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %3lu kl/s %0.0fC ",
                      LDRread,(int)(OutPhotocell*100/255),Loopcounter/1000,RTCklok.getTemperature()); 
-     else               snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %3lu kl/s ",
+    else               snprintf(sptext, sizeof(sptext),"LDR:%3d->%2d%% %3lu kl/s ",
                      LDRread,(int)(OutPhotocell*100/255),Loopcounter/1000);   
-     if(TestLDR) Tekstprintln(sptext);
-     else Tekstprint(sptext); 
-     sptext[0] = 0;
-  }
+    if(TestLDR) Tekstprintln(sptext);
+    else Tekstprint(sptext); 
+    sptext[0] = 0;
+   }
  if(LEDsAreOff) OutPhotocell = 0;
  SetBrightnessLeds(OutPhotocell);     // values between 0 and 255
 }
@@ -2164,34 +2146,34 @@ void WriteLightReducer(int amount)
 //--------------------------------------------------------------------
 void InitTimeSystem(void)
 {
-  SetSystemTimeToCompileTime();                                                               // CompileTime = DateTime(__DATE__, __TIME__);    
-  DS3231Installed = IsDS3231I2Cconnected();
-  snprintf(sptext, sizeof(sptext), "External RTC module %s found", DS3231Installed ? "IS" : "NOT");
-  Tekstprintln(sptext);
-  if (DS3231Installed) RTCklok.begin();
-  if (DS3231Installed ) //&& Mem.UseDS3231)
+ SetSystemTimeToCompileTime();                                                               //   CompileTime = DateTime(__DATE__, __TIME__);    
+ DS3231Installed = IsDS3231I2Cconnected();
+ snprintf(sptext, sizeof(sptext), "External RTC module %s found", DS3231Installed ? "IS" : "NOT");
+ Tekstprintln(sptext);
+ if (DS3231Installed) RTCklok.begin();
+ if (DS3231Installed )
    {
     GetDS3231Time(true);
     Tekstprint("DS3231 -> ");  
     SetSystemTime(mktime(&timeinfo));                                                         // Sync ESP32 RTC from DS3231 to have a better time
    }
-  if (Mem.NTPOn && WiFi.isConnected())
-   {
-   GetNTPtime(false);
-   Tekstprint("   NTP -> ");
-   SetSystemTime(mktime(&timeinfo));                                                          // Sync ESP32 RTC from NTP
-   if (DS3231Installed)
-     {
-      DateTime Inow = RTCklok.now();
-      if (RTCklok.lostPower()) SetDS3231Time();
-      if (timeinfo.tm_year > (2024 - 1900) && Inow.year() < 2025) SetDS3231Time();            // Sync DS3231 if time is years too old
-     }
-  }
-  else
-  {
-    time(&now);
-    localtime_r(&now, &timeinfo);
-  }
+ if (Mem.NTPOn && WiFi.isConnected())
+    {
+     GetNTPtime(false);
+     Tekstprint("   NTP -> ");
+     SetSystemTime(mktime(&timeinfo));                                                        // Sync ESP32 RTC from NTP
+     if (DS3231Installed)
+        {
+         DateTime Inow = RTCklok.now();
+         if (RTCklok.lostPower()) SetDS3231Time();
+         if (timeinfo.tm_year > (2024 - 1900) && Inow.year() < 2025) SetDS3231Time();         // Sync DS3231 if time is years too old
+         }
+    }
+ else
+    {
+     time(&now);
+     localtime_r(&now, &timeinfo);
+    }
 }
 
 //--------------------------------------------                                                //                                               
@@ -2223,12 +2205,12 @@ void SetSystemTimeToCompileTime(void)
 //--------------------------------------------------------------------
 time_t GetTijd(bool printit)
 {
-  if (Mem.UseDS3231 && DS3231Installed)     { GetDS3231Time(false);  }
-  else if (Mem.NTPOn && WiFi.isConnected()) { getLocalTime(&timeinfo);  }
-  else  {    time(&now);                      localtime_r(&now, &timeinfo);  }
-  time_t t = mktime(&timeinfo);
-  if (printit) {Tekstprintln(PrintRTCTime());}
-  return t;
+ if (Mem.UseDS3231 && DS3231Installed)     { GetDS3231Time(false);  }
+ else if (Mem.NTPOn && WiFi.isConnected()) { getLocalTime(&timeinfo);  }
+ else  {    time(&now);                      localtime_r(&now, &timeinfo);  }
+ time_t t = mktime(&timeinfo);
+ if (printit) {Tekstprintln(PrintRTCTime());}
+ return t;
 }
 
 //--------------------------------------------                                                //
@@ -2287,13 +2269,13 @@ const char* PrintUTCtime(void)
 //--------------------------------------------------------------------
 bool IsDS3231I2Cconnected(void)
 {
-  for (byte i = 1; i < 120; i++)
-  {
+ for (byte i = 1; i < 120; i++)
+   {
     Wire.beginTransmission(i);
     if (Wire.endTransmission() == 0 && i == DS3231_I2C_ADDRESS)
-      return true;
+       return true;
   }
-  return false;
+ return false;
 }
 
 //--------------------------------------------                                                //
@@ -2307,11 +2289,11 @@ float GetDS3231Temp(void)
   Wire.requestFrom(DS3231_I2C_ADDRESS, 2);
 
   if (Wire.available())
-  {
+   {
     byte tMSB = Wire.read();
     byte tLSB = Wire.read();
     return (tMSB & 0b01111111) + ((tLSB >> 6) * 0.25);
-  }
+   }
   return -273.0;
 }
 
@@ -2321,11 +2303,11 @@ float GetDS3231Temp(void)
 //--------------------------------------------------------------------
 void SetDS3231Time(void)
 {
-  DateTime tNow(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday,
-                timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-  RTCklok.adjust(tNow);
-  Tekstprintlnf("Time set in DS3231 RTC module: %s" ,PrintDS3231Time());
-  if(!Mem.UseDS3231 && !Mem.NTPOn ) Tekstprintln("*** Not using DS3231");
+ DateTime tNow(timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday,
+               timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+ RTCklok.adjust(tNow);
+ Tekstprintlnf("Time set in DS3231 RTC module: %s" ,PrintDS3231Time());
+ if(!Mem.UseDS3231 && !Mem.NTPOn ) Tekstprintln("*** Not using DS3231");
 }
 
 //--------------------------------------------                                                //
@@ -2334,14 +2316,14 @@ void SetDS3231Time(void)
 //--------------------------------------------------------------------
 void GetDS3231Time(bool printit)
 {
-  DateTime Inow = RTCklok.now();
-  timeinfo.tm_year = Inow.year() - 1900;
-  timeinfo.tm_mon  = Inow.month() - 1;
-  timeinfo.tm_mday = Inow.day();
-  timeinfo.tm_hour = Inow.hour();
-  timeinfo.tm_min  = Inow.minute();
-  timeinfo.tm_sec  = Inow.second();
-  if (printit) Tekstprintln(PrintDS3231Time());
+ DateTime Inow = RTCklok.now();
+ timeinfo.tm_year = Inow.year() - 1900;
+ timeinfo.tm_mon  = Inow.month() - 1;
+ timeinfo.tm_mday = Inow.day();
+ timeinfo.tm_hour = Inow.hour();
+ timeinfo.tm_min  = Inow.minute();
+ timeinfo.tm_sec  = Inow.second();
+ if (printit) Tekstprintln(PrintDS3231Time());
 }
 
 //--------------------------------------------                                                //
@@ -2398,11 +2380,11 @@ void SetRTCTime(void)
 //--------------------------------------------
 void SetSystemTime(time_t t)
 { 
-  struct timeval tv = { .tv_sec = t, .tv_usec = 0 };
-  settimeofday(&tv, nullptr);
-  localtime_r(&t, &timeinfo);
-  Tekstprint("ESP32 RTC time set: ");
-  PrintTimeHMS();
+ struct timeval tv = { .tv_sec = t, .tv_usec = 0 };
+ settimeofday(&tv, nullptr);
+ localtime_r(&t, &timeinfo);
+ Tekstprint("ESP32 RTC time set: ");
+ PrintTimeHMS();
 }
 
 //--------------------------------------------                                                //
@@ -2424,21 +2406,20 @@ void PrintAllClockTimes(void)
 //--------------------------------------------                                                //
 // CLOCK Convert Hex to uint32
 //--------------------------------------------
-uint32_t HexToDec(const String& hexString) {
-    uint32_t decValue = 0;
-
-    for (size_t i = 0; i < hexString.length(); i++) 
-       {
-        char c = hexString.charAt(i);
-        uint8_t value = 0;
-        if      (c >= '0' && c <= '9') { value = c - '0';      } 
-        else if (c >= 'A' && c <= 'F') { value = c - 'A' + 10; } 
-        else if (c >= 'a' && c <= 'f') { value = c - 'a' + 10; } 
-        else { continue;                                                                      // Skip invalid characters
-        }
-        decValue = (decValue << 4) | value;                                                   // Multiply by 16 and add value
+uint32_t HexToDec(const String& hexString) 
+{
+ uint32_t decValue = 0;
+ for (size_t i = 0; i < hexString.length(); i++) 
+   {
+     char c = hexString.charAt(i);
+     uint8_t value = 0;
+     if      (c >= '0' && c <= '9') { value = c - '0';      } 
+     else if (c >= 'A' && c <= 'F') { value = c - 'A' + 10; } 
+     else if (c >= 'a' && c <= 'f') { value = c - 'a' + 10; } 
+     else { continue; }                                                                       // Skip invalid characters
+     decValue = (decValue << 4) | value;                                                   // Multiply by 16 and add value
     }
-    return decValue;
+ return decValue;
 }
 //------------------------------------------------------------------------------              //
 // CLOCK Demo mode
