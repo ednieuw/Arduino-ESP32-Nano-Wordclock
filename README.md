@@ -37,7 +37,7 @@ The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB 
 The PCB can connect to a rotary encoder or three button membrane switch, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
 
 The SK6812 RGBW LED-strip operates at 5V. But the data signal from the Nano is only 3.3V.<br> 
-I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. see here: 
+I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. See here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
 But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more LEDs in the strip.<br>
@@ -146,9 +146,9 @@ The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED
 
 An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
-The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.
-Several designs can be selected before compiling.  (If you have a word plate, of course.)
-Use a word plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software<br>.
+The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.<br>
+Several designs can be selected before compiling.  (If you have a word clockface plate, of course.)<br>
+Use a word clockface plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software.<br>
 
 ![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
 
@@ -223,13 +223,13 @@ If the clock software is started without a SSID it will start a WIFI station you
 - When Submit is pressed the clock will restart and connect to the internet
 
 ### Connect via Bluetooth
-To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.
+To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.<br>
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec)
  	 	 
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 - Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
 
-- For IOS iPhone or iPad: [BLE Serial Pro](https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en). <br>
+- For IOS iPhone or iPad (Buy this one to support me): [BLE Serial Pro](https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en). <br>
 Or the free, less sophisticated app: [BLE serial nRF](https://apps.apple.com/nl/app/bleserial-nrf/id1632235163?l).<br>
 Tip: Turn on Fast BLE with option + in the menu for a faster transmission.
 
