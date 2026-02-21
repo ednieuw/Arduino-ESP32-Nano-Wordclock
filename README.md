@@ -3,12 +3,19 @@
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
-Build your own word clock with one or four languages with an Arduino ESP32 Nano.<br>
+Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or four languages with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
 [See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)<br><br>
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
-The clock can be controlled with an app on your phone, a web page in a browser or with a serial cable connected to your PC, a rotary encoder, an IR-remote controller or (membrane) keypad.<br>
+The clock can be controlled with: 
+- an app on your phone, 
+- a web page in a browser, 
+- a serial cable connected to your PC, 
+- a rotary encoder, 
+- an IR-remote controller, 
+- a (membrane) keypad,
+- a time sender app.<br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In Chrome, since dec 2025,  you can split a TAB to see the Web page and the respone in one TAB. <br><br>
@@ -181,7 +188,7 @@ Then upload the .bin file from this repository.<br>
 Or use this one: [Uploads .bin files in the ESP32 by using wifimanager](https://github.com/ednieuw/OTA-webupdater).<br>
 <br>
 # How to compile: 
-At the moment of writing ( nov 2025) the Espressif ESP32 board core V3.3. with the Arduino Nano ESP32 selected does compile to a working program when ESP32WordclockV100.ino of a higher version is used.
+At the moment of writing (nov 2025) the Espressif ESP32 board core V3.3. with the Arduino Nano ESP32 selected does compile to a working program when ESP32WordclockV100.ino of a higher version is used.
 Select the Nano ESP32 board from Arduino in the Arduino IDE. 
 The Arduino ESP32 board with core version 2.0.17/2.0.18, compiles without errors and is advised to use. 
 It generates the smallest binary code (V2.0.18 = 1.0 Mb vs V3.20 = 1.3 Mb)
@@ -311,7 +318,7 @@ H H01 rotary H02 buttons H03/04 remote
 } Learn IR remote, + Fast BLE
 I Info menu, II long menu
 J DS3231 RTC module On/Off
-K LDR reads/s, K1 Time/min On/Off
+K LDR /s, Time K1/min K2/hr K0/Off
 N Display off between Nhhhh (N2208)
 O Display On/Off, P StatusLED On/Off
 Q Display choice (Q0-9), ~ Changing
@@ -321,22 +328,23 @@ Unnn Demo (U200 msec), Y LED test
 ) HETISWAS  On/Off, ( EdSoft On/Off
 #nnn Selftest,  RTC: ! See, & Update
 W WIFI, X NTP, Z WPS, CCC BLE
-Ed Nieuwenhuijs Dec 2025
+Ed Nieuwenhuijs Feb 2026
 ___________________________________
-Display off between: 22h - 08h
-Display choice: Yellow+
-RandomDisplay is Off
-Slope: 50     Min: 2     Max: 9 
+Display off between: 00h - 00h
+Display off between: 00h - 00h
+
+RandomDisplay:Off, Timestamp:/min
+Slope: 1     Min: 5     Max: 2 
 SSID: FRITZ!BoxEd
-BLE name: ESPRedPCB
-IP-address: 192.168.178.172/update
+BLE name: BLEtest
+IP-address: 192.168.178.145/update
 Timezone:CET-1CEST,M3.5.0,M10.5.0/3
 WIFI=On NTP=On BLE=On FastBLE=Off
-IR-remote = ON  DS3231=Off
-WS2812 strip with 148 LEDs (switch %)
-Software: ESP32_WordClockV150.ino
-ESP32 Arduino core version: 3.3.5
-___________________________________
+No Rotary,   DS3231=Off
+SK6812 strip with 148 LEDs (switch %)
+Software: ESP32_WordClockV184.ino
+ESP32 Arduino core version: 3.3.6
+__________________________________
 </pre>
 
 Menu shown in serial output.
@@ -417,6 +425,7 @@ Enter for example T132145 (or 132145 , or t132145) to set time to 45 seconds and
 
 ### E Set Timezone E&lt;-02&gt;2 or E&lt;+01&gt;-1<br>
 At the bottom of this page you can find the time zones used in 2022. <br>
+For Central Europe the string is: CET-1CEST,M3.5.0,M10.5.0/3  <br>
 It is a rather complicated string and it is therefore wise to copy it. <br>
 Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3" <br>
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
@@ -437,13 +446,15 @@ For example: F8800FF00 is 50% white with 100% green.
 Scan available Wi‑Fi networks (prints SSIDs found).
 This option does not work from the menu web page.
 
-### H H01 rotary encoder, H02 buttons H03/04 remote.
+### H H01 rotary encoder, H02 buttons H03/04 remote, H05 Time sender app.
 Turning on will also Turn off NTP and on use of DS3231. Check DS3231 and NTP setting when turning off (H00)
 The options are:
-H01 Rotary encoder
-H02 Keypad
-H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER
-H04 Tiny IR-remote with six buttons
+H01 Rotary encoder<br>
+H02 Keypad<br>
+H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER<br>
+H04 Tiny IR-remote with six buttons<br>
+H05 Turn On/Off the use of the BLE time sender app<br>
+The h05 option can be used when the clock has no WIFI. The app sends the time every minute when the app is started iand in the neighbouthood of the clock.  
 
 ### } Learn IR remote
 Start learning the keys of a new infrared remote.
