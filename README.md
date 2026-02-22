@@ -9,7 +9,7 @@ The sketch will also work with other ESP32 boards but with different pin numberi
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with: 
-- an app on your phone, 
+- an BLE serial monitor app on your phone, 
 - a web page in a browser, 
 - a serial cable connected to your PC, 
 - a rotary encoder, 
@@ -34,7 +34,7 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 Clock with Corten steel face
 
 # Hardware
-For my projects I designed the printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
+For my projects I designed printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
 
 This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCBs for $5. With +/-$25 shipping and custom charges this is very cheap. The PCBs were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
