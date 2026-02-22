@@ -35,9 +35,10 @@
  Changes V156: Optimize use of DoNotLog flag. const char* PrintRTCTime() --> Tekstprintln(PrintRTCTime()); WTekstprint(PrintRTCTime(), "<!--", " -->");
  Changes V157: testing
  Changes V158: K0 not updating LEDs.-->fixed. added in Everyminute() 
- Changes V159: Double printing of menu in Logging solved.Option K2 debugged
- Changes V160: Stable
-
+ Changes V159: Double printing of menu in Logging solved. Option K2 solved extra printing
+ Changes V160: Stable V160d Repaired ringbuffer log log list
+ Changes V160f: Ringbuffer identical with V184. changedname back to V160
+ 
 *********************
 How to compile: 
 Install ESP32 boards
@@ -762,7 +763,7 @@ void Tekstprintf(const char* fmt, ...)
 }
 //--------------------------------------------                                                //
 // COMMON Formatted Tekstprintln
-// Usage: Tekstprintf("Log buffer allocated: %u bytes\n", (unsigned) LogBufferSize);
+// Usage: Tekstprintf("Log buffer allocated: %u bytes", (unsigned) LogBufferSize);
 //--------------------------------------------
 void Tekstprintlnf(const char* fmt, ...) 
 {
@@ -4420,80 +4421,92 @@ void ToggleIRpower(void)
   } 
 }
 
+//   Ringbuffer
+
 //--------------------------------------------                                                //
-// LOGBUFFER Initialize circular logging buffer      
+// LOGBUFFER Initialize circular logging buffer
 //--------------------------------------------
-void InitLogBuffer()
+void InitLogBuffer() 
 {
- size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
- size_t reserve = 8000; 
+ size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
+ size_t reserve = 5000000;                                                                      // much smaller reserve needed — PSRAM is separate from internal RAM
  StoredStartHeaps(true);                                                                      // Store the values before allocation                                                                               //                                     // Keep a safety margin tune this based on your system
- if (largest > reserve)        LogBufferSize = largest - reserve;
- else        LogBufferSize = largest / 2;
- LogBuffer = (char*)heap_caps_malloc(LogBufferSize, MALLOC_CAP_8BIT);
- if (!LogBuffer) { Tekstprintln("ERROR: Could not allocate log buffer"); return; }
- memset(LogBuffer, 0, LogBufferSize);
+ if (largest > reserve) LogBufferSize = largest - reserve;
+ else LogBufferSize = largest / 2;
+ LogBuffer = (char*)heap_caps_malloc(LogBufferSize, MALLOC_CAP_SPIRAM);
+ if (!LogBuffer)                                                                              // Fallback to internal RAM if no PSRAM available
+    {
+     largest = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
+     reserve = 120000;
+     LogBufferSize = (largest > reserve) ? largest - reserve : largest / 2;
+     LogBuffer = (char*) heap_caps_malloc(LogBufferSize, MALLOC_CAP_8BIT);
+    }
+ if (!LogBuffer) { Tekstprintln("ERROR: Could not allocate log buffer");     return;  }
+ memset(LogBuffer, 0, LogBufferSize);                                                         // Fill the buffer with 0
  LogWritePos = 0;
- LogWrapped  = false;
- snprintf(sptext, sizeof(sptext)," Log buffer allocated: %u bytes (largest block was %u)",
-             (unsigned)LogBufferSize, (unsigned)largest);
- Tekstprintln(sptext);
+ LogWrapped = false;
+ Tekstprintlnf("Log buffer allocated: %u bytes (largest block was %u)", (unsigned)LogBufferSize, (unsigned)largest);
 }
 
 //--------------------------------------------                                                //
 // LOGBUFFER Add a log line (raw C-string). Always ends with '\n'.
 //--------------------------------------------
-void AddLog(const char* msg)
+void AddLog(const char* msg) 
 {
- if (DoNotLog) return; 
- if (!LogBuffer) return;
- size_t len = strlen(msg);
- if (len >= LogBufferSize)
-    {
-     msg += (len - LogBufferSize);  // keep only last part
-     len = strlen(msg);
-    }
-    for (size_t i = 0; i < len; i++)
+  if (DoNotLog) return;
+  if (!LogBuffer) return;
+  static size_t Logbufferlength = 0;
+  size_t len = strlen(msg);
+  if (len >= LogBufferSize) {msg += (len - LogBufferSize);  len = strlen(msg); }              // Keep only last part
+  size_t startPos = LogWritePos;                                                              // Capture starting position for this write
+  for (size_t i = 0; i < len; i++) 
     {
      LogBuffer[LogWritePos++] = msg[i];
-     if (LogWritePos >= LogBufferSize)
-        {
-         LogWritePos = 0;
-         LogWrapped  = true;
-        }
+     if (LogWritePos >= LogBufferSize)  { LogWritePos = 0;  LogWrapped = true; }              // If we are at the end then wrap. Essential to find the last 500 lines
     }
+  
+            // Debugging
+  // Logbufferlength = min(Logbufferlength + len, LogBufferSize);
+  // size_t logicalStart = LogWrapped ? LogWritePos : 0;                                         // Calculate logical start position (oldest data in buffer)
+  // Serial.printf("  Write[%u->%u] len:%u | Filled:%u/%u (%u%%) | Start@%u %s\n",
+  //               (unsigned)startPos, (unsigned)LogWritePos, (unsigned)len, (unsigned)Logbufferlength,
+  //               (unsigned)LogBufferSize, (unsigned)((Logbufferlength * 100) / LogBufferSize),
+  //               (unsigned)logicalStart, LogWrapped ? "[WRAPPED]" : "");
 }
 
 //--------------------------------------------                                                //
-// LOGBUFFER Stream the last 500 lines circular log buffer directly to the client
+// LOGBUFFER Printlast 500 lines
 //--------------------------------------------
-void HandleTekstPrint(AsyncWebServerRequest *request)
+void HandleTekstPrint(AsyncWebServerRequest* request) 
 {
- if (!LogBuffer)
-   {
-     request->send(200, "text/plain", "Log buffer uninitialized\n");
-     return;
-   }
- AsyncResponseStream *response = request->beginResponseStream("text/plain");
- size_t lineCount = 0;
- ssize_t pos = LogWritePos;
- for (size_t scanned = 0; scanned < LogBufferSize && lineCount < 500; scanned++)              // Count lines backwards to find last 500 '\n's
-    {
-     pos = (pos == 0) ? LogBufferSize - 1 : pos - 1;
-     if (LogBuffer[pos] == '\n') lineCount++;
-     if (!LogWrapped && pos == 0) break;                                                      // Stop if buffer not wrapped
-    }
-   size_t start = (pos + 1) % LogBufferSize;                                                  // Now pos points to the start of the 500th-last line (or beginning)
- if (!LogWrapped || start < LogWritePos)                                                      // Stream lines from start → end of buffer
-   {
-    response->write(LogBuffer + start, LogWritePos - start);
-   }
- else
-   {
-    response->write(LogBuffer + start, LogBufferSize - start);                                // Wrap: first part from start → end of buffer
-    response->write(LogBuffer, LogWritePos);                                                  // second part from 0 → write pos
-   }
- request->send(response);
+  if (!LogBuffer) {request->send(200, "text/plain", "Log buffer uninitialized\n"); return; }
+  AsyncResponseStream* response = request->beginResponseStream("text/plain");
+  ssize_t lastNewline = -1;                                                                   // Find the actual end of the last complete line (last \n before LogWritePos)
+  ssize_t searchPos = (LogWritePos == 0) ? LogBufferSize - 1 : LogWritePos - 1;
+  for (size_t i = 0; i < LogBufferSize; i++) {
+    if (LogBuffer[searchPos] == '\n') {lastNewline = searchPos;   break; }
+    if (!LogWrapped && searchPos == 0)                            break;
+    searchPos = (searchPos == 0) ? LogBufferSize - 1 : searchPos - 1;
+  }
+  if (lastNewline == -1) 
+     { request->send(200, "text/plain", "No complete lines in buffer\n");   return; }         // No complete lines yet
+  size_t lineCount = 0;                                                                       // Now count back 100 for testing) (500) lines from lastNewline
+  ssize_t pos = lastNewline;
+  for (size_t scanned = 0; scanned < LogBufferSize && lineCount < 499; scanned++)             //  499 because we already found one \n
+  {
+    pos = (pos == 0) ? LogBufferSize - 1 : pos - 1;
+    if (LogBuffer[pos] == '\n') lineCount++;
+    if (!LogWrapped && pos == 0) break;
+  }
+  size_t start = pos % LogBufferSize;                                                         // Start is the position right after the newline we stopped at
+  size_t end   = (lastNewline + 1) % LogBufferSize;                                           // Include the last newline
+  if (!LogWrapped || start <= end) {
+    response->write(LogBuffer + start, end - start);
+  } else {
+    response->write(LogBuffer + start, LogBufferSize - start);
+    response->write(LogBuffer, end);
+  }
+  request->send(response);
 }
 
 //--------------------------------------------                                                //
@@ -4501,20 +4514,45 @@ void HandleTekstPrint(AsyncWebServerRequest *request)
 //--------------------------------------------
 void HandleTekstDownload(AsyncWebServerRequest *request)
 {
- if (!LogBuffer)
-   {
-    request->send(200, "text/plain", "Log buffer uninitialized\n");
-    return;
-   }
- AsyncResponseStream *response = request->beginResponseStream("text/plain");
- if (!LogWrapped)     response->write(LogBuffer, LogWritePos);
+ if (!LogBuffer) {request->send(200,"text/plain","Log buffer uninitialized\n"); return;  }
+ size_t start   = 0;                                                                          // Calculate start and length of valid data
+ size_t dataLen = 0;
+ if (!LogWrapped)   { start = 0; dataLen = LogWritePos; }
  else
    {
-    size_t tail = LogBufferSize - LogWritePos;
-    response->write(LogBuffer + LogWritePos, tail);
-    response->write(LogBuffer, LogWritePos);
+    ssize_t pos = LogWritePos;                                                                // Find first complete line after LogWritePos (skip partial overwritten line)
+    size_t  scanned = 0;
+    while (scanned < LogBufferSize && LogBuffer[pos % LogBufferSize] != '\n')
+      {
+       pos++;
+       scanned++;
+      }
+    pos++;                                                                                    // move past the '\n'
+    start   = pos % LogBufferSize;
+    dataLen = LogBufferSize - 1;                                                              // almost full buffer, minus the partial line we skipped
    }
-    request->send(response);
+
+ AsyncWebServerResponse *response = request->beginResponse( "text/plain", dataLen,
+        [start, dataLen](uint8_t *buffer, size_t maxLen, size_t alreadySent) -> size_t
+   {                                                                                          // Use a chunked response — ESPAsyncWebServer streams this without one giant allocation
+    if (alreadySent >= dataLen) return 0; // done
+    size_t remaining  = dataLen - alreadySent;
+    size_t toSend     = min(remaining, maxLen);
+    size_t physPos    = (start + alreadySent) % LogBufferSize;                                // Physical position in the ring buffer
+    size_t tillEnd    = LogBufferSize - physPos;                                              // How much fits before wrap?
+    if (toSend <= tillEnd) { memcpy(buffer, LogBuffer + physPos, toSend); }
+    else
+       {
+        memcpy(buffer,           LogBuffer + physPos, tillEnd);                               // Two-part copy over the wrap boundary
+        memcpy(buffer + tillEnd, LogBuffer,           toSend - tillEnd);
+        }
+    return toSend;
+    }
+   );
+ char filename[80];
+ snprintf(filename, sizeof(filename), "attachment; filename=\"%s-log_%lu.txt\"", Mem.BLEbroadcastName, millis());
+ response->addHeader("Content-Disposition", filename);
+ request->send(response);
 }
 
 /// ringbuffer
