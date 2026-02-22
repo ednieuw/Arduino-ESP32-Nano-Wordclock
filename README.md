@@ -9,7 +9,7 @@ The sketch will also work with other ESP32 boards but with different pin numberi
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with: 
-- an BLE serial monitor app on your phone, 
+- a BLE serial monitor app on your phone, 
 - a web page in a browser, 
 - a serial cable connected to your PC, 
 - a rotary encoder, 
