@@ -240,7 +240,7 @@ p.HeaderandFooter, li.HeaderandFooter, div.HeaderandFooter
  /* Page Definitions */
  @page WordSection1
 	{size:595.3pt 841.9pt;
-	margin:38.25pt 72.0pt 35.45pt 72.0pt;}
+	margin:38.25pt 63.7pt 35.45pt 72.0pt;}
 div.WordSection1
 	{page:WordSection1;}
  /* List Definitions */
@@ -645,13 +645,14 @@ color:#1F2328;font-weight:normal'>&nbsp;</span></strong></p>
 color:#1F2328'>Als er geen internetverbinding of Bluetooth-verbinding is</span></strong><strong><span
 lang=NL style='font-family:"Segoe UI",sans-serif;color:#1F2328;font-weight:
 normal'>, kan de klok worden bediend met de draaiknop, met drie drukknoppen, of
-een afstandsbediening, mits deze geïnstalleerd en geactiveerd is. Activeren
-gebeurd in het menu met optie H01 (draaiknop, H02 drukknoppen of H03 en H04 een
-IR-afstandsbediening.  <br>
-Soms zit de knop in de kast gemonteerd.</span></strong></p>
-
-<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
-color:#1F2328;font-weight:normal'>&nbsp;</span></strong></p>
+een afstandsbediening, of met een tijdzender app op de telefoon, mits deze
+geïnstalleerd en geactiveerd is. Activeren gebeurd in het menu met optie H01
+(draaiknop, H02 drukknoppen, H03 en H04 een IR-afstandsbediening of H05 start
+tijdonvanger).  <br>
+<br>
+Soms zit </span></strong><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+color:#1F2328'>de knop</span></strong><strong><span lang=NL style='font-family:
+"Segoe UI",sans-serif;color:#1F2328;font-weight:normal'> in de kast gemonteerd.</span></strong></p>
 
 <p class=MsoNormal style='margin-left:7.1pt;text-indent:-7.1pt'><strong><span
 lang=NL style='font-family:"Segoe UI",sans-serif;color:#1F2328;font-weight:
@@ -685,10 +686,18 @@ normal'>- Negen keer drukken reset de klok naar de fabrieksinstellingen.</span><
 color:#1F2328;font-weight:normal'>&nbsp;</span></strong></p>
 
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
-color:#1F2328;font-weight:normal'>Met de IR-afstandsbediening kan de klok
-bedient worden als deze geleerd is met de klok. Met de { optie in het menu
-vraagt de klok om knoppen te druken die overeenkomen met de getallen 0-9 en een
-paar bedieningsknopen zoals POWER. </span></strong></p>
+color:#1F2328;font-weight:normal'>Met de </span></strong><strong><span lang=NL
+style='font-family:"Segoe UI",sans-serif;color:#1F2328'>IR-afstandsbediening</span></strong><strong><span
+lang=NL style='font-family:"Segoe UI",sans-serif;color:#1F2328;font-weight:
+normal'> kan de klok bedient worden als deze geleerd is met de klok. Met de {
+optie in het menu vraagt de klok om knoppen te druken die overeenkomen met de
+getallen 0-9 en een paar bedieningsknopen zoals POWER. <br>
+<br>
+De </span></strong><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
+color:#1F2328'>tijdontvanger</span></strong><strong><span lang=NL
+style='font-family:"Segoe UI",sans-serif;color:#1F2328;font-weight:normal'> zet
+de klok binnen twee minuten op tijd als de iPhone app op een telefoon of iPad
+wordt gestart.</span></strong></p>
 
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328;font-weight:normal'>&nbsp;</span></strong></p>
@@ -978,9 +987,6 @@ Men kan overschakelen van RTC- naar NTP-tijd.</span></strong></p>
 <p class=MsoNormal style='margin-left:7.1pt;text-indent:-7.1pt'><strong><span
 lang=NL style='font-family:"Segoe UI",sans-serif;color:#1F2328;font-weight:
 normal'>- Negen keer drukken reset de klok naar de fabrieksinstellingen.</span></strong></p>
-
-<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
-color:#1F2328'>&nbsp;</span></strong></p>
 
 <p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif;
 color:#1F2328'>&nbsp;</span></strong></p>
@@ -2393,7 +2399,30 @@ dan of er een invoer plaatsvindt.  Zet daarom de optie met <b>H00</b> uit als
 de invoer niet gebruikt wordt om onbedoelde invoer te voorkomen. </span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Na een Reset naar
-fabrieksinstelling wordt het gebruik van deze instelling ongewijzigd gelaten.</span></span></p>
+fabrieksinstelling wordt het gebruik van deze instelling ongewijzigd gelaten.<br>
+<br>
+</span></span></p>
+
+<p class=MsoNoSpacing><b>H05 Time receiver On/Off</b></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Als een special
+tijdzender wordt gestart kan de klok daarmee op tijd worden gezet. Met het
+commando H05 kan de tijdontvanger aan of uit worden gezet.<br>
+In maart 2026 zijn als tijdzender beschikbaar:</span></span></p>
+
+<p class=MsoNoSpacing style='margin-left:14.2pt;text-indent:-14.2pt'><span
+class=auto-style51><span lang=NO-BOK style='font-family:"Verdana",sans-serif'>-<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp; </span></span></span><span
+class=auto-style51><span lang=NO-BOK>De time sender app “BLE UART time” uit de
+Apple app store</span></span></p>
+
+<p class=MsoNoSpacing style='margin-left:14.2pt;text-indent:-14.2pt'><span
+lang=NL style='font-family:"Verdana",sans-serif'>-<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;
+</span></span><span class=auto-style51><span lang=NL>De Arduino ESP32 sketch “ESP32
+Arduino communications” van mijn Github site </span></span><span lang=NL><a
+href="https://github.com/ednieuw/ESP32Communications">https://github.com/ednieuw/ESP32Communications</a></span></p>
+
+<p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
 
 <p class=MsoNoSpacing><span lang=NL>&nbsp;</span></p>
 
@@ -2490,9 +2519,11 @@ zichtbaar worden stuur dan het commando ! om de interne kloktijden te zien. </sp
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>K
-Reads/sec  aan/uit zetten</span></strong><span lang=NL><br>
-<span class=auto-style51>Door een K in te voeren kan het afdrukken van de
-LDR-uitlezing van de gemeten lichtintensiteit per seconde gevolgd worden<br>
+Reads/sec  aan/uit zetten </span></strong></p>
+
+<p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Door een K in te
+voeren kan het afdrukken van de LDR-uitlezing van de gemeten lichtintensiteit
+per seconde gevolgd worden<br>
 Het toont ook hoe vaak de processor per seconde (l/s) door het programma loopt
 en zijn taken controleert om de klok te laten lopen.</span></span></p>
 
@@ -2526,9 +2557,15 @@ style='font-size:9.0pt;font-family:"Courier New"'>TestLDR: Off</span></span></p>
 <p class=MsoNoSpacing><span class=auto-style51><span lang=EN-GB
 style='font-size:9.0pt;font-family:"Courier New"'>&nbsp;</span></span></p>
 
+<p class=MsoNoSpacing><span class=auto-style51><span lang=EN-GB
+style='font-size:9.0pt;font-family:"Courier New"'>&nbsp;</span></span></p>
+
+<p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>K0,
+K1, K2 Logging uit, per min, per uur</span></strong></p>
+
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>De tijd  wordt
 standaard elke minuut in de logs geprint. Met de webpagina kunnen duizenden
-logregels getoond worden. Met K1 kan de logging per minuut, en met K2 per uur,
+logregels getoond worden. Met K1 kan de log per minuut, en met K2 per uur,
 worden aan of uitgezet gezet.  <br>
 In het lange menu (ii) staat dan </span></span><span lang=NL>Timestamp/min, Timestamp/hour
 of Timestamp off.</span></p>
@@ -2553,6 +2590,12 @@ Status-LED’s uit- en aanschakelen </span></strong><span lang=NL><br>
 aan. </span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
+
+<span class=auto-style51><b><span lang=NL style='font-size:12.0pt'><br
+clear=all style='page-break-before:always'>
+</span></b></span>
+
+<p class=MsoNormal><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Q Keuze van de
 weergavekleur (Q0-9) </span></b></span><b><span lang=NL><br>
@@ -2637,6 +2680,12 @@ versturen van een U wordt de demomodus uitgeschakeld.</span></span></p>
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
+<strong><span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
+clear=all style='page-break-before:always'>
+</span></strong>
+
+<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>W=WIFI,
 X=NTP &amp; , CCC=BLE </span></strong><span lang=NL><br>
 <span class=auto-style51>Schakel WIFI, NTP in en uit. </span><br>
@@ -2654,7 +2703,8 @@ gezet.</span></span></p>
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>Y LED-test</span></b></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><span lang=NL>Alle LEDs gaan een
-regenboog doorlopen. </span></span></p>
+regenboog doorlopen. Deze testoptie laat alle LEDs branden op 5% van de
+maximale intensiteit.</span></span></p>
 
 <p class=MsoNoSpacing><span class=auto-style51><b><span lang=NL>&nbsp;</span></b></span></p>
 
@@ -2680,11 +2730,11 @@ font-weight:normal'>Hoe je WPS moet starten verschilt per router.</span></strong
 
 <p class=MsoNoSpacing><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
-<strong><span lang=NO-BOK style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
+<strong><span lang=NL style='font-size:12.0pt;font-family:"Segoe UI",sans-serif'><br
 clear=all style='page-break-before:always'>
 </span></strong>
 
-<p class=MsoNormal><strong><span lang=NO-BOK style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
+<p class=MsoNormal><strong><span lang=NL style='font-family:"Segoe UI",sans-serif'>&nbsp;</span></strong></p>
 
 <p class=MsoNoSpacing><strong><span lang=NO-BOK style='font-family:"Segoe UI",sans-serif'>+
 = Fast BLE </span></strong><span lang=NO-BOK><br>

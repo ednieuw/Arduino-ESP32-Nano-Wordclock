@@ -1,0 +1,10 @@
+{
+  "additionalFiles": "../..,../..,../..,../..,../..",
+  "builtInLibrariesFolders": "/Users/ednieuw/Library/Arduino15/libraries",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:nano_nora:USBMode=default,PartitionScheme=default,DebugLevel=none,PinNumbers=byGPIONumber",
+  "hardwareFolders": "/Users/ednieuw/Library/Arduino15/packages/esp32/hardware/esp32/3.3.7,/Users/ednieuw/Library/Arduino15/packages/esp32/hardware/esp32/3.3.7",
+  "otherLibrariesFolders": "/Users/ednieuw/Documents/FilesH/Files/Arduino/libraries",
+  "sketchLocation": "/Users/ednieuw/Documents/FilesH/Files/Arduino/Arduino_Nano-ESP32-WordClock/ESP32_WordClockV195"
+}
