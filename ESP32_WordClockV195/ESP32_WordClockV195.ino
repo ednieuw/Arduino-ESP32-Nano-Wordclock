@@ -59,7 +59,7 @@
                Q8=RAINBOW resetting ESP32 solved to -> update per minute. After 5 MCU restart in an hout Reset all settings to factory default 
  Changes V193: Refined Mem.MCUrestarted. No ResetCredential. Set counter to 0 between 1 and 2 hours
  Changes V194: Refined logging (NTP update and time send when LEDs turn on/off with n2208) Mem.TimeMinute --> MemTimeLogPrint
- Changes V195: Cleanup code. Comparable with ESP32Arduino_CommV021.ino
+ Changes V195: Cleanup code. Comparable with ESP32Arduino_CommV022.ino. Corrected nasty bug ->  Mem.NVRAMmem[lasthour] = NoofLDRreadshour ? (byte)(SumLDRreadshour / NoofLDRreadshour) : 0;
 
 
  Issue: Long menu still does not print properly in IOS Timesender app.
@@ -660,7 +660,7 @@ if (Mem.TimeLogPrint == 0 )                                                     
  if (timeinfo.tm_hour == Mem.TurnOnLEDsAtHH)
     { LEDsAreOff = false;   lastminute = 99;     Displaytime(); Tekstprintln("");}            // Force a minute update
  CheckRestoreWIFIconnectivity();                                                              // Check if WIFI is still connected and if not restore it
- Mem.NVRAMmem[lasthour] =(byte)((SumLDRreadshour / NoofLDRreadshour?NoofLDRreadshour:1));     // Update the average LDR readings per hour. Avoids dividing by zero
+ Mem.NVRAMmem[lasthour] = NoofLDRreadshour ? (byte)(SumLDRreadshour / NoofLDRreadshour) : 0;   // Update the average LDR readings per hour. Avoids dividing by zero
  SumLDRreadshour  = 0;
  NoofLDRreadshour = 0;
  if (Mem.RandomDisplay == 2) { ChangeRandomDisplay(); SetSecondColour();}                     // If RandomDisplay is ON change the display choice
@@ -1484,7 +1484,7 @@ void ReworkInputString(String InputString)
       if(len == 1) 
         {
          Mem.Ringbufcnt = !Mem.Ringbufcnt;
-         snprintf(sptext, sizeof(sptext), "Ring buffer counter is %s", Mem.Ringbufcnt ? "OFF" : "ON");
+         snprintf(sptext, sizeof(sptext), "Ring buffer counter is %s", Mem.Ringbufcnt ? "ON" : "OFF");
          lastminute = 99;                                                                        // Force a minute update
         } 
       else snprintf(sptext, sizeof(sptext), "**** Length fault . ****");
@@ -1557,7 +1557,7 @@ void PrintDisplayChoice(bool PrintIt)
 {
  byte dp = Mem.DisplayChoice;
  if (dp>9) dp=9;
- snprintf(sptext, sizeof(sptext),"Display choice: %s",
+ snprintf(sptext, sizeof(sptext),"  Display choice: %s",
         dp==0?"Yellow+":dp==1?"Hourly":dp==2?"White"  :dp==3?"All Own":
         dp==4?"Own+"   :dp==5?"Wheel" :dp==6?"Digital":dp==7?"Hourly+":
         dp==8?"Rainbow":      "NOP");        
@@ -1588,6 +1588,7 @@ void PrintMem(void)
 {
  PrintLine(35); 
  PrintHeaps(); 
+ PrintLine(35); 
  PrintAllMappings();                                                                          // Print the IR remote keys 
  PrintDisplayChoice();
  Tekstprintlnf(" TurnOffLEDsAtHH: %d",Mem.TurnOffLEDsAtHH);                 
@@ -1621,7 +1622,7 @@ void PrintMem(void)
  Tekstprintlnf(" WIFIcredentials: %s", wc==0? "Not SET" : wc==1? "SET" : wc==2? "SET&OK": 
                                        wc==3? "in AP not SET":"Unknown code");   
  Tekstprintlnf("      IntFuture2: %d",Mem.IntFuture2 );  
- Tekstprintlnf("      Ringbufcnt: %d",Mem.Ringbufcnt );                     
+ Tekstprintlnf("      Ringbufcnt: %s",Mem.Ringbufcnt ? "ON" : "OFF");                     
  Tekstprintlnf("     byteFuture3: %d",Mem.byteFuture3 );  
  Tekstprintlnf("     byteFuture4: %d",Mem.byteFuture4 );                                         
  Tekstprintlnf("      HET IS WAS: %s", Mem.HetIsWasOff ? "OFF" : "ON");     
@@ -1860,7 +1861,7 @@ void DimLeds(bool print)
     char tempStr[10] = "";
     char posStr[30]  = "";
     if (Mem.UseDS3231)  snprintf(tempStr, sizeof(tempStr), "%0.0fC", RTCklok.getTemperature());
-    if (Mem.Ringbufcnt) snprintf(posStr, sizeof(posStr), "►%u →%u", LogWritePos, LogBufferSize-LogWritePos);
+    if (Mem.Ringbufcnt) snprintf(posStr, sizeof(posStr), "@%u ->%u", LogWritePos, LogBufferSize-LogWritePos);
     snprintf(sptext, sizeof(sptext), "LDR:%3d->%2d%% %3lu kl/s %s%s ",
             LDRread, (int)(OutPhotocell * 100 / 255), Loopcounter / 1000, posStr, tempStr);               
     if(TestLDR) Tekstprintln(sptext);
