@@ -8,14 +8,15 @@ The sketch will also work with other ESP32 boards but with different pin numberi
 [See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)<br><br>
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
-The clock can be controlled with: 
-- a BLE serial monitor app on your phone, 
+The clock can be controlled with: a
+- [a BLE serial monitor app on your phone or with a web page Windows/Android](https://github.com/ednieuw/HTML-BLEserial), 
 - a web page in a browser, 
 - a serial cable connected to your PC, 
 - a rotary encoder, 
 - an IR-remote controller, 
 - a (membrane) keypad,
-- a time sender app.<br>
+- [a time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
+<br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In Chrome, since dec 2025,  you can split a TAB to see the Web page and the respone in one TAB. <br><br>
