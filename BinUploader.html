@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP32 Uploader</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;600;800&display=swap');
+
+:root {
+–bg: #0a0e1a;
+–panel: #0f1628;
+–border: #1e2d50;
+–accent: #00d4ff;
+–accent2: #ff6b35;
+–green: #00ff88;
+–text: #c8d8f0;
+–dim: #4a6080;
+–glow: 0 0 20px rgba(0,212,255,0.3);
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Exo 2’, sans-serif;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 20px;
+background-image:
+radial-gradient(ellipse at 20% 20%, rgba(0,80,150,0.15) 0%, transparent 60%),
+radial-gradient(ellipse at 80% 80%, rgba(0,212,255,0.08) 0%, transparent 50%);
+}
+
+.container {
+width: 100%;
+max-width: 680px;
+}
+
+header {
+text-align: center;
+margin-bottom: 32px;
+}
+
+.logo {
+font-family: ‘Exo 2’, sans-serif;
+font-weight: 800;
+font-size: 2.2rem;
+letter-spacing: 0.12em;
+color: var(–accent);
+text-shadow: var(–glow);
+text-transform: uppercase;
+}
+
+.logo span { color: var(–accent2); }
+
+.subtitle {
+font-size: 0.78rem;
+color: var(–dim);
+letter-spacing: 0.3em;
+text-transform: uppercase;
+margin-top: 4px;
+}
+
+.card {
+background: var(–panel);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 28px;
+margin-bottom: 16px;
+position: relative;
+overflow: hidden;
+}
+
+.card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+background: linear-gradient(90deg, transparent, var(–accent), transparent);
+opacity: 0.6;
+}
+
+.section-label {
+font-size: 0.68rem;
+font-weight: 600;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–accent);
+margin-bottom: 14px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.section-label::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+/* COM port row */
+.com-row {
+display: flex;
+gap: 10px;
+align-items: stretch;
+}
+
+select, input[type=“text”] {
+flex: 1;
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 0.9rem;
+padding: 10px 14px;
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+appearance: none;
+-webkit-appearance: none;
+}
+
+select:focus, input[type=“text”]:focus {
+border-color: var(–accent);
+box-shadow: 0 0 0 2px rgba(0,212,255,0.15);
+}
+
+select option {
+background: #111827;
+color: var(–text);
+}
+
+.btn {
+background: transparent;
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–dim);
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 0.78rem;
+padding: 10px 16px;
+cursor: pointer;
+transition: all 0.2s;
+white-space: nowrap;
+letter-spacing: 0.05em;
+}
+
+.btn:hover {
+border-color: var(–accent);
+color: var(–accent);
+box-shadow: 0 0 12px rgba(0,212,255,0.2);
+}
+
+/* File drop zone */
+.dropzone {
+border: 2px dashed var(–border);
+border-radius: 10px;
+padding: 28px;
+text-align: center;
+cursor: pointer;
+transition: all 0.25s;
+position: relative;
+}
+
+.dropzone:hover, .dropzone.drag-over {
+border-color: var(–accent);
+background: rgba(0,212,255,0.04);
+}
+
+.dropzone input[type=“file”] {
+position: absolute;
+inset: 0;
+opacity: 0;
+cursor: pointer;
+width: 100%;
+height: 100%;
+}
+
+.drop-icon {
+font-size: 2rem;
+margin-bottom: 8px;
+opacity: 0.5;
+}
+
+.drop-text {
+font-size: 0.85rem;
+color: var(–dim);
+}
+
+.drop-text strong {
+color: var(–accent);
+font-weight: 600;
+}
+
+.file-selected {
+margin-top: 10px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 0.8rem;
+color: var(–green);
+word-break: break-all;
+}
+
+/* Board select */
+.board-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+}
+
+.board-btn {
+background: var(–bg);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–dim);
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 0.78rem;
+padding: 10px 12px;
+cursor: pointer;
+transition: all 0.2s;
+text-align: left;
+line-height: 1.4;
+}
+
+.board-btn:hover {
+border-color: var(–accent);
+color: var(–text);
+}
+
+.board-btn.active {
+border-color: var(–accent);
+background: rgba(0,212,255,0.08);
+color: var(–accent);
+box-shadow: 0 0 12px rgba(0,212,255,0.15);
+}
+
+.board-btn .board-name {
+font-weight: 600;
+color: inherit;
+display: block;
+margin-bottom: 2px;
+}
+
+.board-btn .board-detail {
+font-size: 0.68rem;
+color: var(–dim);
+opacity: 0.8;
+}
+
+/* Upload button */
+.upload-btn {
+width: 100%;
+padding: 16px;
+background: linear-gradient(135deg, #0056a3, #007acc);
+border: none;
+border-radius: 10px;
+color: #fff;
+font-family: ‘Exo 2’, sans-serif;
+font-weight: 700;
+font-size: 1rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+cursor: pointer;
+transition: all 0.25s;
+margin-bottom: 16px;
+position: relative;
+overflow: hidden;
+}
+
+.upload-btn::after {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+}
+
+.upload-btn:hover:not(:disabled) {
+background: linear-gradient(135deg, #0066bb, #0090e0);
+box-shadow: 0 6px 24px rgba(0,122,204,0.4);
+transform: translateY(-1px);
+}
+
+.upload-btn:disabled {
+opacity: 0.4;
+cursor: not-allowed;
+transform: none;
+}
+
+.upload-btn.uploading {
+background: linear-gradient(135deg, #005500, #008800);
+animation: pulse-btn 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-btn {
+0%, 100% { box-shadow: 0 0 16px rgba(0,200,80,0.3); }
+50% { box-shadow: 0 0 32px rgba(0,200,80,0.6); }
+}
+
+/* Console */
+.console {
+background: #050810;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 16px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 0.8rem;
+line-height: 1.7;
+min-height: 160px;
+max-height: 300px;
+overflow-y: auto;
+color: #8ab4d4;
+}
+
+.console::-webkit-scrollbar { width: 6px; }
+.console::-webkit-scrollbar-track { background: transparent; }
+.console::-webkit-scrollbar-thumb { background: var(–border); border-radius: 3px; }
+
+.log-info  { color: #8ab4d4; }
+.log-ok    { color: var(–green); }
+.log-warn  { color: #ffcc44; }
+.log-error { color: #ff5555; }
+.log-cmd   { color: var(–accent); }
+.log-dim   { color: var(–dim); }
+
+/* Status bar */
+.status-bar {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-top: 14px;
+font-size: 0.72rem;
+color: var(–dim);
+font-family: ‘Share Tech Mono’, monospace;
+}
+
+.status-dot {
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background: var(–dim);
+display: inline-block;
+margin-right: 6px;
+}
+
+.status-dot.ok { background: var(–green); box-shadow: 0 0 6px var(–green); }
+.status-dot.error { background: #ff5555; box-shadow: 0 0 6px #ff5555; }
+.status-dot.busy { background: var(–accent); animation: blink 0.8s step-end infinite; }
+
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.2; }
+}
+
+/* Instructions toggle */
+.help-toggle {
+font-size: 0.72rem;
+color: var(–dim);
+cursor: pointer;
+text-align: center;
+margin-top: 8px;
+letter-spacing: 0.1em;
+}
+
+.help-toggle:hover { color: var(–accent); }
+
+.help-box {
+background: #050810;
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 14px 18px;
+font-size: 0.78rem;
+line-height: 1.8;
+color: var(–dim);
+margin-top: 10px;
+display: none;
+}
+
+.help-box.open { display: block; }
+
+.help-box code {
+color: var(–accent);
+font-family: ‘Share Tech Mono’, monospace;
+background: rgba(0,212,255,0.08);
+padding: 1px 5px;
+border-radius: 3px;
+}
+
+.help-box b { color: var(–text); }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+ <header>
+   <div class="logo">ESP32 <span>Flash</span> Tool</div>
+   <div class="subtitle">Firmware uploader — Windows 11</div>
+ </header>
+
+ <!-- COM poort -->
+
+ <div class="card">
+   <div class="section-label">COM Poort</div>
+   <div class="com-row">
+     <select id="comSelect">
+       <option value="">— selecteer COM poort —</option>
+     </select>
+     <button class="btn" onclick="refreshPorts()">⟳ Vernieuwen</button>
+     <button class="btn" onclick="detectPorts()">⚡ Auto-detect</button>
+   </div>
+   <div style="margin-top:10px; font-size:0.72rem; color:var(--dim);">
+     Of typ handmatig: &nbsp;
+     <input type="text" id="comManual" placeholder="bijv. COM5" style="width:120px; padding:6px 10px; font-size:0.8rem;">
+   </div>
+ </div>
+
+ <!-- Board type -->
+
+ <div class="card">
+   <div class="section-label">Board Type</div>
+   <div class="board-grid">
+     <button class="board-btn" onclick="selectBoard(this, 'esp32')" data-fqbn="esp32:esp32:esp32">
+       <span class="board-name">ESP32</span>
+       <span class="board-detail">DOIT DevKit / NodeMCU</span>
+     </button>
+     <button class="board-btn active" onclick="selectBoard(this, 'nano_esp32')" data-fqbn="arduino:esp32:nano_nora">
+       <span class="board-name">Arduino Nano ESP32</span>
+       <span class="board-detail">Nano Nora (nRF)</span>
+     </button>
+     <button class="board-btn" onclick="selectBoard(this, 'esp32s3')" data-fqbn="esp32:esp32:esp32s3">
+       <span class="board-name">ESP32-S3</span>
+       <span class="board-detail">USB-CDC native</span>
+     </button>
+     <button class="board-btn" onclick="selectBoard(this, 'esp32c3')" data-fqbn="esp32:esp32:esp32c3">
+       <span class="board-name">ESP32-C3</span>
+       <span class="board-detail">RISC-V</span>
+     </button>
+   </div>
+   <div style="margin-top:12px;">
+     <div class="section-label" style="margin-bottom:8px;">FQBN (aanpasbaar)</div>
+     <input type="text" id="fqbnInput" value="arduino:esp32:nano_nora" style="width:100%">
+   </div>
+ </div>
+
+ <!-- Bin bestand -->
+
+ <div class="card">
+   <div class="section-label">Firmware (.bin)</div>
+   <div class="dropzone" id="dropzone">
+     <input type="file" id="binFile" accept=".bin" onchange="fileSelected(this)">
+     <div class="drop-icon">📦</div>
+     <div class="drop-text">Sleep je <strong>.bin</strong> bestand hiernaartoe<br>of klik om te bladeren</div>
+     <div class="file-selected" id="fileLabel"></div>
+   </div>
+   <div style="margin-top:10px; font-size:0.72rem; color:var(--dim);">
+     Of pad handmatig: &nbsp;
+     <input type="text" id="binManual" placeholder="C:\Users\...\sketch.bin" style="width:100%; margin-top:6px;">
+   </div>
+ </div>
+
+ <!-- Upload knop -->
+
+ <button class="upload-btn" id="uploadBtn" onclick="startUpload()" disabled>
+   ▶ &nbsp; Upload Firmware
+ </button>
+
+ <!-- Console -->
+
+ <div class="card" style="padding:0; overflow:hidden;">
+   <div style="padding:14px 20px 0; display:flex; justify-content:space-between; align-items:center;">
+     <div class="section-label" style="margin-bottom:0;">Output Console</div>
+     <button class="btn" style="padding:5px 12px; font-size:0.7rem;" onclick="clearConsole()">wissen</button>
+   </div>
+   <div style="padding:12px 14px 14px;">
+     <div class="console" id="console">
+       <span class="log-dim">// ESP32 Flash Tool klaar — selecteer COM poort en .bin bestand</span>
+     </div>
+   </div>
+ </div>
+
+ <div class="status-bar">
+   <div>
+     <span class="status-dot" id="statusDot"></span>
+     <span id="statusText">Wachten op invoer</span>
+   </div>
+   <div id="avrdudeVersion" style="color:var(--dim)">esptool niet gevonden</div>
+ </div>
+
+ <!-- Help -->
+
+ <div class="help-toggle" onclick="toggleHelp()">ℹ Installatie info &amp; werking ▾</div>
+ <div class="help-box" id="helpBox">
+   <b>Vereisten:</b><br>
+   • Arduino IDE 2.x geïnstalleerd (bevat <code>arduino-cli.exe</code>)<br>
+   • Of Arduino CLI apart: <code>arduino-cli.exe</code> in je PATH<br><br>
+
+```
+<b>Hoe werkt het?</b><br>
+Dit tool genereert een <code>.bat</code> uploadscript dat via een PowerShell-brug wordt aangeroepen.<br>
+Klik op <b>Upload Firmware</b> → een <code>.bat</code> bestand wordt gedownload.<br>
+Dubbelklik dat bestand om de upload te starten.<br><br>
+
+<b>arduino-cli pad aanpassen:</b><br>
+Als Arduino IDE 2 geïnstalleerd is, staat de CLI hier:<br>
+<code>C:\Users\%USERNAME%\AppData\Local\Arduino15\...</code><br>
+of in de Arduino IDE map zelf.<br><br>
+
+<b>Direct uploaden:</b><br>
+Gebruik de gegenereerde batch als basis voor automatisering.
+```
+
+ </div>
+</div>
+
+<script>
+ let selectedBoardFqbn = 'arduino:esp32:nano_nora';
+ let selectedFile = null;
+
+ // ── Board selectie ──────────────────────────────────
+ function selectBoard(btn, id) {
+   document.querySelectorAll('.board-btn').forEach(b => b.classList.remove('active'));
+   btn.classList.add('active');
+   selectedBoardFqbn = btn.dataset.fqbn;
+   document.getElementById('fqbnInput').value = selectedBoardFqbn;
+ }
+
+ document.getElementById('fqbnInput').addEventListener('input', function() {
+   selectedBoardFqbn = this.value;
+ });
+
+ // ── COM poorten (gesimuleerd — echte detectie via gegenereerde batch) ──
+ function refreshPorts() {
+   log('info', 'COM-poorten worden opgehaald via gegenereerde batch...');
+   const sel = document.getElementById('comSelect');
+   // We vullen common COM ports in als richtlijn
+   const common = ['COM1','COM2','COM3','COM4','COM5','COM6','COM7','COM8','COM9','COM10','COM11','COM12'];
+   sel.innerHTML = '<option value="">— selecteer COM poort —</option>';
+   common.forEach(c => {
+     const opt = document.createElement('option');
+     opt.value = c;
+     opt.textContent = c;
+     sel.appendChild(opt);
+   });
+   log('ok', 'Lijst bijgewerkt — selecteer de juiste COM poort.');
+   log('dim', 'Tip: kijk in Apparaatbeheer → Poorten (COM & LPT) voor de juiste poort.');
+ }
+
+ function detectPorts() {
+   log('info', 'Auto-detect: downloaden van detectie-script...');
+   const bat = `@echo off
+echo Beschikbare COM poorten:
+echo.
+powershell -Command "Get-WMIObject Win32_SerialPort | Select-Object Name, Description | Format-Table -AutoSize"
+echo.
+pause`;
+   downloadText('detecteer-compoorten.bat', bat);
+   log('ok', 'detecteer-compoorten.bat gedownload — dubbelklik om poorten te zien.');
+ }
+
+ // ── Bestand selectie ────────────────────────────────
+ function fileSelected(input) {
+   if (input.files.length > 0) {
+     selectedFile = input.files[0];
+     document.getElementById('fileLabel').textContent = '✓ ' + selectedFile.name;
+     log('ok', 'Bestand geselecteerd: ' + selectedFile.name + ' (' + formatBytes(selectedFile.size) + ')');
+     checkReady();
+   }
+ }
+
+ // Drag & drop
+ const dz = document.getElementById('dropzone');
+ dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+ dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+ dz.addEventListener('drop', e => {
+   e.preventDefault();
+   dz.classList.remove('drag-over');
+   const f = e.dataTransfer.files[0];
+   if (f && f.name.endsWith('.bin')) {
+     selectedFile = f;
+     document.getElementById('fileLabel').textContent = '✓ ' + f.name;
+     log('ok', 'Bestand gesleept: ' + f.name + ' (' + formatBytes(f.size) + ')');
+     checkReady();
+   } else {
+     log('warn', 'Alleen .bin bestanden zijn toegestaan.');
+   }
+ });
+
+ // ── Klaar-check ─────────────────────────────────────
+ function getComPort() {
+   const manual = document.getElementById('comManual').value.trim();
+   const sel = document.getElementById('comSelect').value;
+   return manual || sel;
+ }
+
+ function getBinPath() {
+   const manual = document.getElementById('binManual').value.trim();
+   return manual || (selectedFile ? selectedFile.name : '');
+ }
+
+ document.getElementById('comSelect').addEventListener('change', checkReady);
+ document.getElementById('comManual').addEventListener('input', checkReady);
+ document.getElementById('binManual').addEventListener('input', checkReady);
+
+ function checkReady() {
+   const ready = getComPort() && (selectedFile || document.getElementById('binManual').value.trim());
+   document.getElementById('uploadBtn').disabled = !ready;
+ }
+
+ // ── Upload → genereert .bat ─────────────────────────
+ function startUpload() {
+   const com = getComPort();
+   const binManual = document.getElementById('binManual').value.trim();
+   const fqbn = document.getElementById('fqbnInput').value.trim() || selectedBoardFqbn;
+
+   if (!com) { log('error', 'Geen COM poort opgegeven.'); return; }
+
+   const btn = document.getElementById('uploadBtn');
+   btn.classList.add('uploading');
+   btn.disabled = true;
+   btn.textContent = '⏳  Batch genereren...';
+   setStatus('busy', 'Batch aanmaken...');
+
+   log('cmd', '> Upload gestart → ' + com + ' | ' + fqbn);
+
+   // Bepaal het bin-pad in de batch
+   // Als er een file geselecteerd is, halen we de naam op; het pad is onbekend in de browser.
+   // Als de gebruiker een handmatig pad invult, gebruiken we dat.
+   const usesManualPath = !!binManual;
+   const binPathInBat = usesManualPath ? binManual : '%~dp0' + (selectedFile ? selectedFile.name : 'firmware.bin');
+
+   const batContent = generateBatch(com, fqbn, binPathInBat, usesManualPath, selectedFile?.name);
+
+   setTimeout(() => {
+     downloadText('upload-esp32.bat', batContent);
+
+     // Als er een file object is, ook die downloaden
+     if (selectedFile && !usesManualPath) {
+       log('info', 'Let op: sla het .bin bestand op in dezelfde map als upload-esp32.bat');
+     }
+
+     log('ok', 'upload-esp32.bat gedownload!');
+     log('info', 'Stap 1: Sla het .bin bestand op naast het .bat bestand (als je geen pad ingevuld hebt)');
+     log('info', 'Stap 2: Dubbelklik upload-esp32.bat om te uploaden');
+     log('dim', '─────────────────────────────────────────────');
+
+     btn.classList.remove('uploading');
+     btn.disabled = false;
+     btn.textContent = '▶  Upload Firmware';
+     setStatus('ok', 'Batch gegenereerd — zie Downloads map');
+   }, 600);
+ }
+
+ function generateBatch(com, fqbn, binPath, usesManualPath, originalFilename) {
+   // Zoek arduino-cli op bekende locaties
+   return `@echo off
+setlocal EnableDelayedExpansion
+title ESP32 Firmware Upload
+color 0B
+
+echo.
+echo  ╔══════════════════════════════════════════╗
+echo  ║      ESP32 Firmware Uploader             ║
+echo  ║      COM: ${com.padEnd(8)} FQBN: ${fqbn.substring(0,18).padEnd(18)} ║
+echo  ╚══════════════════════════════════════════╝
+echo.
+
+REM ── Zoek arduino-cli ────────────────────────────────────────────────
+set "CLI="
+
+REM 1. In PATH
+where arduino-cli.exe >nul 2>&1 && set "CLI=arduino-cli.exe"
+
+REM 2. Arduino IDE 2 default locaties
+if not defined CLI (
+ for %%D in (
+   "%LOCALAPPDATA%\\Arduino15\\packages\\builtin\\tools\\arduino-cli"
+   "%ProgramFiles%\\Arduino IDE\\resources\\app\\lib\\backend\\resources"
+   "%ProgramFiles(x86)%\\Arduino IDE\\resources\\app\\lib\\backend\\resources"
+   "%USERPROFILE%\\AppData\\Local\\Programs\\Arduino IDE\\resources\\app\\lib\\backend\\resources"
+ ) do (
+   if not defined CLI (
+     for /r "%%D" %%F in (arduino-cli.exe) do (
+       if not defined CLI set "CLI=%%F"
+     )
+   )
+ )
+)
+
+REM 3. esptool als fallback (voor .bin direct)
+set "ESPTOOL="
+where esptool.py >nul 2>&1 && set "ESPTOOL=esptool.py"
+if not defined ESPTOOL where esptool >nul 2>&1 && set "ESPTOOL=esptool"
+
+if not defined CLI (
+ if not defined ESPTOOL (
+   echo [FOUT] Kan arduino-cli.exe of esptool niet vinden.
+   echo.
+   echo Oplossingen:
+   echo  1. Installeer Arduino IDE 2 van https://www.arduino.cc/en/software
+   echo  2. Of voeg arduino-cli.exe handmatig toe aan je PATH
+   echo  3. Of installeer esptool: pip install esptool
+   echo.
+   pause
+   exit /b 1
+ )
+)
+
+REM ── Bin bestand ─────────────────────────────────────────────────────
+${usesManualPath
+ ? `set "BINFILE=${binPath}"`
+ : `set "BINFILE=%~dp0${originalFilename || 'firmware.bin'}"
+if not exist "!BINFILE!" (
+ echo [FOUT] .bin bestand niet gevonden: !BINFILE!
+ echo Zorg dat het bestand naast dit .bat bestand staat.
+ pause
+ exit /b 1
+)`
+}
+
+echo Uploaden naar ${com}...
+echo Bestand: !BINFILE!
+echo Board:   ${fqbn}
+echo.
+
+REM ── Upload via arduino-cli ───────────────────────────────────────────
+if defined CLI (
+ echo Methode: arduino-cli
+ echo.
+ "!CLI!" upload --port ${com} --fqbn ${fqbn} --input-file "!BINFILE!" --verbose
+ if errorlevel 1 goto :UPLOAD_FAIL
+) else (
+ REM ── Fallback: esptool direct ─────────────────────────────────────
+ echo Methode: esptool (fallback)
+ echo.
+ REM Probeer flash_freq en flash_mode automatisch
+ "!ESPTOOL!" --chip esp32 --port ${com} --baud 921600 write_flash -z 0x1000 "!BINFILE!"
+ if errorlevel 1 goto :UPLOAD_FAIL
+)
+
+echo.
+echo  ╔══════════════════════════════════════════╗
+echo  ║  ✓  Upload succesvol!                    ║
+echo  ╚══════════════════════════════════════════╝
+echo.
+pause
+exit /b 0
+
+:UPLOAD_FAIL
+echo.
+echo  [FOUT] Upload mislukt. Controleer:
+echo   • Juiste COM poort (nu: ${com})
+echo   • ESP32 in flash-modus (houd BOOT knop ingedrukt bij aansluiten)
+echo   • Juiste FQBN voor je board (nu: ${fqbn})
+echo   • Driver geïnstalleerd (CH340 / CP210x / FTDI)
+echo.
+pause
+exit /b 1
+`;
+ }
+
+ // ── Utilities ───────────────────────────────────────
+ function downloadText(filename, content) {
+   const blob = new Blob([content], { type: 'text/plain' });
+   const a = document.createElement('a');
+   a.href = URL.createObjectURL(blob);
+   a.download = filename;
+   a.click();
+ }
+
+ function formatBytes(b) {
+   if (b < 1024) return b + ' B';
+   if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+   return (b/1048576).toFixed(2) + ' MB';
+ }
+
+ const con = document.getElementById('console');
+ function log(type, msg) {
+   const span = document.createElement('span');
+   span.className = 'log-' + type;
+   const prefix = { info:'ℹ', ok:'✓', warn:'⚠', error:'✗', cmd:'$', dim:'' }[type] || '';
+   span.textContent = (prefix ? prefix + ' ' : '') + msg;
+   con.appendChild(span);
+   con.appendChild(document.createElement('br'));
+   con.scrollTop = con.scrollHeight;
+ }
+
+ function clearConsole() {
+   con.innerHTML = '<span class="log-dim">// console gewist</span><br>';
+ }
+
+ function setStatus(state, msg) {
+   document.getElementById('statusDot').className = 'status-dot ' + state;
+   document.getElementById('statusText').textContent = msg;
+ }
+
+ function toggleHelp() {
+   document.getElementById('helpBox').classList.toggle('open');
+ }
+
+ // Initialiseer
+ log('dim', '// ESP32 Flash Tool v1.0 — ednieuw');
+ log('info', 'Selecteer een COM poort en .bin bestand om te beginnen.');
+ log('dim', 'Tip: gebruik "Auto-detect" voor een lijst van beschikbare poorten.');
+</script>
+
+</body>
+</html>
+
+
