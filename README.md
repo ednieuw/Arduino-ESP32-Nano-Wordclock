@@ -8,7 +8,7 @@ The sketch will also work with other ESP32 boards but with different pin numberi
 [See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)<br><br>
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
-The clock can be controlled with: a
+The clock can be controlled with a:
 - [a BLE serial monitor app on your phone or with a web page Windows/Android](https://github.com/ednieuw/HTML-BLEserial), 
 - a web page in a browser, 
 - a serial cable connected to your PC, 
@@ -35,7 +35,7 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 Clock with Corten steel face
 
 # Hardware
-For my projects I designed printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
+For my projects I designed a printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
 
 This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCBs for $5. With +/-$25 shipping and custom charges this is very cheap. The PCBs were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
@@ -313,7 +313,7 @@ ___________________________________
 A SSID, B Password, C BLE beacon name
 D Date (D15012021), T Time (T132145)
 E Timezone (E<-02>2 or E<+01>-1)
-F Own colour (FWWRRGGBB or Fwrgb)
+F Own V Bkgn colour (FWWRRGGBB Fwrgb)
 G Scan WIFI networks
 H H01 rotary H02 buttons H03/04 remote
 } Learn IR remote, + Fast BLE
@@ -329,11 +329,9 @@ Unnn Demo (U200 msec), Y LED test
 ) HETISWAS  On/Off, ( EdSoft On/Off
 #nnn Selftest,  RTC: ! See, & Update
 W WIFI, X NTP, Z WPS, CCC BLE
-Ed Nieuwenhuijs Feb 2026
+Ed Nieuwenhuijs Apr 2026
 ___________________________________
 Display off between: 00h - 00h
-Display off between: 00h - 00h
-
 RandomDisplay:Off, Timestamp:/min
 Slope: 1     Min: 5     Max: 2 
 SSID: FRITZ!BoxEd
@@ -434,11 +432,13 @@ E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3
 
 ### Own colour (FWWRRGGBB or Fwrgb) <br>
 With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
-The format to be entered is hexadecimal. 0123456789ABCDEF are the characters that can be used. <br>
-The command is 2 digits for white followed with two digits for Red followed with two digits for Green and ending with two digits for Blue.<br>
+The format to be entered is hexadecimal, 0123456789ABCDEF or decimal, 0123456789. <br>
+The decimal range is made for users that are not familiar with hexadecimal arithmetic.<br>
+The hexadecimal command is 2 characters for white followed with two characters for Red followed with two characters for Green and ending with two digits for Blue.<br>
+The hexadecimal range is 00-FF, or 0-256 decimal and the decimal range is limited to 0-9.
 To colour the characters intense red enter FF0000 prefixed with the character F. <br>
-To set intense blue enter: F0000FF or FFF.<br>
-To set the dimmed character to dark gray enter for example: F191919. <br>
+To set intense blue enter: F000000FF or FFF.<br>
+To set the dimmed character to dark gray enter for example: F00191919. <br>
 You get gray if red, green and blue have the same intensity.
 With SK6812 LEDs the extra white LED can be used besides the three RGB LEDs in the same housing.
 For example: F8800FF00 is 50% white with 100% green.
@@ -455,7 +455,7 @@ H02 Keypad<br>
 H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER<br>
 H04 Tiny IR-remote with six buttons<br>
 H05 Turn On/Off the use of the BLE time sender app<br>
-The h05 option can be used when the clock has no WIFI. The app sends the time every minute when the app is started iand in the neighbouthood of the clock.  
+The H05 option can be used when the clock has no WIFI. The app sends the time every minute when the app is started iand in the neighbouthood of the clock.  
 
 ### } Learn IR remote
 Start learning the keys of a new infrared remote.
@@ -484,7 +484,7 @@ With N2208 the display will be turned off between 22:00 and 08:00.
 Toggles the display off and on.
 
 ### P Display toggle On/Off<br>
-Toggle status LEDs on the board On/Off.. 
+Toggle status LEDs on the board On/Off.
 
 ###  Q Display choice (Q0-9)<br>
 Q0 will show the time with yellow words., HETISWAS changing. <br>
@@ -509,9 +509,22 @@ Enter U followed with the duration of a second in milli seconds.
 M200 (200 millisecond) will speed up the clock 5*60 times.  
 Sending an U will turn off the demo mode or if not in demo mode start demo mode with 800 ms/min.
 
+### V Backgroung colour (VWWRRGGBB or Vwrgb) <br>
+With this option you can set the colour and intensity of the LEDs that are normally not turned on.
+This option is usefull when there is light leakage between the characters or to highlight the characters turned off.
+When this option is used the minimal light intensity is set to 50 bits to avoid that the background light with get off during the evening.<br>
+50 bits is 20% of the max intensity. When you enter a background of say hexadecimal 10 (=16 decimal) the 20% of 16  = 3 bits and that is almost off.<br>
+<br>
+The format to be entered is hexadecimal, 0123456789ABCDEF or decimal, 0123456789. <br>
+The decimal range is made for users that are not familiar with hexadecimal arithmetic.
+The hexadecimal command is 2 characters for white followed with two characters for Red followed with two characters for Green and ending with two digits for Blue.<br>
+The hexadecimal range is 00-FF, that is a decimal range of 0-256 and the decimal range is limited to 0-9.
+To colour the characters weak red enter V00110000 or decimal V0100. <br>
+To set weak blue enter: V00000011 or V0001 decimal.<br>
+With the command V the background light is turned off and minimal light intensity to 10
+
 ### Y Play lights
 To test the functionality of the LEDs.
-This option does not work from the menu web page.
 
 ### S Slope, L Min, M Max (S50 L5 M200)
 
@@ -554,12 +567,10 @@ The BLE UART protocol sends default packets of 20 bytes. Between every packet th
 The IOS BLEserial app, and maybe others too, is able to receive packets of 80 bytes or more before characters are missed.<br>With most apps you will see these will truncate the long strings of the menu.<br>
 Then turn off Fast BLE. <br>
 Option Z toggles between the long and short packages. 
-Settings are stored in the SPIFFS space on the Arduino Nano ESP32
 
 ### ~ = change display mode per minute or hour
 ~ will start the changing display mode option. ~ or ~1 will change the dislay mode every minute and ~2 every hour. ~ or ~0 turns the option off. 
 It is convenient for testing and demonstrations.
-
 
 ### ! = Show NTP, RTC and DS3231 time
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and in use to show a realistic time.
