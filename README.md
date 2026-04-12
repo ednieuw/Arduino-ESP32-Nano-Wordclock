@@ -341,7 +341,7 @@ Timezone:CET-1CEST,M3.5.0,M10.5.0/3
 WIFI=On NTP=On BLE=On FastBLE=Off
 No Rotary,   DS3231=Off
 SK6812 strip with 148 LEDs (switch %)
-Software: ESP32_WordClockV184.ino
+Software: ESP32_WordClockV199.ino
 ESP32 Arduino core version: 3.3.6
 __________________________________
 </pre>
@@ -460,8 +460,8 @@ The H05 option can be used when the clock has no WIFI. The app sends the time ev
 ### } Learn IR remote
 Start learning the keys of a new infrared remote.
   
-### Info menu, II long menu
-Print the menu to Bluetooth and the serial monitor when connected with an USB-cable. 
+### I short menu, II long menu
+Print the menu. 
 `i` prints the short info menu.
 `ii` prints the extended menu (long help).
 
