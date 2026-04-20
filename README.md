@@ -19,7 +19,7 @@ The clock can be controlled with a:
 <br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
-<br>In Chrome, since dec 2025,  you can split a TAB to see the Web page and the respone in one TAB. <br><br>
+<br>In Chrome and Edge you can split a TAB to see the Web page and the Serial monitor response in one TAB. <br><br>
 
 To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
@@ -27,7 +27,7 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 
 | | |
 |---|---|
-| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | It will keep its time within the second correct with the internet Network Time Protocol (NTP) time with time zone and daylight-saving corrections.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>A user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
+| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>A user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
 
 
 
@@ -37,7 +37,7 @@ Clock with Corten steel face
 # Hardware
 For my projects I designed a printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
 
-This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB with the Fritzing app itself.<br>
+This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB made in Europe with the Fritzing app itself.<br>
 [PCBWay](https://www.pcbway.com/) print 10 PCBs for $5. With +/-$25 shipping and custom charges this is very cheap. The PCBs were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
 The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
@@ -48,8 +48,9 @@ The SK6812 RGBW LED-strip operates at 5V. But the data signal from the Nano is o
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. See here: 
 https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
-But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more LEDs in the strip.<br>
+But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
 The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
+ 
 
 ![Nano-ESP32-V04](https://github.com/user-attachments/assets/3ad06452-0dd4-4310-8b51-25c115ec3959)
 
@@ -341,8 +342,8 @@ Timezone:CET-1CEST,M3.5.0,M10.5.0/3
 WIFI=On NTP=On BLE=On FastBLE=Off
 No Rotary,   DS3231=Off
 SK6812 strip with 148 LEDs (switch %)
-Software: ESP32_WordClockV199.ino
-ESP32 Arduino core version: 3.3.6
+Software: ESP32_WordClockV200.ino
+ESP32 Arduino core version: 3.3.7
 __________________________________
 </pre>
 
@@ -388,14 +389,15 @@ Reset to default setting by send R.<br><br>
 	
 <table cellspacing="6" style="width: auto">
 <tr>
-<td style="width: 318px">
-<img alt="Phone" src="Pics/IMG_9449.jpg" width="350" class="auto-style4" /></td>
+<td style="width: 280px">
+<img alt="Phone" src="Pics/V200HTMLserialMenu.jpg" height="550" class="auto-style4" /></td>
 <td>
-<img alt="WIFI-BLE" src="Pics/IMG_9448.jpg" width="350" class="auto-style4" /></td>
+<img alt="WIFI-BLE" src="Pics/V200BLE
+serialMenu.jpg" height="550" class="auto-style4" /></td>
 </tr>
 <tr>
-<td style="width: 318px" >HTML page</td>
-<td >BLE menu</td>
+<td style="width: 280px" >HTML page</td>
+<td >BLEserial iPhone menu</td>
 </tr>
 </table>
 
@@ -511,14 +513,14 @@ Sending an U will turn off the demo mode or if not in demo mode start demo mode 
 
 ### V Backgroung colour (VWWRRGGBB or Vwrgb) <br>
 With this option you can set the colour and intensity of the LEDs that are normally not turned on.
-This option is usefull when there is light leakage between the characters or to highlight the characters turned off.
+This option is usefull when there is light leakage between the characters or to highlight the characters turned off.<br>
 When this option is used the minimal light intensity is set to 50 bits to avoid that the background light with get off during the evening.<br>
 50 bits is 20% of the max intensity. When you enter a background of say hexadecimal 10 (=16 decimal) the 20% of 16  = 3 bits and that is almost off.<br>
 <br>
 The format to be entered is hexadecimal, 0123456789ABCDEF or decimal, 0123456789. <br>
 The decimal range is made for users that are not familiar with hexadecimal arithmetic.
 The hexadecimal command is 2 characters for white followed with two characters for Red followed with two characters for Green and ending with two digits for Blue.<br>
-The hexadecimal range is 00-FF, that is a decimal range of 0-256 and the decimal range is limited to 0-9.
+The hexadecimal range is 00-FF, that is a decimal range of 0-255 and the decimal range is limited to 0-9.
 To colour the characters weak red enter V00110000 or decimal V0100. <br>
 To set weak blue enter: V00000011 or V0001 decimal.<br>
 With the command V the background light is turned off and minimal light intensity to 10
@@ -557,7 +559,7 @@ Sending the character will toggle it on or off. <br>
 At the bottom of the long menu (ii) the state is printed.<br>
  </td>
 <td>
-<img alt="Bottom menu" class="auto-style4" src="Pics/BottomMenu.gif" /></td>
+<img alt="Bottom menu" class="auto-style4" src="Pics/BottomMenu.jpg" /></td>
 </tr>
 </table>
 
@@ -625,15 +627,13 @@ Remember to install the ESP32 boards as explained above.<br>
 //------------------------------------------------------------------------------              //
 // ESP32 Includes defines and initialisations
 //-------------------------------------------
-#if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (5, 2, 0)  // Disabled. Change to 3,2,0 to Use EdSoftLED  with ESP32 compiler.
-#define USEEDSOFTLED
-#endif
-
-#include <Preferences.h>
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (5, 2, 0)            // Use EdSoftLED with ESP32 compiler.
+#define USEEDSOFTLED  // Use EdsoftLED >= V1.7.0 for SK6812. Saves 200-500 bytes compared with NeoPixel. NeoPixel is OK
+                      #endif
                       #ifdef USEEDSOFTLED
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
                       #else
-#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel   for LED strip WS2812 or SK6812
+#include <Adafruit_NeoPixel.h> // https://github.com/adafruit/Adafruit_NeoPixel  *** USE GPIO NUMBERING and compile By GPIO number (legacy) 
                       #endif
 #include <Preferences.h>
 #include <NimBLEDevice.h>      // For BLE communication. !!!Use NimBLE version 2.x.x  https://github.com/h2zero/NimBLE-Arduino
@@ -644,13 +644,11 @@ Remember to install the ESP32 boards as explained above.<br>
 #include <Update.h>            // For Over-the-Air (OTA)
 #include <ESPmDNS.h>           // To show BLEname in router
 #include <DNSServer.h>         // For the web page to enter SSID and password of the WIFI router 
-#include <Wire.h>              // Ter zijner tijd Wire functies gaan gebruiken. Staan al klaar in de code 
+#include <Wire.h>              //  
 #include <RTClib.h>            // Used for connected DS3231 RTC // Reference https://adafruit.github.io/RTClib/html/class_r_t_c___d_s3231.html
 #include <Encoder.h>           // For rotary encoder
 #include <Keypad.h>            // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
 #include <IRremote.hpp>        // IR remote control
-
-#include "ClockFaces.h"           // For 3x1 membrane keypad instead of rotary encoder by Mark Stanley & Alexander Brevig 
 
 </pre>
 
@@ -682,7 +680,7 @@ With a simple find it is easy in this one great listing to find the back.<br>
 To print the time as text and colour with the proper LEDs or characters, the words and its position in a string of LEDs or text are defined. <br>
 The defines executes the function ColorLeds with its proper parameters.<br>
 Further in the program in the function void Dutch(void), void English(void) et cetera it becomes clear why these defines are so useful and handy.  
-
+The definitions are placed in the TAB "ClockFaces.h"
 <pre> ...   
 #define PRECIES ColorLeds("precies", 16, 22, LetterColor);
 #define MTIEN   ColorLeds("tien", 25, 28, LetterColor); 
@@ -695,13 +693,13 @@ The Struct with all its settings is saved in one command to permanent memory or 
 Preferences FLASHSTOR; <br>
 <br>
 <pre> ...  
-struct EEPROMstorage { // Data storage in EEPROM to maintain them after power loss <br>
-byte DisplayChoice = 0; <br>
+struct EEPROMstorage { // Data storage in EEPROM to maintain them after power loss 
+byte DisplayChoice = 0; 
 ... <br>
-char BLEbroadcastName[30]; // Name of the BLE beacon <br>
-char Timezone[50]; <br>
-int Checksum = 0; <br>
-} Mem; <br>
+char BLEbroadcastName[30]; // Name of the BLE beacon 
+char Timezone[50];
+int Checksum = 0;
+} Mem;
 ... 
 </pre>
 <br>
@@ -710,20 +708,19 @@ For example Mem.DisplayChoice = 3; <br>
 <br>
 The Struct EEPROMstorage is stored with the function StoreStructInFlashMemory and retrieved with the function GetStructFromFlashMemory <br>
 <br>
-<br><br>
+
 The menu displayed in the serial monitor and BLE app is defined here.<br>
-Strings may not be longer than 40 characters what can be checked with the 'ruler' string. <br>
 
 ```cpp
 // Menu 
 //0        1         2         3         4 
 //1234567890123456789012345678901234567890  
-char menu[][40] = { 
+const char *menu[] = { 
 "A SSID B Password C BLE beacon name", 
 "D Date (D15012021) T Time (T132145)", 
 ... 
 "W=WIFI, X=NTP, Y=BLE, Z=Fast BLE",  
-"Nov 2022" };
+"Apr 2026" };
 ```
  The Setup happens here: 
 ```cpp
@@ -749,10 +746,11 @@ There is nothing in this program that should be executes every millisecond or le
 void loop() 
 {
  Loopcounter++;
- if (Demo)         Demomode();
- else              EverySecondCheck();                 // Let the second led tick and run the clock program
+ if (Demo)            Demomode();  
+ else if(FireDisplay) FireMode(); 
+ else                 EverySecondCheck();  
  CheckDevices();
-} 
+}
 ```
 
 The following routines check if something must happen every second, minute, hour and day.<br>
@@ -767,12 +765,20 @@ In the serial monitor the number of loops per second is printed. This can be han
 //--------------------------------------------
 void CheckDevices(void)
 {
- CheckBLE();                                                  // Something with BLE to do?
- SerialCheck();                                               // Check serial port every second 
- NTPsyncEvent();                                              // Check for NTP events
- ElegantOTA.loop();                                           // For Over The Air updates
- if (Mem.UseRotary==1) RotaryEncoderCheck(); 
+ CheckBLE();
+ SerialCheck();
+ CheckWIFIcommand();
+ if (Mem.TimeReceiver) CheckTimeReceiverClient();
+ if (Mem.UseRotary==1) RotaryEncoderCheck();
  if (Mem.UseRotary==2) Keypad3x1Check();
+ if (Mem.UseRotary==3 || Mem.UseRotary==4) IrReceiverDecode();
+ if (ntpJustSynced) CheckandPrintNTPsynced();
+                                  #ifdef ONEWIREKEYPAD3x4   
+ OnewireKeypad3x4Check(); 
+                                  #endif  //ONEWIREKEYPAD3x4
+                                  #ifdef ONEWIREKEYPAD3x1   
+ OnewireKeypad3x1Check(); 
+                                  #endif  //ONEWIREKEYPAD3x1
 }
 //-------------------------------------------- 
 // CLOCK Update routine done every second 
@@ -803,24 +809,16 @@ void EveryHourUpdate(void)
 ... 
 if (timeinfo.tm_mday != lastday) EveryDayUpdate();  
 }
-// // 
-//------------------------------------------------------------------------------ 
+
+//-------------------------------------------- 
 // CLOCK Update routine done every day 
-//------------------------------------------------------------------------------ 
+//-------------------------------------------- 
 void EveryDayUpdate(void) 
 {
 ... 
 }
 ```
 <br>
-Update the LEDs on the Nano and the PCB. 
-On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON<br>
-With ESP32 core 3 the resolution of the of the RMT channel is from 8 - 10 bits default. <br>
-This prevents that the LED does not turn off completely when compiling with core 3: 
-
-```cpp
-analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red)); 
-```
 
 ```cpp
 //--------------------------------------------                                                //
@@ -845,29 +843,52 @@ void UpdateStatusLEDs(int Toggle)
     SetNanoLED13(0);      
    }
 }
-//--------------------------------------------                                                //
-// COMMON Control the RGB LEDs on the Nano ESP32
-// Analog range 0 - 512. 0 is LED Off, 512 is max intensity
-// 512 is LED off. Therefore the value is subtracted from 512
-// in core 3 the value to write is 13-bit 8191 to turn off the led completely
-//  rgbLedWrite(512-Red,512-Green,512-Blue);
+```
+Update the LEDs on the Nano ESP32 and the PCB. 
+On the Nano analogWrite(LED_RED,   512); is OFF and analogWrite(LED_RED, 0); is ON<br>
+When compiling with Espressif ESP32 core 3.x.x the resolution of the of the RMT channel is raised from 8 -> 10 bits. <br>
+This prevents that the LED does not turn off completely when compiling with core 3. ( 8191 = 10^2)
+
+```cpp
+analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red)); 
+```
+
+```cpp
 //--------------------------------------------
-void SetStatusLED(int Red, int Green, int Blue)                                               // If LED should be off, use digitalWrite instead of analogWrite
+// COMMON Control the RGB LEDs on the Nano ESP32
+//--------------------------------------------
+void SetStatusLED(int Red, int Green, int Blue) 
 {
  analogWrite(LED_RED,   Red   == 0 ? 8191 : (512 - Red));
  analogWrite(LED_GREEN, Green == 0 ? 8191 : (512 - Green));
  analogWrite(LED_BLUE,  Blue  == 0 ? 8191 : (512 - Blue));
 }
-//--------------------------------------------                                                //
+```
+
+```cpp
+//--------------------------------------------
 // COMMON Control orange LED D13 on the Arduino 
 //--------------------------------------------
 void SetNanoLED13(int intensity) {analogWrite(secondsPin, intensity);}
-//--------------------------------------------                                                //
+```
+
+```cpp
+//--------------------------------------------
 // COMMON Control the RGB LED on the PCB
 //--------------------------------------------
 void SetPCBLED09(int intensity) {analogWrite(PCB_LED_D09, intensity);}
 void SetPCBLED10(int intensity) {analogWrite(PCB_LED_D10, intensity);}
 
+```
+Control the color and intensity of the LED on the boards in one command <br>
+```cpp
+//
+--------------------------------------------
+// CLOCK Control the LEDs on the ESP32 
+// 0 Low is LED off. Therefore the value is inversed with the ! Not 
+//-------------------------------------------- 
+void SetStatusLED(bool Red, bool Green, bool Blue) 
+{
 ```
 
 
@@ -879,41 +900,49 @@ Check for serial input from the serial monitor and pass the command to ReworkInp
 void SerialCheck(void) 
 {
 ... 
-ReworkInputString(SerialString+"\n"); // Rework ReworkInputString(); 
+ReworkInputString(SerialString); // Processes the inputstring in the menu 
 ... 
 }
 ```
 
 Restore all the default values. 
 ```cpp
-//------------------------------------------------------------------------------ 
+//-------------------------------------
 // Common Reset to default settings 
-//------------------------------------------------------------------------------ 
-void Reset(void) 
+//--------------------------------------
+void Reset(void)
 {
-Mem.Checksum = 25065;
+ Mem.Checksum         = 25065;
+ Mem.DisplayChoice    = DEFAULTCOLOUR; 
+ Mem.OwnColour        = green; 
+ Mem.DimmedLetter     = black;
+ Mem.BackGround       = black; 
 ...
+ StoreStructInFlashMemory();   
+ GetTijd(false); 
+ SWversion();
+ Displaytime();Tekstprintln("");
+}
+
  }
  ```
 
 Common print routines.<br>
 
-To keep all the print commands in one places it is easy to change these routines 
-for other boards with a different 'slang'. <br>
+To keep all the print commands in one places it is easy to change these routines for other boards with a different 'slang'. <br>
 ```cpp
 //-------------------------------------------- 
 // Common common print routines 
 //-------------------------------------------- 
-void Tekstprint(char const tekst[]) { if(Serial) Serial.print(tekst); SendMessageBLE(tekst);sptext[0]=0; }  
-void Tekstprintln(char const tekst[]) { sprintf(sptext,"%s\n",tekst); Tekstprint(sptext); } 
-void TekstSprint(char const tekst[]) { printf(tekst); sptext[0]=0;} // printing for Debugging purposes in serial monitor  
-void TekstSprintln(char const tekst[]){ sprintf(sptext,"%s\n",tekst); TekstSprint(sptext); } 
-//------------------------------------------------------------------------------ 
-// Common Constrain a string with integers 
-// The value between the first and last character in a string is returned between the low and up bounderies 
-//------------------------------------------------------------------------------ 
-int SConstrainInt(String s,byte first,byte last,int low,int up){return constrain(s.substring(first, last).toInt(), low, up);} 
-int SConstrainInt(String s,byte first, int low,int up){return constrain(s.substring(first).toInt(), low, up);} 
+void Tekstprint(char const *tekst)    { if(Serial) Serial.print(tekst); SendMessageTimeReceiver(tekst); SendMessageBLE(tekst); AddLog(tekst);}  
+void Tekstprintln(char const *tekst)  { snprintf(sptext, sizeof(sptext),"%s\n",tekst); Tekstprint(sptext); }
+void Tekstprintf(const char* fmt, ...) 
+{ va_list args; va_start(args, fmt); vsnprintf(sptext, sizeof(sptext), fmt, args); va_end(args); Tekstprint(sptext);}
+
+void Tekstprintlnf(const char* fmt, ...) 
+{ va_list args; va_start(args, fmt); vsnprintf(sptext, sizeof(sptext), fmt, args); va_end(args);  Tekstprintln(sptext);}
+
+
 ```
 
 The setup of storage space and control of the validity of the settings.<br>
@@ -977,12 +1006,12 @@ The menu letters are almost used but it possible to distinguish between lower an
 void ReworkInputString(String InputString) 
 {
 ....  
-switch (InputString[0]) 
-{
-case 'A': 
-case 'a':  
-if (InputString.length() >5 ) 
-... 
+  int len = InputString.length();
+  switch(toupper(InputString[0])) 
+   {
+    case 'A':
+      if(len > 4 && len < 30)
+.... 
 ```
 
 Read the LDR and divide it with 16 to get the values from 0 - 4096 between 0 and 255.<br>
@@ -996,16 +1025,6 @@ Not all boards has a 12 bit AD converter like.
 int ReadLDR(void) {  return analogRead(PhotoCellPin)/16;} 
 ```
 
-Control the color and intensity of the LED on the boards in one command <br>
-```cpp
-//
---------------------------------------------
-// CLOCK Control the LEDs on the ESP32 
-// 0 Low is LED off. Therefore the value is inversed with the ! Not 
-//-------------------------------------------- 
-void SetStatusLED(bool Red, bool Green, bool Blue) 
-{
-```
 
 Here we print and colour the characters in the display or light up to proper LEDs in a String of RGB(W) LEDs.<br>
 The #define executes this functions with the proper parameters for every language and prints the texts in the serial connections.<br>
@@ -1021,9 +1040,9 @@ void ColorLeds(char const *Texkst, int FirstLed, int LastLed, uint32_t RGBColor)
 
 Every display or strip uses other commands to regulate the brightness. Therefore for all LED/Display commands a function.
 ```cpp
-//------------------------------------------------------------------------------ 
+//----------------------------------------------
 // LED Set brightness of backlight 
-//------------------------------------------------------------------------------ 
+//------------------------------------------------
 void SetBrightnessLeds(byte Bright) 
 { 
  SetBackLight(Bright);                        // Set brightness of LEDs 
@@ -1061,9 +1080,9 @@ switch (Mem.DisplayChoice)
 
 Subroutine for the Self test of the clock. Default there is a 900 ms delay.
 ```cpp
-//------------------------------------------------------------------------------
+//------------------------------------
 // CLOCK Self test sequence
-//------------------------------------------------------------------------------
+//--------------------------------------
 void Selftest(void){Selftest(900);}
 void Selftest(int Delayms)
 { 
@@ -1082,12 +1101,12 @@ It also sends the appropriate sequence of colour and intensities to a RGB(W) LED
 //--------------------------------------------
 void Displaytime(void) 
 {  
-LedsOff();                                                                                  // Start by clearing the display to a known state   
+LedsOff();   
  if( Mem.DisplayChoice == DIGITAL ) { TimePlaceDigit(timeinfo.tm_hour,timeinfo.tm_min); }
- else                                                                                        // If not a digital display 
+ else
    {
                      #ifdef NL144CLOCK
-    Dutch();                                                                                 // If TurnLEDsOff is true a new time must be send to the LEDstrip      
+    Dutch();  
                      #endif  //NL144CLOCK
 ...
                      #ifdef FOURLANGUAGECLOCK
@@ -1128,14 +1147,14 @@ void StartLeds(void)
       case 0: LEDstrip = LED6812strip; 
               white  = 0xFF000000; 
               lgray  = 0x66000000;  
-              gray   = 0x33000000;                                                            // The SK6812 LED has a white LED that is pure white
+              gray   = 0x33000000; 
               dgray  = 0x22000000;
               wgray  = 0xAA000000; 
 
       break;
       case 1: LEDstrip = LED2812strip; 
               white  = 0xFFFFFF;
-              lgray  = 0x666666;                                                              // R, G and B on together gives white light
+              lgray  = 0x666666; // R, G and B on together gives white light
 ...
 }
 
@@ -1172,8 +1191,9 @@ There is also a lot of slang in languages. <br>
 'Half nine' sometimes means 8:30 but can also be 9:30. (-:<br>
 <br>
 
+These definitions are in clockfaces.h 
 ```cpp
-//--------------------------------------------                                                //
+//--------------------------------------------
 //  CLOCK Dutch clock display
 //--------------------------------------------
                       #if defined(NL) || defined(NL144CLOCK)  
