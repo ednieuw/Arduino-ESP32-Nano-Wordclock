@@ -46,7 +46,7 @@ The PCB can connect to a rotary encoder or three button membrane switch, a DS323
 
 The SK6812 RGBW LED-strip operates at 5V. But the data signal from the Nano is only 3.3V.<br> 
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. See here: 
-https://ednieuw.home.xs4all.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
+https://ednieuw.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
 But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
 The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
@@ -170,7 +170,7 @@ Select one of the three word clocks
 ```
 
 - #define NL144CLOCK -> a 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines.<br>
- [Build instruction for the clock in Dutch and English](https://ednieuw.home.xs4all.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
+ [Build instruction for the clock in Dutch and English](https://ednieuw.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
 or [here in this repository](Manual-Instructions)
 
 - #define NLM1M2M3M4L94 -> a 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design
@@ -369,7 +369,7 @@ Enter 'wordclock.local' as URL in the browser.
 Or 
 Open the BLE terminal app. Look for the WordClock to connect to and connect.
 
-for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.home.xs4all.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
+for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
 
 For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
 nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
