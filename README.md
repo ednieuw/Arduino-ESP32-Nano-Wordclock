@@ -3,7 +3,7 @@
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
-Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or four languages with an Arduino ESP32 Nano.<br>
+Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
 [See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)<br><br>
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
