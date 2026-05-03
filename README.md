@@ -27,7 +27,7 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 
 | | |
 |---|---|
-| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>A user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
+| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>An user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
 
 
 
@@ -35,40 +35,56 @@ Software updates can be uploaded with OTA (Over the Air).<br>
 Clock with Corten steel face
 
 # Hardware
-For my projects I designed a printed circuit board (PCB) with [Fritzing software](https://fritzing.org/).
+For my projects printed circuit boards (PCB) were designed with [Fritzing software](https://fritzing.org/).
 
-This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. You can also order a PCB made in Europe with the Fritzing app itself.<br>
+This Fritzing program is easy to use and it can export Gerber files that can be send to companies that print PCB's. <br>
+PCB's made in Europe can be ordered with the Fritzing app itself.<br>
+
 [PCBWay](https://www.pcbway.com/) print 10 PCBs for $5. With +/-$25 shipping and custom charges this is very cheap. The PCBs were received within a week after ordering and the quality was excellent. Just upload the Gerber files in the ZIP-file and pay the charges.<br>  
 
 The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
-The PCB can connect to a rotary encoder or three button membrane switch, a DS3231 RTC module or other I2C device, a DCF77-receiver module or other device that receives pulses and a LDR to measure light intensity to control the brightness of the LED-strip.
+The PCB can connect to 
+- a rotary encoder or 
+- a three button membrane switch or 
+- a DS3231 RTC module or other I2C device or 
+- a DCF77-receiver module or other device that receives pulses and 
+- a LDR to measure light intensity to control the brightness of the LED-strip.
 
-The SK6812 RGBW LED-strip operates at 5V. But the data signal from the Nano is only 3.3V.<br> 
-I tried to use optocouplers to amplify the data signal from 3.3V to 5V but failed. See here: 
+The SK6812 RGBW or WS2812 RGB LED-strip operates at 5V. But the data signal from the Nano ESP32 is 3.3V.<br> 
+
+I tried to use optocouplers to amplify the data signal from 3.3V to 5V, but that failed. See here: 
 https://ednieuw.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
-For level switching the 74HCT125 level shifter is used. It has four ports and I adapted the design of the PCB it can use the other three ports on the IC for other uses. <br>
-But the SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
+
+For level switching the 74HCT125 level shifter IC is used. It has four ports. The design of the PCB can use the other three ports on the IC for other uses. <br>
+
+A SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32 without using the 74HCT125 level shifter IC. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
+
 The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
  
-
 ![Nano-ESP32-V04](https://github.com/user-attachments/assets/3ad06452-0dd4-4310-8b51-25c115ec3959)
 
-An alternative universal PCB to drive RGB(W) LEDs and /or white 2835 LED strips with shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
+An alternative universal PCB to drive RGB(W) LEDs and white 2835 LED strips using shift registers can be found here: [Nano  ESP32 RGBW BW PCB](https://github.com/ednieuw/NanoESP32-BW-RGBW-clock) <br>
 This PCB, with one Arduino source code, will support the colour LED clocks and the white LED clocks to run with a Arduino Nano ESP32. 
 
 ![V01SmallNanoESP32-3D](https://github.com/user-attachments/assets/fb3863f4-1346-4985-a541-f087be7e8b68)
 The design of a [minimum PCB for small spaces](/PCB-small) can also be found in the folder PCB-small in this repository.
 
 Power for the LED-strip can be drawn from the VBUS-pin (5V USB) on the Nano if powered with a USB-C cable.  
-VBUS provides 5V whenever powered via USB. It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.<br> 
+VBUS provides 5V whenever powered via USB. 
+
+It is possible to feed the LED-strip via this connection but keep in mind the power travels through the PCB and USB-C power supplies are able to supply over 20 A. This will probably melt the small copper lines on the PCB.
+
 If powered via the VIN pin, VBUS is disabled. This means that while powering the board through the VIN pin, you can't get 5V power from the board. 
 
 The PCB can use different power connection options.
-A 5V, >1A power supply can be attached at the 5V power connection on the top left of the PCB.<br>
+A 5V, >1A power supply can be attached at the 5V power connection on the top left of the PCB.
+
 If the red line shortcut (see picture below) is closed then the LED-strip is powered via the Power 6-21V (VIN) connection with 5V.<br> 
-This will also power the Nano ESP32. You can connect the Vin on the ESP32 Nano with a 5V USB power supply although the minimum voltage is noted as 6V. The 1N5817 diode even lowers the voltage by 0.5V to 4.5V.<br> 
-BUT KEEP IN MIND. This 5V connection is fed to the LED-strip directly. If a higher voltage power supply connected the LEDs will be destroyed but Nano will turn on happily. <br>
+This will also power the Nano ESP32. You can connect the Vin on the ESP32 Nano with a 5V USB power supply although the minimum voltage is noted as 6V. The 1N5817 diode even lowers the voltage by 0.5V to 4.5V.
+
+BUT KEEP IN MIND. This 5V connection is fed to the LED-strip directly. If a higher voltage power supply is connected the LEDs will be destroyed but Nano will turn on happily.<br>
+
 If the Nano ESP32 is connected via the USB-C port then the yellow connection must be shortcut. The LEDs will be powered by this power source. This is fine with 20 LEDs but probably not for longer strips.
 
 ![5VConnections](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/39ea30fc-2850-4c1c-9fdb-4b4bec752f9a)
@@ -121,12 +137,13 @@ The distance between the LEDs on the strip is suitable for making a clock of 25 
 You can choose to stick the 144 LEDs of the clock in 12 rows of 12 LEDs or only behind the letter that should light up.<br>
 The advantage of the latter is that fewer LEDs are needed and that you have to drill fewer holes in the spacer plate.<br>
 But there are many more soldering points, each of which can cause malfunctions.<br>  
-My experience is that imperfect soldering on the strip may loosens over time causing malfunctions. 
+My experience is that imperfect soldering on the strip may loosens over time, causing malfunctions. 
 
-The software has a digital time display option you cannot use if you do not install all 144 LEDs.<br>
-You can choose to cut out the words like IT WAS FIVE and so on in a 1 cm thick MDF board with a jigsaw.<br>
+The software has a digital time display option you use 144 (12 x 12) LEDs.<br>
+
+You can choose to cut out the words like IT, WAS, FIVE and so on in a 1 cm thick MDF board with a jigsaw.<br>
 Be sure to paint the insides bright white, otherwise the white light will become dingy.<br> 
-It is better to use foamed PVC white 10 MM RAL 9003. It cuts easily, is white and does not discolour. (Often paint does discolours)
+It is better to use foamed PVC white 10 MM RAL 9003. It cuts easily, is white and does not discolour. (Often white paint discolours)
  
 Stick/glue the strips starting from left to right on the odd lines and from right to left on the even lines. <br>
 
