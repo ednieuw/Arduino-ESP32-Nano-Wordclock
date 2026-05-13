@@ -44,12 +44,14 @@ PCB's made in Europe can be ordered with the Fritzing app itself.<br>
 
 The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
-The PCB can connect to 
-- a rotary encoder or 
-- a three button membrane switch or 
-- a DS3231 RTC module or other I2C device or 
-- a DCF77-receiver module or other device that receives pulses and 
-- a LDR to measure light intensity to control the brightness of the LED-strip.
+The PCB/software can connect to a
+- rotary encoder  
+- three button membrane switch 
+- DS3231 RTC module or other I2C device 
+- DCF77-receiver module or other device that receives pulses and 
+- LDR to measure light intensity to control the brightness of the LED-strip.
+- IR-remote receiver
+- reset button 
 
 The SK6812 RGBW or WS2812 RGB LED-strip operates at 5V. But the data signal from the Nano ESP32 is 3.3V.<br> 
 
@@ -105,6 +107,7 @@ The large PCB has connections to: (from top right clock wise)
 - LDR to pin A2 and 3V3
 - RTC-clock to pin  GND, 3V3, A4 and A5
 - Rotary encoder or 3-button switch to pin D8, D3, D4 3V3 and GND
+- Reset button on D6 and GND (or D7)
 - IR-remote D4 3V3 and GND
 - LEDs to pin D10 and D9
 - Connector to pin D12, D11, D10 and D9
@@ -124,6 +127,7 @@ The small PCB has connections to: (from top left clock wise)
 - 5V power input to to 5V-USB on ESP32 and to LED-strip
 - Connector for LED-strip SK6812/WS2812 to 5V, D5 and GND
 - Rotary encoder or 3-button switch to pin D2, D3, D4 3V3 and GND
+- Reset button on D6 and GND (or D7)
 - IR-remote D4 3V3 and GND
 - RTC-clock to pin  GND, 3V3, A4 and A5
 
@@ -274,7 +278,10 @@ Clockname is the name of the clock displayed in the WIFI-router in the list of b
 If the clock is connected to the internet it will seek contact with a time server. (NTP connection can be turned off in the menu).
 
 The time zone is set to UTC+1 Amsterdam but can be changed in the menu. <br>
-To connect to a WIFI network a SSID and password must be entered. 
+To connect to a WIFI network a SSID and password must be entered.
+
+If equipped with a reset button, holding it for two seconds restores the clock to its factory settings. <br>
+Bluetooth and WIFI will be turned on.
  
 There are a few methods: <br>
 1. Connect the MCU with a serial cable to a PC and use a serial terminal.
@@ -320,7 +327,7 @@ If the length of the SSID and/or password is less then 5 characters the WIFI wil
 Use a length of minimal 8 characters for SSID and password. <br>
 Check in the menu (third row from the bottom) if WIFI and NTP are on. <br>
 If WIFI is connected the LED on the MCU will pulse green. <br>
-<br> Enter @ to reset the MCU. It will restart and connections will be made. <br>
+<br> Enter @ to reset the MCU. It will restart and connections will be made.<br>
 <br>
 To set a time zone, send the time zone string between the quotes prefixed with the character E or e. <br>
 See the time zones at the bottom of this page. <br>
@@ -521,7 +528,8 @@ Send an 'I' to display the latest's settings in the menu.
 ### R Reset settings <br>
 R will set all preferences to default settings. The SSID and password, timezone, the LED-strip type and rotary/IR usage will be kept.<br>
 RRR will clear SSID, password, set Time zone to Amsterdam (CET-1) and turn WIFI, NTP and BLE on.<br>
-RRRRR is a total reset. A combination of R and RRR
+RRRRR is a total reset. A combination of R and RRR.<br> 
+A total reset can also be achieved with a reset button connected to D6 or D7. If no rotary encoder is used, the rotary encoder pins D2, D3, and D4 can also serve this purpose.
 
 ### Unnn Demo (U200 msec)
 Enter U followed with the duration of a second in milli seconds. 
