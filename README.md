@@ -5,17 +5,19 @@
 
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
-[See the basic communication sketch stripped from the word clock functions here.](https://github.com/ednieuw/ESP32Communications)<br><br>
+
+This sketch stripped from the word clock functions is [here.](https://github.com/ednieuw/ESP32Communications)
+
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with a:
-- [a BLE serial monitor app on your phone or with a web page Windows/Android](https://github.com/ednieuw/HTML-BLEserial), 
-- a web page in a browser, 
-- a serial cable connected to your PC, 
-- a rotary encoder, 
-- an IR-remote controller, 
-- a (membrane) keypad,
-- [a time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
+- [several BLE serial monitor apps or with a BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
+- web page in a browser, 
+- serial cable connected to your PC, 
+- rotary encoder, 
+- IR-remote controller, 
+- (membrane) keypad,
+- [time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
 <br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
