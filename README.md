@@ -11,8 +11,9 @@ This sketch stripped from the word clock functions is [here.](https://github.com
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with a:
-- [several BLE serial monitor apps or with a BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
+- [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
 - web page in a browser, 
+- BLE serial terminal app
 - serial cable connected to your PC, 
 - rotary encoder, 
 - IR-remote controller, 
