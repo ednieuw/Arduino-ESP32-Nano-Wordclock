@@ -224,7 +224,7 @@ It generates the smallest binary code (V2.0.18 = 1.0 Mb vs V3.20 = 1.3 Mb)
 There are two compiler pin numbering methods: One method uses the GPIO pin numbering of the ESP32-S3 and the other by Arduino pin numbering.<br>
 This code works fine with GPIO pin numbering selected.<br>
 The Neopixel library generates an error when this is not selected. 
-The EdSoftLED library can use both pin numberings.   
+The EdSoftLED library can use both pin number settings and uses the same function calls.    
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
@@ -606,15 +606,21 @@ It is convenient for testing and demonstrations.
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and in use to show a realistic time.
 Same as & option but this option will not update from the internet NTP server but only shows the time.
 
-### #= Self test
+### # = Self test
 Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
 #nnnn were nnnn is the delay between minutes in milliseconds.
   
-
 ### % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
 A Reset of all settings by sending a R in the menu will not change this LED strip selection.
+
+### ^nn = Set Reset pin to GPIO pin number nn
+A clock can be reset to default settings with the option R in the menu and by starting the clock more than five times within 10 minutes.
+A button can also be used when connected to a pin and ground. 
+When the button is pressed longer than 2 seconds the clock is reset to factory defaults similar to menu option RRRRR.
+Use the GPIO pin numbers when entering a value. So pin D2 is GPIO 5 and D6 is GPIO9. D2 and D6 are the more likely to use.
+Entering ^0 wll turn off checking the Reset button. Use this when no reset button is installed.
 
 ### $ = Fire display
 Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
@@ -633,8 +639,8 @@ IT/IS/ WAS is always off
 In other cases the program will check the time running in the clock and on the NTP server so now and then and update the RTC clocks.
 The DS3231 time module must be installed and being used to show a realistic time.
 
-### = = Display a permanent memory values in Mem
-=  will print the values stored in the permanent memory of the Arduino.
+### = = Display the permanent stored memory values in Mem
+=  will print the values stored in the permanent memory of the ESP32.
 
 ### 123456 Set time in RTC module
 Enter the time as 152300 hhmmss. Same as T152300
@@ -655,8 +661,8 @@ Remember to install the ESP32 boards as explained above.<br>
 //------------------------------------------------------------------------------              //
 // ESP32 Includes defines and initialisations
 //-------------------------------------------
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (5, 2, 0)            // Use EdSoftLED with ESP32 compiler.
-#define USEEDSOFTLED  // Use EdsoftLED >= V1.7.0 for SK6812. Saves 200-500 bytes compared with NeoPixel. NeoPixel is OK
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (3, 3, 0)            // Use EdSoftLED with ESP32 compiler.
+#define USEEDSOFTLED  // Use EdsoftLED >= V1.9.0 for SK6812. Saves 200-500 bytes compared with NeoPixel. NeoPixel is OK
                       #endif
                       #ifdef USEEDSOFTLED
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
