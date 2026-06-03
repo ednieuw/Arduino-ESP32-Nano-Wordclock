@@ -13,12 +13,12 @@ This sketch stripped from the word clock functions is [here.](https://github.com
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
 - web page in a browser, 
-- BLE serial terminal app
+- [BLE serial terminal app](https://ednieuw.home.xs4all.nl/BLESerial/IOSappMain.html)
 - serial cable connected to your PC, 
 - rotary encoder, 
 - IR-remote controller, 
 - (membrane) keypad,
-- [time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
+- [time sender app (IOS) or web page Windows/Android to set time](https://github.com/ednieuw/HTML-TimeSender).<br>
 <br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
