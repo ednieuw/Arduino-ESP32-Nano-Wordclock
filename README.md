@@ -420,8 +420,7 @@ Reset to default setting by send R.<br><br>
 <td style="width: 280px">
 <img alt="Phone" src="Pics/V200HTMLserialMenu.jpg" height="550" class="auto-style4" /></td>
 <td>
-<img alt="WIFI-BLE" src="Pics/V200BLE
-serialMenu.jpg" height="550" class="auto-style4" /></td>
+<img alt="WIFI-BLE" src="Pics/V200BLEserialMenu.jpg" height="550" class="auto-style4" /></td>
 </tr>
 <tr>
 <td style="width: 280px" >HTML page</td>
