@@ -21,6 +21,7 @@ The clock can be controlled with a:
 - [time sender app (IOS) or web page Windows/Android to set time](https://github.com/ednieuw/HTML-TimeSender).<br>
 <br>
 
+## web page in a browser
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In Chrome and Edge you can split a TAB to see the Web page and the Serial monitor response in one TAB. <br><br>
 
