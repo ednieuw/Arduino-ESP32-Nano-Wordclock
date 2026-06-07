@@ -25,6 +25,9 @@ The clock can be controlled with a:
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In Chrome and Edge you can split a TAB to see the Web page and the Serial monitor response in one TAB. <br><br>
 
+<img width="1244" height="982" alt="image" src="https://github.com/user-attachments/assets/a9789520-88ec-4904-a784-3bdd5d6e0c14" style="width:90%;" />
+<br>Or a word colour selector. 
+
 To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 
