@@ -12,19 +12,20 @@ This sketch stripped from the word clock functions is [here.](https://github.com
 
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
-- web page in a browser, 
+- Web page in a browser, 
 - BLE serial terminal app
-- serial cable connected to your PC, 
-- rotary encoder, 
+- Serial cable connected to your PC, 
+- Rotary encoder, 
 - IR-remote controller, 
 - (membrane) keypad,
-- [time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
+- [Time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).  <sub>[Time sender HTML shortcut](https://ednieuw.home.xs4all.nl/Woordklok/TimeSender/TimeSender.html)</sub>
 <br>
 
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In several browsers the TAB can be split to see the menu and the Serial monitor response in one TAB. <br><br>
 
-![Colour picker](image.png)
+
+<img alt="image" src="Pics/Colourpicker.png" style="width:90%;"  /><br>
 
 To connect the clock to WIFI the SSID and password of the router can be entered by the BLE serial terminal app or the WPS function can be used.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
@@ -267,7 +268,7 @@ With some browser you can also use [this web based BLE HTML from my site](https:
 
 | | |
 |:---:|:---:|
-| <img src="image-1.png" alt="BLE UART terminal" width="350"> | ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec) |
+| <img src="Pics/BLEHTMLUART.png" alt="BLE UART terminal" width="350"> | ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec) |
 | [BLE UART HTML from my site](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html) | Bluetooth UART serial terminal app |   
 
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
@@ -349,15 +350,16 @@ For example, if you live in Australia/Sydney send the string: eAEST-10AEDT,M10.1
 
 <pre>
 ___________________________________
+___________________________________
 A SSID, B Password, C BLE beacon name
 D Date (D15012021), T Time (T132145)
 E Timezone (E<-02>2 or E<+01>-1)
-F Own V Bkgn colour (FWWRRGGBB Fwrgb)
+F Own, V BKGD color (Fwwrrggbb Fwrgb)
 G Scan WIFI networks
 H H01 rotary H02 buttons H03/04 remote
 } Learn IR remote, + Fast BLE
 I Info menu, II long menu
-J DS3231 RTC module On/Off
+J DS3231 RTC, H05 Time receiver On/Off
 K LDR /s, Time K1/min K2/hr K0/Off
 N Display off between Nhhhh (N2208)
 O Display On/Off, P StatusLED On/Off
@@ -368,24 +370,24 @@ Unnn Demo (U200 msec), Y LED test
 ) HETISWAS  On/Off, ( EdSoft On/Off
 #nnn Selftest,  RTC: ! See, & Update
 W WIFI, X NTP, Z WPS, CCC BLE
-Ed Nieuwenhuijs Apr 2026
+Ed Nieuwenhuijs Jun 2026
 ___________________________________
-Display off between: 00h - 00h
-RandomDisplay:Off, Timestamp:/min
-Slope: 1     Min: 5     Max: 2 
+Display off between: 22h - 08h
+Display choice  : All Own
+RandomDisplay:Off, Timestamp: Off
+Slope: 50     Min: 5     Max: 25 
 SSID: FRITZ!BoxEd
-BLE name: BLEtest
-IP-address: 192.168.178.145/update
+BLE name: ESPredPCB
+IP-address: 192.168.178.172/update
 Timezone:CET-1CEST,M3.5.0,M10.5.0/3
-WIFI=On NTP=On BLE=On FastBLE=Off
-No Rotary,   DS3231=Off
-SK6812 strip with 148 LEDs (switch %)
-Software: ESP32_WordClockV200.ino
-ESP32 Arduino core version: 3.3.7
+WIFI=On NTP=On BLE=On FastBLE=On
+H00=On DS3231=Off TimeReceiver=Off
+625 WS2812 LEDs (switch %) 
+Software: ESP32_WordClockV223.ino
+ESP32 Arduino core version: 3.3.8
 __________________________________
 </pre>
-
-Menu shown in serial output.
+#### Menu shown in serial output.
 
 As mentioned before the clock can be controlled with the WIFI webpage or BLE UART terminal app. <br>
 When the clock is connected to WIFI the IP-address is displayed in the menu<br>
@@ -393,9 +395,8 @@ When the clock is connected to WIFI the IP-address is displayed in the menu<br>
 Enter this IP-address numbers and dots (for example: 192.168.178.31) in the browser of your mobile or PC where you type 
 your internet addresses (URL). 
 
-Or in version V056 or higher the name of the BLE beacon can be used followed with .local
+If the name of your BLE beacon is wordclock (see in the wordclock menu -> BLE name: wordclock)
 
-If the name of your BLE beacon is wordclock ( see in the menu -> BLE name: wordclock)
 Enter 'wordclock.local' as URL in the browser. 
  if this does not work install host software:
   - For Linux, install Avahi (http://avahi.org/).
@@ -405,7 +406,8 @@ Enter 'wordclock.local' as URL in the browser.
   - Point your browser to http://wordclock.local, you should see a response.
 
 Or 
-Open the BLE terminal app. Look for the WordClock to connect to and connect.
+Open the BLE terminal app. (in some apps you have to press a CONNECT-button)
+Look for the WordClock to connect to and connect.
 
 for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
 
@@ -470,6 +472,9 @@ Let's pick one if you happen to live here: Antarctica/Troll,"&lt;+00&gt;0&lt;+02
 Copy the string between the " " 's and send it starting with an 'E' or 'e' in front. <br>
 E&lt;+00&gt;0&lt;+02&gt;-2,M3.5.0/1,M10.5.0/3 
 
+Entering RRR will reset the timezone to Amsterdam CET. 
+You will loose your credentials too with this reset! and have to reenter your SSID and password.
+
 ### Own colour (FWWRRGGBB or Fwrgb) <br>
 With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
 The format to be entered is hexadecimal, 0123456789ABCDEF or decimal, 0123456789. <br>
@@ -494,8 +499,12 @@ H01 Rotary encoder<br>
 H02 Keypad<br>
 H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER<br>
 H04 Tiny IR-remote with six buttons<br>
-H05 Turn On/Off the use of the BLE time sender app<br>
-The H05 option can be used when the clock has no WIFI. The app sends the time every minute when the app is started iand in the neighbouthood of the clock.  
+H05 Turn On/Off the use of the BLE time sender app.<br>
+The H05 option can be used when the clock has no WIFI. 
+A dedicated timesender app sends the time every minute when the Timesender is started and is in the neighbourhood of the clock.  
+[See here for Timesenders for your clock](https://github.com/ednieuw/HTML-TimeSender)
+
+[Or start a HTML based one directly](https://ednieuw.nl/Woordklok/TimeSender/TimeSender.html)
 
 ### } Learn IR remote
 Start learning the keys of a new infrared remote.
@@ -551,6 +560,7 @@ M200 (200 millisecond) will speed up the clock 5*60 times.
 Sending an U will turn off the demo mode or if not in demo mode start demo mode with 800 ms/min.
 
 ### V Backgroung colour (VWWRRGGBB or Vwrgb) <br>
+
 With this option you can set the colour and intensity of the LEDs that are normally not turned on.
 This option is usefull when there is light leakage between the characters or to highlight the characters turned off.<br>
 When this option is used the minimal light intensity is set to 50 bits to avoid that the background light with get off during the evening.<br>
