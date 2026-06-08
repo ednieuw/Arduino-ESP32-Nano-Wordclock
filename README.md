@@ -6,35 +6,33 @@
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
 
-An identical sketch stripped from the word clock functions is [here.](https://github.com/ednieuw/ESP32Communications)
+This sketch stripped from the word clock functions is [here.](https://github.com/ednieuw/ESP32Communications)
 
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
 - web page in a browser, 
-- [BLE serial terminal app](https://ednieuw.home.xs4all.nl/BLESerial/IOSappMain.html)
+- BLE serial terminal app
 - serial cable connected to your PC, 
 - rotary encoder, 
 - IR-remote controller, 
 - (membrane) keypad,
-- [time sender app (IOS) or web page Windows/Android to set time](https://github.com/ednieuw/HTML-TimeSender).<br>
+- [time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).<br>
 <br>
 
-## web page in a browser
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
-<br>In Chrome and Edge you can split a TAB to see the Web page and the Serial monitor response in one TAB. <br><br>
+<br>In several browsers the TAB can be split to see the menu and the Serial monitor response in one TAB. <br><br>
 
-<img width="1244" height="982" alt="image" src="https://github.com/user-attachments/assets/a9789520-88ec-4904-a784-3bdd5d6e0c14" style="width:90%;" />
-<br>Or a word colour selector. 
+![Colour picker](image.png)
 
-To connect the clock to WIFI one can enter the SSID and password of the router or use the WPS function.<br>
+To connect the clock to WIFI the SSID and password of the router can be entered by the BLE serial terminal app or the WPS function can be used.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
 
 
 | | |
 |---|---|
-| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time. With a rotary, membrane pad or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>An user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
+| <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time.<br>With a rotary, membrane pad, time sender app or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>An user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
 
 
 
@@ -51,7 +49,7 @@ PCB's made in Europe can be ordered with the Fritzing app itself.<br>
 
 The [PCB design .FZZ-file and Gerber files](PCB) can be found in the folder PCB in this repository or here:  [ESP32 PCB](https://github.com/ednieuw/NanoESP32PCB)
 
-The PCB/software can connect to a
+The PCB can connect a
 - rotary encoder  
 - three button membrane switch 
 - DS3231 RTC module or other I2C device 
@@ -179,76 +177,79 @@ Place the spacer plate over the LEDs, then a sheet of white paper and finally th
 
 # Software
 
-The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to your WIFI router and receives the time from a NTP server.
+The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to a WIFI router and receives the time from a NTP server.
 
 An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
-The software can be controlled with Bluetooth on your PC or a mobile Android or iPhone/iPad/iMac.<br>
+The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
+
 Several designs can be selected before compiling.  (If you have a word clockface plate, of course.)<br>
 Use a word clockface plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software.<br>
 
 ![ClockDefines](https://github.com/user-attachments/assets/89a48534-c97a-41fc-94a5-bb8ee35ebb34)
 
-Select one of the three word clocks
+Select one of the word clock designs
 ```
 //#define FOURLANGUAGECLOCK
 #define NL144CLOCK
 //#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up
-
+...
 ```
 
 - #define NL144CLOCK -> a 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines.<br>
  [Build instruction for the clock in Dutch and English](https://ednieuw.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
 or [here in this repository](Manual-Instructions)
 
-- #define NLM1M2M3M4L94 -> a 144 LED single language clock with 4 extra LEDs for the minutes and a slightly different design
+- #define NLM1M2M3M4L??? -> a ??? LED single language clock with 4 extra LEDs for the minutes and a slightly different design. Many lay-outs are defined.
 
 - #define FOURLANGUAGECLOCK-> a 4-language clock with 625 LEDs in a 25 x 25 grid.<br>
 [Build instruction of 4-language word clock with SK6812 LEDs in UK, NL, DE, FR with Nano Every.](https://github.com/ednieuw/FourLanguageClock). 
 
-In the libraries.zip are the libraries to compile the software. Unpack them in your libraries folder.<br>
-Download the program folder and compile for Arduino Nano ESP32.<br>
+In the libraries.zip are the libraries to compile the software.<br>
+Unpack them in your libraries folder.(libraries folder in the folder where your sketches are saved by default)<br>
+Download the program folder and compile for Arduino Nano ESP32 using the Espressif core 3.<br>
 Libraries update constantly, which may result in incompatibility with this source code over time. Therefore, these libraries are included.
 
 An alternative is to compile the ArduinoOTA sketch that can be found in the Examples of the Arduino IDE.<br>
 Upload the OTA-updater in the Nano ESP32 and note the IP-address that is printed in the Serial monitor of the Arduino IDE.
 Type this IP-address URL in a browser and enter admin/admin as user and password.<br>
-Then upload the .bin file from this repository.<br>
+Then upload the .bin file made by the Arduino IDE with Sketch->Export compiled binary.<br>
 <br>
 Or use this one: [Uploads .bin files in the ESP32 by using wifimanager](https://github.com/ednieuw/OTA-webupdater).<br>
 <br>
 # How to compile: 
-At the moment of writing (nov 2025) the Espressif ESP32 board core V3.3. with the Arduino Nano ESP32 selected does compile to a working program when ESP32WordclockV100.ino of a higher version is used.
+At the moment of writing (June 2026) the Espressif ESP32 board core V3.3.9 with the Arduino Nano ESP32 selected does compile to a working program when ESP32WordclockV220.ino of a higher version is used.
 Select the Nano ESP32 board from Arduino in the Arduino IDE. 
-The Arduino ESP32 board with core version 2.0.17/2.0.18, compiles without errors and is advised to use. 
-It generates the smallest binary code (V2.0.18 = 1.0 Mb vs V3.20 = 1.3 Mb)
+The Arduino ESP32 board with core version 2.0.17/2.0.18, also compiles without errors when using the Adafuit Neopixel library.
+
 
 ![image](https://github.com/user-attachments/assets/1f4eeec5-ebc5-47fb-b513-2514f5ff6ecd)
 
 There are two compiler pin numbering methods: One method uses the GPIO pin numbering of the ESP32-S3 and the other by Arduino pin numbering.<br>
 This code works fine with GPIO pin numbering selected.<br>
 The Neopixel library generates an error when this is not selected. 
-The EdSoftLED library can use both pin number settings and uses the same function calls.    
+The EdSoftLED library can use both pin numberings and only compiles with Espessif core 3.3.n because it used the RMT functionality to drive the LEDs.
 
 ![Nano-ESP32 Pinout](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/8d2201ea-e34a-4734-9fc0-5480a702290c)
 
 Install Arduino Nano ESP32 board<br>
-'''
-Board: Arduino Nano ESP32<br>
-Partition Scheme: With FAT<br>
-<strong> Pin Numbering: By GPIO number (legacy)  !! change this if using Neopixel </strong><br>
-'''
+```
+Board: Arduino Nano ESP32
+Partition Scheme: With FAT
+Pin Numbering: By GPIO number (legacy)  !! use this when using Neopixel 
+```
 <br>
 
 ![SerialOutputs](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/6b1e48c3-783a-4b4e-bc32-eaa1fe344297)
 
 # Before starting
 
-The clock receives time from the internet if a DS3231 time module is not installed. 
+The clock receives time from the internet when connected to a router.
 
 When a DS3231 time module is attached to the circuit board an internet connection is not required. Select in the menu that the DS3231 is used instead of the NTP time. (J Toggle use DS3231 RTC module)
+Be aware that DS3231 time is being used also when there is a internet connection. 
 
-To connect to the internet the name of the WIFI station and its password must be entered in the clock software to be able to connect to a WIFI router.
+To connect to the internet the name of the WIFI station and its password must be entered in the clock software to be able to connect to a WIFI router or use the personal hotspot in you mobile.
 
 ### Connect to WIFI
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
@@ -261,8 +262,14 @@ If the clock software is started without a SSID it will start a WIFI station you
 
 ### Connect via Bluetooth
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.<br>
-![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec)
- 	 	 
+
+With some browser you can also use [this web based BLE HTML from my site](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html)
+
+| | |
+|:---:|:---:|
+| <img src="image-1.png" alt="BLE UART terminal" width="350"> | ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec) |
+| [BLE UART HTML from my site](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html) | Bluetooth UART serial terminal app |   
+
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 - Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
 
@@ -297,7 +304,7 @@ I use the Arduino IDE as serial terminal.
 
 Sending the character 'I' for information will display the menu followed with the actual settings of several preferences. 
 
-<table style="width: 51%"><tr>
+<table style="width: 90%"><tr>
 <td style="width: 342px"><img alt="Menu on iPhone" src="Pics/menuphone.jpg" width="350"  /></td>
 <td style="width: 415px"><img alt="Termite terminal" src="Pics/Termite.jpg" width="400"  /></td>
 </tr>
@@ -423,7 +430,8 @@ Reset to default setting by send R.<br><br>
 <td style="width: 280px">
 <img alt="Phone" src="Pics/V200HTMLserialMenu.jpg" height="550" class="auto-style4" /></td>
 <td>
-<img alt="WIFI-BLE" src="Pics/V200BLEserialMenu.jpg" height="550" class="auto-style4" /></td>
+<img alt="WIFI-BLE" src="Pics/V200BLE
+serialMenu.jpg" height="550" class="auto-style4" /></td>
 </tr>
 <tr>
 <td style="width: 280px" >HTML page</td>
@@ -609,21 +617,15 @@ It is convenient for testing and demonstrations.
 !  will display the NTP, RTC and DS3231 time as they are stored in the clock  in the clock. The DS3231 time module must be installed and in use to show a realistic time.
 Same as & option but this option will not update from the internet NTP server but only shows the time.
 
-### # = Self test
+### #= Self test
 Sending a # will start the clock self test. This is convenient to check if all the words in the display are functioning.<br> 
 The time of a minute is reduced to 0.9 seconds (900 milli seconds).<br>
 #nnnn were nnnn is the delay between minutes in milliseconds.
   
+
 ### % = Switch between SK6812 and WS2812 LED strip
 With this option the used LED strip can be changed. The clock is equipped with on of these to types of LED strips. 
 A Reset of all settings by sending a R in the menu will not change this LED strip selection.
-
-### ^nn = Set Reset pin to GPIO pin number nn
-A clock can be reset to default settings with the option R in the menu and by starting the clock more than five times within 10 minutes.
-A button can also be used when connected to a pin and ground. 
-When the button is pressed longer than 2 seconds the clock is reset to factory defaults similar to menu option RRRRR.
-Use the GPIO pin numbers when entering a value. So pin D2 is GPIO 5 and D6 is GPIO9. D2 and D6 are the more likely to use.
-Entering ^0 wll turn off checking the Reset button. Use this when no reset button is installed.
 
 ### $ = Fire display
 Shows a fire on the display in some clocks with a 12 x12 LED-matrix design installed
@@ -642,8 +644,8 @@ IT/IS/ WAS is always off
 In other cases the program will check the time running in the clock and on the NTP server so now and then and update the RTC clocks.
 The DS3231 time module must be installed and being used to show a realistic time.
 
-### = = Display the permanent stored memory values in Mem
-=  will print the values stored in the permanent memory of the ESP32.
+### = = Display a permanent memory values in Mem
+=  will print the values stored in the permanent memory of the Arduino.
 
 ### 123456 Set time in RTC module
 Enter the time as 152300 hhmmss. Same as T152300
@@ -664,8 +666,8 @@ Remember to install the ESP32 boards as explained above.<br>
 //------------------------------------------------------------------------------              //
 // ESP32 Includes defines and initialisations
 //-------------------------------------------
-                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (3, 3, 0)            // Use EdSoftLED with ESP32 compiler.
-#define USEEDSOFTLED  // Use EdsoftLED >= V1.9.0 for SK6812. Saves 200-500 bytes compared with NeoPixel. NeoPixel is OK
+                      #if ESP_ARDUINO_VERSION >= ESP_ARDUINO_VERSION_VAL (5, 2, 0)            // Use EdSoftLED with ESP32 compiler.
+#define USEEDSOFTLED  // Use EdsoftLED >= V1.7.0 for SK6812. Saves 200-500 bytes compared with NeoPixel. NeoPixel is OK
                       #endif
                       #ifdef USEEDSOFTLED
 #include <EdSoftLED.h>         // https://github.com/ednieuw/EdSoftLED for LED strip WS2812 or SK6812 
