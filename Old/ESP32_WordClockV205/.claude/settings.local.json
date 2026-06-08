@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(mkdir -p \"C:\\\\Users\\\\ednie\\\\.claude\\\\projects\\\\C--Users-ednie-Documents-Files-BLESerialAppDev-ESP32-WordClockV205\\\\memory\")"
-    ]
-  }
-}
