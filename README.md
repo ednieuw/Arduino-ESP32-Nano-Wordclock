@@ -499,7 +499,9 @@ H01 Rotary encoder<br>
 H02 Keypad<br>
 H03 Large IR-remote with nummeric UP DOWN LEFT RIGHT ON/OFF and POWER<br>
 H04 Tiny IR-remote with six buttons<br>
-H05 Turn On/Off the BLE time receiver. When enabled, the device listens for time sent by a BLE time sender app running on a nearby phone or PC and uses that to set its clock. Compatible senders:
+H05 Turn On/Off the BLE time receiver. <br>
+When enabled, the device listens for time sent by a BLE time sender app running on a nearby phone or PC and uses that to set its clock. <br>
+Compatible senders:
 - HTML BLE time sender (Chrome/Edge): [HTML-BLEserial](https://github.com/ednieuw/HTML-BLEserial)
 - iOS BLE time sender app: [BLEtimeSender](https://ednieuw.nl/BLESerial/BLEtimeSender.html)
 The H05 option can be used when the clock has no WIFI. 
