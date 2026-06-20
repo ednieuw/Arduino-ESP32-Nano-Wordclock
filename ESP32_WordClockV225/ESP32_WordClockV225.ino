@@ -839,10 +839,10 @@ void Reset(void)
  Mem.DCF77On          = 0;                                                                    // Default off
  Mem.UseDS3231        = 0;                                                                    // Default off
  //Mem.LEDstrip       = 0;    // Do not erase this setting with a reset                       // 0 = SK6812, 1=WS2812
-  uint32_t ColourNL     = 0x00FFFFFF;                                                         // Self defined NL colour for clock display
-  uint32_t ColourUK     = 0x0000FF00;                                                                  // Self defined UK colour for clock display
-  uint32_t ColourDE     = 0x00FFFF00;                                                                  // Self defined DE colour for clock display
-  uint32_t ColourFR     = 0x00FF0000;                                                                  // Self defined FR colour for clock display 
+ Mem.ColourNL        = 0x00FFFFFF;                                                            // Self defined NL colour for clock display
+ Mem.ColourUK         = 0x0000FF00;                                                           // Self defined UK colour for clock display
+ Mem.ColourDE        = 0x00FFFF00;                                                            // Self defined DE colour for clock display
+ Mem.ColourFR         = 0x00FF0000;                                                            // Self defined FR colour for clock display 
  Previous_LDR_read    = ReadLDR();                                                            // Read LDR to have a start value. max = 4096/8 = 255
  MinPhotocell         = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
  MaxPhotocell         = Previous_LDR_read;                                                    // Stores maximum reading of photocell;                                            
