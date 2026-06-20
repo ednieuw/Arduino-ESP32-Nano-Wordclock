@@ -24,19 +24,23 @@ extern void DitLeHeure(void);
 #define DE4
 #define FR4    
                      #endif //FOURLANGUAGECLOCK                     
+                     #if defined NL144CLOCK ||defined NL92CLOCK
+#define NLEDSOFT
+                     #endif
                      #if defined NLM1M2M3M4L94 ||defined NLM1M2M3M4L114 || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L294) || (defined NLM1M2M3M4L144) || (defined NLM1M2M3M4L161)
 #define NLM1M2M3M4
                      #endif
 
+
                      #ifdef NL144CLOCK
-// const uint32_t NUM_LEDS    = 144+4;                                                         // How many leds in  strip? + 4 for the minutes
-// const  uint32_t LEDNEARLDR = 132                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
-// const byte MATRIX_WIDTH    =  12;                                                           // Grid size For digital display mode.  
+// const uint32_t NUM_LEDS    = 144+4;                                                          // How many leds in  strip? + 4 for the minutes
+// const  uint32_t LEDNEARLDR = 132;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+// const byte MATRIX_WIDTH    =  12;                                                            // Grid size For digital display mode.  
 // const byte MATRIX_HEIGHT.  =  12;                                                           // Grid size For digital display mode.
-const uint32_t NUM_LEDS    =  256;                                                       // Temporary for testinf with 16x16LED WS2812. To clear all LEDs. During uploading LEDs get randomly On and Off
-const uint32_t LEDNEARLDR  = 132                                                         // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
-const byte MATRIX_WIDTH    =  16;                                                        // Grid size For digital display mode.
-const byte MATRIX_HEIGHT   =  16;                                                        // Grid size For digital display mode.
+const uint32_t NUM_LEDS    =  256;                                                            // Temporary for testinf with 16x16LED WS2812. To clear all LEDs. During uploading LEDs get randomly On and Off
+const uint32_t LEDNEARLDR  = 132;                                                             // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+const byte MATRIX_WIDTH    =  16;                                                             // Grid size For digital display mode.
+const byte MATRIX_HEIGHT   =  16;                                                             // Grid size For digital display mode.
 
 #define HET     ColorLeds("Het",     0,   2, MINColor);   
 #define IS      ColorLeds("is",      4,   5, SECColor);  ColorLeds("", 8,10, Mem.DimmedLetter); Is = true;   // Turn off the WAS LEDs
@@ -112,37 +116,147 @@ const byte MATRIX_HEIGHT  =  10;                                                
 #define X_ON    ColorLeds("",         0,  2, LetterColor);
                      #endif //NL92CLOCK
 
-                     #ifdef DE144CLOCK
-const uint32_t NUM_LEDS    =  144;                                                            // How many leds in  strip? 
+                      #ifdef FR144CLOCK
+#define IL      ColorLeds("| Il",    16,  17, FRMINColor);   
+#define EST     ColorLeds("est",     19,  21, FRSECColor); 
+#define ETAIT   ColorLeds("etait",   19,  21, FRSECColor);
+#define EXACT   ColorLeds("exact",   34,  38, FRLetterColor);
+#define SIX     ColorLeds("six",     30,  32, FRLetterColor); 
+#define DEUX    ColorLeds("deux",    73,  76, FRLetterColor); 
+#define TROIS   ColorLeds("trois",   78,  82, FRLetterColor);
+#define ONZE    ColorLeds("onze",    92,  95, FRLetterColor);
+#define QUATRE  ColorLeds("quatre",  84,  89, FRLetterColor);
+#define MINUIT  ColorLeds("minuit", 128, 133, FRLetterColor);
+#define DIX     ColorLeds("dix",    135, 137, FRLetterColor);
+#define CINQ    ColorLeds("cinq",   148, 151, FRLetterColor);
+#define NEUF    ColorLeds("neuf",   144, 147, FRLetterColor);
+#define MIDI    ColorLeds("midi",   140, 143, FRLetterColor);
+#define HUIT    ColorLeds("huit",   185, 188, FRLetterColor);
+#define SEPT    ColorLeds("sept",   192, 195, FRLetterColor);
+#define UNE     ColorLeds("une",    205, 207, FRLetterColor);
+#define HEURE   ColorLeds("heure",  199, 203, FRLetterColor);
+#define HEURES  ColorLeds("heures", 198, 203, FRLetterColor);
+#define ET      ColorLeds("et",     240, 241, FRLetterColor);
+#define MOINS   ColorLeds("moins",  243, 247, FRLetterColor);
+#define LE      ColorLeds("le",     249, 250, FRLetterColor);
+#define DEMI    ColorLeds("demie",  256, 260, FRLetterColor);
+#define QUART   ColorLeds("quart",  296, 300, FRLetterColor);
+#define MDIX    ColorLeds("dix",    303, 305, FRLetterColor);
+#define VINGT   ColorLeds("vingt",  315, 319, FRLetterColor);
+#define MCINQ   ColorLeds("cinq",   310 ,313, FRLetterColor);
+#define DITLEHEURE DitLeHeure();
+                      #endif //FR144CLOCK
+
+
+//------------------------------------------------------------------------------
+// CORRECTED 144-LED single-language clock definitions
+// LED numbering verified against KloktekstSegouNLUKFRDE_12x12_23okt2018.xlsx
+// (Sheet1, 12x12 word plates per language, zigzag numbering: row0 L->R, row1 R->L, ...)
+//------------------------------------------------------------------------------
+
+                      #ifdef FR144CLOCK
+const uint32_t NUM_LEDS    =  144;                                                            // How many leds in  strip?
 const uint32_t LEDNEARLDR  = 9999;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
-const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.  
+const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
 const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
-#define ES      ColorLeds("Es",       1,   2, LetterColor);   
-#define IST     ColorLeds("ist",      4,   6, LetterColor);  ColorLeds("", 8, 10, Mem.DimmedLetter); Is = true;
-#define WAR     ColorLeds("war",      8,  10, LetterColor);  ColorLeds("", 4,  6, Mem.DimmedLetter); Is = false;
-#define GENAU   ColorLeds("genau",   18,  22, LetterColor);
-#define MZEHN   ColorLeds("zehn",    13,  16, LetterColor);
-#define MFUNF   ColorLeds("funf",   383, 386, LetterColor);
-#define VIERTEL ColorLeds("viertel",375, 381, LetterColor);
-#define ZWANZIG ColorLeds("zwanzig",413, 419, LetterColor);
-#define KURZ    ColorLeds("kurz",   421, 424, LetterColor);
-#define VOR     ColorLeds("vor",    433, 435, LetterColor);
-#define NACH    ColorLeds("nach",   427, 430, LetterColor);
-#define HALB    ColorLeds("halb",   465, 468, LetterColor);
-#define FUNF    ColorLeds("funf",   471, 474, LetterColor);
-#define EINS    ColorLeds("eins",   483, 486, LetterColor);
-#define VIERDE  ColorLeds("vier",   478, 481, LetterColor);
-#define ZEHN    ColorLeds("zehn",   514, 517, LetterColor);
-#define ZWOLF   ColorLeds("zwolf",  520, 524, LetterColor);
-#define DREI    ColorLeds("drei",   532, 535, LetterColor);
-#define NEUN    ColorLeds("neun",   526, 529, LetterColor);
-#define ACHTDE  ColorLeds("acht",   565, 568, LetterColor);
-#define SECHS   ColorLeds("sechs",  570, 574, LetterColor);
-#define SIEBEN  ColorLeds("sieben", 580, 585, LetterColor);
-#define ZWEI    ColorLeds("zwei",   575, 578, LetterColor);
-#define ELFDE   ColorLeds("elf",    614, 616, LetterColor);
-#define UHR     ColorLeds("uhr",    621, 623, LetterColor);
+
+#define IL      ColorLeds("| Il",     0,   1, FRMINColor);
+#define EST     ColorLeds("est",      3,   5, FRSECColor);  ColorLeds("", 7, 11, Mem.DimmedLetter); Is = true;   // Turn off the ETAIT LEDs
+#define ETAIT   ColorLeds("etait",    7,  11, FRSECColor);  ColorLeds("", 3,  5, Mem.DimmedLetter); Is = false;  // Turn off the EST LEDs
+#define EXACT   ColorLeds("exact",   18,  22, FRLetterColor);
+#define SIX     ColorLeds("six",     14,  16, FRLetterColor);
+#define DEUX    ColorLeds("deux",    25,  28, FRLetterColor);
+#define TROIS   ColorLeds("trois",   30,  34, FRLetterColor);
+#define ONZE    ColorLeds("onze",    44,  47, FRLetterColor);
+#define QUATRE  ColorLeds("quatre",  36,  41, FRLetterColor);
+#define MINUIT  ColorLeds("minuit",  48,  53, FRLetterColor);
+#define DIX     ColorLeds("dix",     55,  57, FRLetterColor);
+#define CINQ    ColorLeds("cinq",    68,  71, FRLetterColor);
+#define NEUF    ColorLeds("neuf",    64,  67, FRLetterColor);
+#define MIDI    ColorLeds("midi",    60,  63, FRLetterColor);
+#define HUIT    ColorLeds("huit",    73,  76, FRLetterColor);
+#define SEPT    ColorLeds("sept",    80,  83, FRLetterColor);
+#define UNE     ColorLeds("une",     93,  95, FRLetterColor);
+#define HEURE   ColorLeds("heure",   87,  91, FRLetterColor);
+#define HEURES  ColorLeds("heures",  86,  91, FRLetterColor);
+#define ET      ColorLeds("et",      96,  97, FRLetterColor);
+#define MOINS   ColorLeds("moins",   99, 103, FRLetterColor);
+#define LE      ColorLeds("le",     105, 106, FRLetterColor);
+#define DEMI    ColorLeds("demie",  112, 116, FRLetterColor);
+#define QUART   ColorLeds("quart",  120, 124, FRLetterColor);
+#define MDIX    ColorLeds("dix",    127, 129, FRLetterColor);
+#define VINGT   ColorLeds("vingt",  139, 143, FRLetterColor);
+#define MCINQ   ColorLeds("cinq",   134, 137, FRLetterColor);
+#define DITLEHEURE DitLeHeure();
+                      #endif //FR144CLOCK
+
+
+                     #ifdef DE144CLOCK
+const uint32_t NUM_LEDS    =  144;                                                            // How many leds in  strip?
+const uint32_t LEDNEARLDR  = 9999;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
+const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
+
+#define ES      ColorLeds("Es",       1,   2, DEMINColor);
+#define IST     ColorLeds("ist",      4,   6, DESECColor);  ColorLeds("", 8, 10, Mem.DimmedLetter); Is = true;   // Turn off the WAR LEDs
+#define WAR     ColorLeds("war",      8,  10, DESECColor);  ColorLeds("", 4,  6, Mem.DimmedLetter); Is = false;  // Turn off the IST LEDs
+#define GENAU   ColorLeds("genau",   18,  22, DELetterColor);
+#define MZEHN   ColorLeds("zehn",    13,  16, DELetterColor);
+#define MFUNF   ColorLeds("funf",    24,  27, DELetterColor);
+#define VIERTEL ColorLeds("viertel", 29,  35, DELetterColor);
+#define ZWANZIG ColorLeds("zwanzig", 41,  47, DELetterColor);
+#define KURZ    ColorLeds("kurz",    36,  39, DELetterColor);
+#define VOR     ColorLeds("vor",     49,  51, DELetterColor);
+#define NACH    ColorLeds("nach",    54,  57, DELetterColor);
+#define HALB    ColorLeds("halb",    66,  69, DELetterColor);
+#define FUNF    ColorLeds("funf",    60,  63, DELetterColor);
+#define EINS    ColorLeds("eins",    72,  75, DELetterColor);
+#define VIERDE  ColorLeds("vier",    77,  80, DELetterColor);
+#define ZEHN    ColorLeds("zehn",    91,  94, DELetterColor);
+#define ZWOLF   ColorLeds("zwolf",   84,  88, DELetterColor);
+#define DREI    ColorLeds("drei",    97, 100, DELetterColor);
+#define NEUN    ColorLeds("neun",   103, 106, DELetterColor);
+#define ACHTDE  ColorLeds("acht",   114, 117, DELetterColor);
+#define SECHS   ColorLeds("sechs",  108, 112, DELetterColor);
+#define SIEBEN  ColorLeds("sieben", 121, 126, DELetterColor);
+#define ZWEI    ColorLeds("zwei",   128, 131, DELetterColor);
+#define ELFDE   ColorLeds("elf",    140, 142, DELetterColor);
+#define UHR     ColorLeds("uhr",    133, 135, DELetterColor);
                      #endif //DE144CLOCK
+
+
+                     #ifdef UK144CLOCK
+const uint32_t NUM_LEDS    =  144;                                                            // How many leds in  strip?
+const uint32_t LEDNEARLDR  = 9999;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
+const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
+
+#define IT      ColorLeds("| It",     1,   2, UKMINColor);
+#define ISUK    ColorLeds("is",       4,   5, UKSECColor);  ColorLeds("", 7, 9, Mem.DimmedLetter); Is = true;   // Turn off the WAS LEDs
+#define WASUK   ColorLeds("was",      7,   9, UKSECColor);  ColorLeds("", 4, 5, Mem.DimmedLetter); Is = false;  // Turn off the IS LEDs
+#define EXACTUK ColorLeds("exact",   18,  22, UKLetterColor);
+#define HALFUK  ColorLeds("half",    13,  16, UKLetterColor);
+#define TWENTY  ColorLeds("twenty",  24,  29, UKLetterColor);
+#define MFIVE   ColorLeds("five",    32,  35, UKLetterColor);
+#define QUARTER ColorLeds("quarter", 41,  47, UKLetterColor);
+#define MTEN    ColorLeds("ten",     36,  38, UKLetterColor);
+#define PAST    ColorLeds("past",    48,  51, UKLetterColor);
+#define TO      ColorLeds("to",      53,  54, UKLetterColor);
+#define SIXUK   ColorLeds("six",     56,  58, UKLetterColor);
+#define TWO     ColorLeds("two",     68,  70, UKLetterColor);
+#define FIVE    ColorLeds("five",    61,  64, UKLetterColor);
+#define TWELVE  ColorLeds("twelve",  72,  77, UKLetterColor);
+#define TEN     ColorLeds("ten",     81,  83, UKLetterColor);
+#define ELEVEN  ColorLeds("eleven",  90,  95, UKLetterColor);
+#define FOUR    ColorLeds("four",    85,  88, UKLetterColor);
+#define NINE    ColorLeds("nine",    97, 100, UKLetterColor);
+#define THREE   ColorLeds("three",  103, 107, UKLetterColor);
+#define EIGHT   ColorLeds("eight",  112, 116, UKLetterColor);
+#define ONE     ColorLeds("one",    120, 122, UKLetterColor);
+#define SEVEN   ColorLeds("seven",  126, 130, UKLetterColor);
+#define OCLOCK  ColorLeds("O'clock",133, 138, UKLetterColor);
+                      #endif //UK144CLOCK
+
                      #ifdef NLM1M2M3M4L94
 const uint32_t NUM_LEDS    =  94;                                                             // How many leds in  strip? + 4 for the minutes
 const uint32_t LEDNEARLDR  = 9999;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
@@ -326,6 +440,8 @@ const byte MATRIX_HEIGHT  =  16;                                                
 #define MIN4    ColorLeds("M4",      255, 255, LetterColor); 
 #define EDSOFT  ColorLeds("EdSoft",  256, 256, LetterColor);
                      #endif //NLM1M2M3M4L256
+
+
                                              #ifdef FOURLANGUAGECLOCK                                             
 const uint32_t  NUM_LEDS  = 625;                                                              // How many leds in  strip?
 const uint32_t LEDNEARLDR = 9999;                                                             // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
@@ -448,6 +564,7 @@ const byte MATRIX_HEIGHT  =  25;                                                
                       #endif //FR
              #endif //FOURLANGUAGECLOCK 
 
+
              #ifdef VIERTALENKLOK                                             
 const uint32_t  NUM_LEDS  = 676;                                                              // How many leds in  strip?
 const uint32_t LEDNEARLDR = 9999;                                                              // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
@@ -569,7 +686,6 @@ const byte MATRIX_HEIGHT  =  29;                                                
 #define DITLEHEURE DitLeHeure();
                       #endif //FR4
               #endif //VIERTALENKLOK      
-
 
                     #ifdef NLM1M2M3M4L294
 const uint32_t NUM_LEDS   =  294;                                                             // How many leds in  strip? + 4 for the minutes

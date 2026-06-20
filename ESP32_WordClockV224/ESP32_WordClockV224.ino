@@ -34,7 +34,10 @@
  Changes V220: Claude optimised TimeReceiver
  Changes V221: Cleanup code. No flickering with EDSoftLEd V1.10.0 
  Changes V222: combined Mem2 at bottom of Mem. Removed Mem data struct
- Changes V222: Added const uint32_t LEDNEARLDR in clockfaces.h to control LDR reading
+ Changes V223: Added const uint32_t LEDNEARLDR in clockfaces.h to control LDR reading
+ Changes V224: Added colourpicker.h to choose colours
+ Changes V225: Corrected bugs, black after reset, DimmedLeds with SK6812 white LED. 
+               Added French, English single language designes and corrected LED position in German design
 
 *********************
 How to compile: 
@@ -51,14 +54,16 @@ Select below, with only one #define selected, the clock variant
 */
 // =============================================================================================================================
 // ------------------>   Define only one clock type
-//#define NL144CLOCK              // Dutch display for 12 x 12 Front
-#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
+#define NL144CLOCK              // Dutch display for 12 x 12 Front
+//#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
 //#define NL92CLOCK               // Dutch display for one LED behind every character
-//#define NLM1M2M3M4L161          // NL EdSoft Qclock design
+//#define UK144CLOCK              // English display for 12 x 12 Front 
+//#define FR144CLOCK              // French display for 12 x 12 Front
 //#define DE144CLOCK              // German display for 12 x 12 Front
 //#define NLM1M2M3M4L94           // NL clock with four extra LEDs for the minutes to light up 
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
+//#define NLM1M2M3M4L161          // NL EdSoft Qclock design
 //#define NLM1M2M3M4L256          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L294          // NL clock with four extra LEDs for the minutes to light up
 //#define VIERTALENKLOK           // Viertalenklok Ulrich
@@ -158,7 +163,7 @@ enum DigitalPinAssignments {      // Digital hardware constants ATMEGA 328 ----
  clearButton  = D4, //7,          // D4 switch (labeled SW on decoder)
  IRReceiverPin= D4,               // D4 Infrared receiver pin instead of rotary encoder
  LED_PIN      = D5, //8,          // D5 / GPIO 8 Pin to control colour SK6812/WS2812 LEDs (replace D5 with 8 for NeoPixel lib)
- RST_PIN      = 0,                // D2 / GPIO 5 or D6 Reset pin. Stored in Mem.ResetPin. After reset Mem.ResetPin = RST_PIN
+ RST_PIN      = 0,                // if 0 then not used D2 / GPIO 5 or D6 Reset pin. Stored in Mem.ResetPin. After reset Mem.ResetPin = RST_PIN
  EmptyD6      = D6,               // D6 / GPIO 9 Empty
  EmptyD7      = D7,               // D7 / GPIO 10 Empty
  encoderPinBL = D8,               // D8 *** If large PCB is used change pin D2 to D8 !!
@@ -509,40 +514,6 @@ struct    EEPROMstorage {                                                       
 }  Mem; 
 
 
-// struct    EEPROM2storage {                                                                     // Data storage in EEPROM to maintain them after power loss
-//   uint32_t DimmedLetter = 0;                                                                  // DimmedLetter colour                                                                 // For future use    
-//   uint32_t OwnColour    = 0;                                                                  // Self defined colour for clock display
-//   uint32_t ColourNL     = 0;                                                                  // Self defined NL colour for clock display
-//   uint32_t ColourUK     = 0;                                                                  // Self defined UK colour for clock display
-//   uint32_t ColourDE     = 0;                                                                  // Self defined DE colour for clock display
-//   uint32_t ColourFR     = 0;                                                                  // Self defined FR colour for clock display
-//   byte byteFuture1      = 0;                                                                  // Use Reset pin
-//   byte byteFuture2      = 0;                                                                  // For future use
-//   byte byteFuture3      = 0;                                                                  // For future use
-//   byte byteFuture4      = 0;                                                                  // For future use
-//   byte byteFuture5      = 0;                                                                  // For future use
-//   byte byteFuture6      = 0;                                                                  // For future use 
-//   byte byteFuture7      = 0;                                                                  // Use Reset pin
-//   byte byteFuture9      = 0;                                                                  // For future use
-//   byte byteFuture10     = 0;                                                                  // For future use
-//   byte byteFuture11     = 0;                                                                  // For future use
-//   byte byteFuture12     = 0;                                                                  // For future use  
-//   byte byteFuture13     = 0;                                                                  // For future use 
-//   int  IntFuture1       = 0;                                                                  // For future use
-//   int  IntFuture2       = 0;                                                                  // For future use
-//   int  IntFuture3       = 0;                                                                  // For future use
-//   int  IntFuture4       = 0;                                                                  // For future use
-//   int  IntFuture5       = 0;                                                                  // For future use    
-//   int  IntFuture6       = 0;                                                                  // For future use
-//   int  IntFuture7       = 0;                                                                  // For future use
-//   int  IntFuture8       = 0;                                                                  // For future use
-//   int  IntFuture9       = 0;                                                                  // For future use
-//   uint32_t Extra1       = 0;
-//   uint32_t Extra2       = 0;
-//   char ExtraSpace[50]   = "";                                                                 // ExtraSpace      
-//   int  ControlNumber    = 0;
-// }  Mem2; 
-
 //--------------------------------------------                                                //
 // Menu
 //0        1         2         3         4
@@ -868,6 +839,10 @@ void Reset(void)
  Mem.DCF77On          = 0;                                                                    // Default off
  Mem.UseDS3231        = 0;                                                                    // Default off
  //Mem.LEDstrip       = 0;    // Do not erase this setting with a reset                       // 0 = SK6812, 1=WS2812
+  uint32_t ColourNL     = 0x00FFFFFF;                                                         // Self defined NL colour for clock display
+  uint32_t ColourUK     = 0x0000FF00;                                                                  // Self defined UK colour for clock display
+  uint32_t ColourDE     = 0x00FFFF00;                                                                  // Self defined DE colour for clock display
+  uint32_t ColourFR     = 0x00FF0000;                                                                  // Self defined FR colour for clock display 
  Previous_LDR_read    = ReadLDR();                                                            // Read LDR to have a start value. max = 4096/8 = 255
  MinPhotocell         = Previous_LDR_read;                                                    // Stores minimum reading of photocell;
  MaxPhotocell         = Previous_LDR_read;                                                    // Stores maximum reading of photocell;                                            
@@ -2021,6 +1996,23 @@ void LEDstartup(uint32_t LEDColour)
 }
 
 //--------------------------------------------                                                //
+// LED covert 0x00rrggbb to 0Xww000000 for WS2812 LEDstrip
+//--------------------------------------------
+void FixDimmedLetterForStrip(uint32_t &colour)
+  {
+  uint8_t w = Cwhite(colour);
+  uint8_t r = Cred(colour);
+  uint8_t g = Cgreen(colour);
+  uint8_t b = Cblue(colour);
+
+  if (Mem.LEDstrip == 0)                       // SK6812 RGBW
+    {
+    if (w == 0 && r == g && g == b && r > 0)   // pure gray stored as RGB
+      colour = ((uint32_t)r << 24);            // move to W channel
+    }
+  // WS2812 — leave as 0x00RRGGBB
+  }
+//--------------------------------------------                                                //
 // LED convert HSV to RGB  h is from 0-360, s,v values are 0-1
 // r,g,b values are 0-255
 // brief Convert HSV values to packed RGBW format (white = 0).
@@ -2943,283 +2935,6 @@ void CheckTimeReceiverClient(void)
 }
 
 
-
-
-/*
-// --------- Time Receiver. Connect to TimeSender TIMESENDER_DEVICE_NAME "BLE-UARTtime"
-//--------------------------------------------                                                //
-// BLE TimeReceiver client
-//--------------------------------------------
-void SendMessageTimeReceiver(const char* msg)
-{
- if (!TRConnected || !msg || !pRemoteRX || !pClient) return;
- if (!pClient->isConnected()) { TRConnected = false; return; }
- size_t len = strlen(msg);
- pRemoteRX->writeValue((uint8_t*)msg, len, false);
-}
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Reconnect time receiver
-//--------------------------------------------
-void ReconnectTimeReceiver()
-{
- if (pClient)                                                                                 // Clean up old client before reconnecting to avoid race condition with onDisconnect callback
-   {
-    if (pClient->isConnected()) pClient->disconnect();
-    NimBLEDevice::deleteClient(pClient);
-    pClient = nullptr;
-   }
- TRConnected        = false;
- TRConnecting       = false;
- TRhaveFoundAddr    = true;                                                                   // Keep the address
- TRconnectRequested = true;
- delay(200);
- Connect_TimeReceiver();
-}
-//--------------------------------------------                                                //
-// BLE TimeReceiver RX notify callback
-// -------------------------------------------
-static void TimeReceiverNotifyCB( NimBLERemoteCharacteristic*,  uint8_t* data, size_t len, bool notify)
-{
- static char buf[128];
- size_t n = (len < sizeof(buf) - 1) ? len : sizeof(buf) - 1;
- memcpy(buf, data, n);
- buf[n] = 0;
- ReworkInputString(String(buf));
- TRConnectedSince = millis();
-}
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Scan callbacks
-// Client callbacks
-// -------------------------------------------
-class TimeReceiverClientCB : public NimBLEClientCallbacks
-{
- void onConnect(NimBLEClient* client) override
-   {
-    TRConnected = true;
-    TRConnecting = false;
-    TRConnectedSince = millis();
-    Tekstprintlnf("TimeReceiver connected to: %s", TIMESENDER_DEVICE_NAME);
-   }
-
- void onDisconnect(NimBLEClient* client, int reason) override
-   {
-    Tekstprintlnf("TimeReceiver disconnected (reason: %d)", reason); 
-    TRConnected        = false;
-    TRConnecting       = false;
-    TRhaveFoundAddr    = false;
-    TRconnectRequested = false;
-    TimeReceiverRunning  = false;                                                            // Reset flag
-    if (pClient)                                                                             // Clean up client
-      {
-       NimBLEDevice::deleteClient(pClient);
-       pClient = nullptr;
-      }
-    pRemoteTX = nullptr;
-    pRemoteRX = nullptr;
-    NimBLEScan* scan = NimBLEDevice::getScan();                                               // Stop any existing scan first
-    if (scan->isScanning())  {  scan->stop();   delay(100);  }
-    delay(200);
-    StartTimeReceiverScan();                                                                  // Start new scan
-   }
-};
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Scan callbacks
-//--------------------------------------------
-class TimeReceiverScanCB : public NimBLEScanCallbacks
-{
- void onResult(const NimBLEAdvertisedDevice* dev) override
-   {
-    if (TRConnecting) return;
-    if (!dev->haveName()) return;
-    std::string rawName = dev->getName();
-    if (rawName.find(TIMESENDER_DEVICE_NAME) == std::string::npos) return;
-    if (dev->getRSSI() <= TIMERECEIVER_MIN_RSSI) return;
-    if (!dev->isConnectable()) return;
-    if (!dev->isAdvertisingService(NimBLEUUID(SERVICE_UUID))) return;
-    TRfoundAddr        = dev->getAddress();
-    TRhaveFoundAddr    = true;
-    TRconnectRequested = true;
-    NimBLEDevice::getScan()->stop();
-   }
-};
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Start Time Receiver scan
-//--------------------------------------------
-void StartTimeReceiverScan(void)
-{
- NimBLEScan* scan = NimBLEDevice::getScan();
- if (TimeReceiverRunning && !scan->isScanning())                                              // Reset flag if scan isn't actually running
-   {
-    TimeReceiverRunning = false;
-    Tekstprintln("Flag reset - scan not running");
-   }
- if (TimeReceiverRunning)  { Tekstprintln("Scan already running - skipping");   return;}     // Only start if not already running
- if (scan->isScanning()) { scan->stop();  delay(100);}                                        // Stop any existing scan 
- TimeReceiverRunning = true; 
- scan->setActiveScan(true);
- scan->setInterval(160);
- scan->setWindow(30);
- scan->setScanCallbacks(new TimeReceiverScanCB(), true);  // true = delete old callback 
- if (!scan->start(0, false, false))
-   {
-    Tekstprintln("ERROR: Failed to start TimeReceiver scan");
-    TimeReceiverRunning = false;
-   }
- else
-   {
-    LastTimeReceiverScan = millis();
-    Tekstprintln("TimeReceiver scan started");
-   }
-}
-//--------------------------------------------                                                //
-// BLE TimeReceiver Stop Time Receiver
-//--------------------------------------------
-void StopTimeReceiver(void)
-{
- NimBLEDevice::getScan()->stop();
- if (pClient)
-   {
-    if (pClient->isConnected()) pClient->disconnect();
-    NimBLEDevice::deleteClient(pClient);                                                      // Always delete to avoid memory leak
-    pClient = nullptr;
-   }
- TRConnected           = false;
- TRConnecting          = false;
- pRemoteTX             = nullptr;
- pRemoteRX             = nullptr;
- TRhaveFoundAddr       = false;
- TRconnectRequested    = false;
-}
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Connect TimeReceiver
-// -------------------------------------------
-static void Connect_TimeReceiver(void)
-{
- if (!TRhaveFoundAddr || TRConnected || TRConnecting) return;
- const int MAX_CONNECT_ATTEMPTS = 3;
- const unsigned long POST_DISCONNECT_DELAY_MS = 150;
- 
- for (int attempt = 1; attempt <= MAX_CONNECT_ATTEMPTS; ++attempt)
-    {
-     NimBLEDevice::getScan()->stop();
-     delay(100);
-     pClient = NimBLEDevice::createClient();
-     pClient->setClientCallbacks(new TimeReceiverClientCB(), false);
-     TRConnecting      = true;
-     TRconnectStartms  = millis();
-     
-     if (!pClient->connect(TRfoundAddr))
-        {
-         NimBLEDevice::deleteClient(pClient);
-         pClient = nullptr;
-         TRConnecting = false;
-         delay(POST_DISCONNECT_DELAY_MS);
-         continue;
-        }
-       
-      NimBLERemoteService* svc = pClient->getService(SERVICE_UUID);
-      if (!svc)
-        {
-         pClient->disconnect();
-         NimBLEDevice::deleteClient(pClient);
-         pClient = nullptr;
-         TRConnecting = false;
-         delay(POST_DISCONNECT_DELAY_MS);
-         continue;
-        }
-      
-      pRemoteTX = svc->getCharacteristic(CHARACTERISTIC_UUID_TX);
-      pRemoteRX = svc->getCharacteristic(CHARACTERISTIC_UUID_RX);
-      if (!pRemoteTX || !pRemoteRX)
-        {
-         pClient->disconnect();
-         NimBLEDevice::deleteClient(pClient);
-         pClient = nullptr;
-         TRConnecting = false;
-         delay(POST_DISCONNECT_DELAY_MS);
-         continue;
-        }
-      
-      if (!pRemoteTX->subscribe(true, TimeReceiverNotifyCB, true))
-        {
-         pClient->disconnect();
-         NimBLEDevice::deleteClient(pClient);
-         pClient = nullptr;
-         TRConnecting = false;
-         delay(POST_DISCONNECT_DELAY_MS);
-         continue;
-        }
-      
-      TRConnectedSince    = millis();
-      TRhaveFoundAddr     = false;
-      TRconnectRequested  = false;
-      TRConnecting        = false;
- //     Tekstprintlnf("TimeReceiver connected to: %s", Mem.BLEbroadcastName);
-      return;
-    }
-
- if (pClient)
-   {
-    NimBLEDevice::deleteClient(pClient);
-    pClient = nullptr;
-   }
- TRhaveFoundAddr    = false;
- TRconnectRequested = false;
- Tekstprintln("TimeReceiver connection failed - restarting scan");
- StartTimeReceiverScan();
-}
-
-//--------------------------------------------                                                //
-// BLE TimeReceiver Check TimeReceiver Client
-//--------------------------------------------
-void CheckTimeReceiverClient(void)
-{
- unsigned long now = millis();
- NimBLEScan* scan = NimBLEDevice::getScan();
- if (!scan->isScanning() && TimeReceiverRunning)                                              // If scanning is not active and flag is still true, reset it to allow rescanning
-   {
-    TimeReceiverRunning = false;                                                              // Allow rescanning
-    Tekstprintln("TimeReceiverRunning flag reset - ready for rescan");
-   }
- if (TRconnectRequested && TRhaveFoundAddr && !TRConnected && !TRConnecting)                  // Handle connect request
-   {
-    TRconnectRequested = false;
-    Connect_TimeReceiver();
-   }
- if (TRConnecting && (now - TRconnectStartms > CONNECT_TIMEOUT_MS))                           // Handle connection timeout
-   {
-    if (pClient)
-      {
-       if (pClient->isConnected()) pClient->disconnect();
-       NimBLEDevice::deleteClient(pClient);
-       pClient = nullptr;
-      }
-    TRConnecting = false;
-    TRhaveFoundAddr = false;
-    TRconnectRequested = false;
-    TimeReceiverRunning = false;                                                              // Reset flag to allow new scan
-    Tekstprintln("Connect timeout - resetting for new scan");
-    scan->start(0, false, false);
-  }
-
- if (!TRConnected && !scan->isScanning())
-   {
-    unsigned long timeSinceLastScan = now - LastTimeReceiverScan;
-    if (timeSinceLastScan > 3000)                                                             // Reset the flag if it's been long enough (allows rescanning)
-      {
-       TimeReceiverRunning = false;                                                           // Reset flag for new attempt
-       StartTimeReceiverScan();                                                               // This will restart the scan
-       Tekstprintlnf("Periodic rescan initiated (%.1f seconds since last scan)",timeSinceLastScan / 1000.0);
-      }
-    }
-}
-// End Time Receiver
-*/
 //--------------------------------------------                                                //
 // WIFI WIFIEvents
 //Yes — using WiFi.onEvent() is definitely the better and more reliable way to handle Wi-Fi connection state on the ESP32.
@@ -3725,7 +3440,8 @@ void WebPage(void)
   if (Mem.LEDstrip == 1 && Mem.ColourDE == 0xFF000000) Mem.ColourDE = 0x00FFFFFF;
   if (Mem.LEDstrip == 1 && Mem.ColourFR == 0xFF000000) Mem.ColourFR = 0x00FFFFFF;
   if (Mem.LEDstrip == 1 && Mem.ColourUK == 0xFF000000) Mem.ColourUK = 0x00FFFFFF;  
-  if (Mem.LEDstrip == 1 && Mem.DimmedLetter == 0xFF000000) Mem.DimmedLetter = 0x00FFFFFF;   
+  //if (Mem.LEDstrip == 1 && Mem.DimmedLetter == 0xFF000000) Mem.DimmedLetter = 0x00FFFFFF;   
+   FixDimmedLetterForStrip(Mem.DimmedLetter);
   StoreStructInFlashMemory();                                                                // Store the 4-language Colour values in Mem2
   ReworkInputString("Q3");                                                                    // Force a minute update  
    request->send(200, "text/plain", "OK"); 

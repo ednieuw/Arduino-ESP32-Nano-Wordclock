@@ -11,10 +11,20 @@ void SetSecondColour(void)
                              #if defined FOURLANGUAGECLOCK || defined VIERTALENKLOK
   return;                                                                                     // 4-language clock uses SetColours() once per minute
                              #endif  //FOURLANGUAGECLOCK    
- static byte kleur = 0;                                                                       //  color increases per second in RAINBOW
- MINColor = FuncCRGBW(15 + timeinfo.tm_min * 4, 255 - timeinfo.tm_min * 4, 0, 0); 
- SECColor = FuncCRGBW(15 + timeinfo.tm_sec * 4, 255 - timeinfo.tm_sec * 4, 0, 0 );   
-                                                                                              // Light up  IS or WAS with the proper colour  
+  static byte kleur = 0;                                                                      // Colour increases per second in RAINBOW
+  MINColor = FuncCRGBW(15 + timeinfo.tm_min * 4, 255 - timeinfo.tm_min * 4, 0, 0); 
+  SECColor = FuncCRGBW(15 + timeinfo.tm_sec * 4, 255 - timeinfo.tm_sec * 4, 0, 0 );   
+  
+                               # if defined NL144CLOCK || defined NL92CLOCK
+  Mem.OwnColour = Mem.ColourNL;
+                               #elif UK144CLOCK                                               // English display for 12 x 12 Front 
+  Mem.OwnColour = Mem.ColourUK;
+                               #elif FR144CLOCK                                               // French display for 12 x 12 Front
+  Mem.OwnColour = Mem.ColourFR;
+                              #elif DE144CLOCK                                                // German display for 12 x 12 Front
+  Mem.OwnColour = Mem.ColourDE;
+                              #endif
+                                                                                               // Light up  IS or WAS with the proper colour  
  switch (Mem.DisplayChoice)
   {
    case DEFAULTCOLOUR: LetterColor = DefaultColor;                                     break; // Yellow text with changing MIN and SEC  

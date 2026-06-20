@@ -49,7 +49,7 @@ const char ColourPick_html[] = R"rawliteral(
 
   .lang-row {
     display: grid;
-    grid-template-columns: 52px 1fr auto;
+    grid-template-columns: 52px 1fr 90px auto;
     align-items: center;
     gap: 14px;
     padding: 16px 20px;
@@ -74,7 +74,6 @@ const char ColourPick_html[] = R"rawliteral(
   .picker-wrap {
     position: relative;
     height: 36px;
-    min-width: 20vw;
     border-radius: 6px;
     overflow: hidden;
     border: 1px solid var(--border);
@@ -106,6 +105,15 @@ const char ColourPick_html[] = R"rawliteral(
     transition: background .15s;
   }
   .colour-preview.is-white::after { background: rgba(255,255,255,.6); }
+
+  .hex-val {
+    font-size: .71rem;
+    letter-spacing: .04em;
+    color: #c8d4e0;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
 
   .var-name {
     font-size: .70rem;
@@ -264,9 +272,17 @@ const LANGS = [
   { id:'bg', label:'BG', varName:'DimmedLetter', packed:'%%COLBG%%' },
 ];
 
+// Unpack 0xWWRRGGBB → '#rrggbb' for the colour picker.
+// If W byte is set, it represents a gray/white shade on the W channel
+// (e.g. 0x22000000 = dim gray, 0xFF000000 = full white) — reconstruct
+// it as an equal R=G=B value so the picker shows the correct shade.
 function unpackToHex(s) {
   const n = parseInt(s, 16) >>> 0;
-  if ((n >>> 24) !== 0) return '#ffffff';
+  const w = (n >>> 24) & 0xFF;
+  if (w !== 0) {
+    const hex2 = w.toString(16).padStart(2, '0');
+    return '#' + hex2 + hex2 + hex2;
+  }
   return '#' + (n & 0x00FFFFFF).toString(16).padStart(6, '0');
 }
 
@@ -277,6 +293,12 @@ function packColour(hex) {
 
 function toHex8(n)   { return '0x' + (n>>>0).toString(16).toUpperCase().padStart(8,'0'); }
 function isWhite(h)  { return h.replace('#','').toLowerCase() === 'ffffff'; }
+// true when R=G=B (a gray/white shade that the ESP32 may store on the W channel)
+function isGrayShade(h) {
+  const n = parseInt(h.replace('#',''), 16);
+  const r=(n>>16)&0xff, g=(n>>8)&0xff, b=n&0xff;
+  return r === g && g === b && r > 0;
+}
 function hexToRGB(h) { const n=parseInt(h.replace('#',''),16); return {r:(n>>16)&0xff,g:(n>>8)&0xff,b:n&0xff}; }
 
 const state = {};
@@ -294,6 +316,7 @@ LANGS.forEach(({ id, label, varName }) => {
       <div class="colour-preview" id="prev-${id}"></div>
       <input type="color" id="col-${id}" value="${state[id]}">
     </div>
+    <span class="hex-val" id="hex-${id}"></span>
     <span class="var-name">${varName}<span class="w-tag" id="wtag-${id}">W</span> ${offBtn}</span>
   </div>`);
 });
@@ -309,11 +332,13 @@ const dots = document.querySelectorAll('.dot');
 
 function updateRow(id) {
   const rgb    = state[id];
+  const packed = packColour(rgb);
   const white  = isWhite(rgb);
 
   document.getElementById('prev-'  + id).style.background = rgb;
   document.getElementById('prev-'  + id).classList.toggle('is-white', white);
-  document.getElementById('wtag-'  + id).classList.toggle('show', white);
+  document.getElementById('hex-'   + id).textContent = toHex8(packed);
+  document.getElementById('wtag-'  + id).classList.toggle('show', isGrayShade(rgb));
 
   const glow = (rgb === '#000000') ? '#555' : rgb;
   const badge = document.getElementById('badge-' + id);
@@ -332,11 +357,10 @@ function updateOutput() {
   const lines = LANGS.map(({ id, varName }) => {
     const rgb   = state[id];
     const hex8  = toHex8(packColour(rgb));
-    const white = isWhite(rgb);
     const {r,g,b} = hexToRGB(rgb);
     const pad   = ' '.repeat(maxLen - varName.length + 1);
-    const cmt   = white
-      ? '<span class="cmt">// W=255</span>'
+    const cmt   = isGrayShade(rgb)
+      ? `<span class="cmt">// W=${r} (gray/white channel)</span>`
       : `<span class="cmt">// R=${r} G=${g} B=${b}</span>`;
     return `<span class="kw">uint32_t</span> <span class="var">${varName}</span>${pad}<span class="pun">=</span> <span class="num">${hex8}</span><span class="pun">;</span>  ${cmt}`;
   });
