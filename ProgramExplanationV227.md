@@ -290,23 +290,11 @@ void HandleTekstPrint(...)               // Serve the last ~500 lines  -> /tekst
 void HandleTekstDownload(...)            // Stream the full buffer      -> /tekstdownload
 ```
 
-The web routes are registered in `WebPage()`:
 
-| Route | Page |
-|-------|------|
-| `/`             | Main clock page (Webpage.h) |
-| `/menu`         | Touch menu page (MenuPage.h) |
-| `/log`          | Full log viewer (LogViewer.h) |
-| `/tekstprint`   | Last ~500 log lines (used by the live log windows) |
-| `/tekstdownload`| Full log buffer download |
-| `/colourpick`   | Colour picker (ColourPick.h) |
-| `/update`       | OTA firmware update (OTAhtml.h) |
-
-The main page and the menu page each embed a small **live log window** — a read-only text area that fetches `/tekstprint` every 5 seconds, shows the last 50 lines and auto-scrolls to the bottom *only* when you are already at the bottom (so you can scroll up to read history without being yanked back). A checkbox on the main page toggles the window on/off.
 
 ## Get the commands
 
-Input from serial, BLE or the web page is processed in `ReworkInputString()`. The menu letters are case-sensitive (no upper/lower conversion) so upper- and lowercase can carry different commands when more are needed.
+Input from serial, BLE or the web page is processed in `ReworkInputString()`. The menu letters are case-insensitive (upper/lower conversion) so upper- and lowercase can carry the same commands.
 
 ```cpp
 //--------------------------------------------
@@ -331,26 +319,10 @@ int ReadLDR(void) { return analogRead(PhotoCellPin)/16; }
 
 `DimLeds()` reads the LDR and **squares** the value to get a hyperbolic curve that matches the eye's response to dark/light far better than a linear range — it works wonderfully well.
 
-## LED helpers and the interruptible LED test  *(updated in V227)*
+## LED helpers and the interruptible LED test 
 
 A series of LED helpers (`ColorLeds`, `ColorLed`, `LedsOff`, `ShowLeds`, `SetBrightnessLeds`, `Stripfill`, `StartLeds`, …) wrap every strip-specific command so the rest of the code stays generic. The SK6812 strip also has a white LED, controlled by the highest byte of the 32-bit colour value (`0xWWRRGGBB`).
 
-The LED test (`Y` command) runs long rainbow animations. Previously these used blocking `delay()` calls and could not be interrupted. V227 replaces those delays with an interruptible helper:
-
-```cpp
-volatile bool StopTest    = false;   // Set true to abort the running test
-volatile bool LEDtestBusy = false;   // True while LEDtest() is running
-
-void Dlay(uint32_t ms)               // Interruptible replacement for delay()
-{
- uint32_t t = millis();
- while (millis()-t < ms) { CheckDevices(); if (StopTest) return; }
-}
-```
-
-`RainbowCycle()` and `WhiteOverRainbow()` call `Dlay(wait); if(StopTest) return;` instead of `delay(wait)`, so input keeps being processed during the animation. Pressing **`Y`** a second time (serial, BLE or web) sets `StopTest = true` and the test stops promptly instead of running to the end.
-
-Here the characters are coloured / the proper LEDs lit. Each macro calls this function with the right parameters for every language and also prints the text to the serial connections.
 
 ```cpp
 //--------------------------------------------
@@ -478,6 +450,14 @@ const char* PrintRTCTime(void)            // Time string dd-mmm-yy hh:mm:ss
 void        PrintTimeHMS(void)            // Print hh:mm:ss with linefeed
 void        SetRTCTime(void)              // Set internal RTC from timeinfo
 void        PrintAllClockTimes(void)      // Print all available time sources
+void        InitTimeSystem(void)          // Initialise time system (DS3231 + NTP + internal RTC).
+void SetSystemTimeToCompileTime(void)     // Set system time to compile time.
+bool        IsDS3231I2Cconnected(void)    // DS3231 Check for I2C connection.
+float       GetDS3231Temp(void)           // DS3231 Read temperature from DS3231.
+void        SetDS3231Time(void)           // DS3231 Write ESP32 time to DS3231.
+void        GetDS3231Time(bool printit)   // DS3231 Read time from DS3231 module.
+void        SetSystemTime(time_t t)       // RTC Set RTC using Unix timestamp.
+void        PrintAllClockTimes(void)      // Print all the clock times available 
 ```
 
 Convert a HEX string to an unsigned 32-bit integer:
@@ -525,15 +505,70 @@ The BLE functions use the Nordic nRF (NimBLE) stack, which differs from the Texa
 void SendMessageBLE(std::string Message)   // BLE Send message in packets of 20 chars
 class MyServerCallbacks : public NimBLEServerCallbacks   // BLE connect/disconnect callbacks
 void StartBLEService(void)                 // BLE Start the UART service
+void DisconnectBLE(void)                   // BLE Disconnect BLE Service
 void CheckBLE(void)                        // BLE Check input and process the string
 ```
+```cpp
+//--------------------------- BLE TimeReceiver functions --------------------------
+void        TimeReceiverNotifyCB(...)              // Notify callback: copies incoming BLE data into a buffer and passes it to ReworkInputString(); resets the connection-alive timestamp
+void        SendMessageTimeReceiver(const char*)   // Writes a message to the remote RX characteristic (no-op if not connected)
+void        StartTimeReceiverScan(void)            // Starts a continuous BLE scan using the static scan callback; guards against double-starts and resets stale flags
+void        StopTimeReceiver(void)                 // Stops the scan, disconnects and deletes the NimBLE client, and resets all TR state flags
+static void Connect_TimeReceiver(void)             // Attempts up to 3 times to connect to the found address, discover the service/characteristics, and subscribe to TX notifications; falls back to a fresh scan on total failure
+void        ReconnectTimeReceiver(void)            // Tears down any existing client, reuses the previously found address, and immediately calls Connect_TimeReceiver()
+void        CheckTimeReceiverClient(void)          // Main loop-context driver: processes deferred disconnect cleanup, honours scan-callback connect requests, times out stalled connection attempts, and triggers periodic rescans when idle
+```
+These functions start a connection to a time sender that will set time in this sketch  when the BLE connection is succesfull.
+Several time senders are available; from IOS app to web pages or ESP32 sketches.
+Just open the application, wait a minute or so and you will see the clock sets time correctly.
+
+- [iPhone BLE TimeSender app (search for Timesender in the Apple app store)](https://ednieuw.nl/BLESerial/BLEtimeSender.html)
+- [Arduino Nano ESP32 sketch that Auto connects to BLE-UARTtime BLE client and sends time and date](https://github.com/ednieuw/BLE-time-Sender)
+- [HTML page that connects to a BLE UART client and send time and date to it](https://github.com/ednieuw/HTML-TimeSender)
+- [web page Windows/IOS/Android.](https://github.com/ednieuw/HTML-BLEserial)
+- [BLE serial monitor app on your phone or with a web page Windows/Android](https://github.com/ednieuw/HTML-BLEserial)
+
+
 
 ## WIFI and the web page
 
-Functions to start a WIFI connection and serve the web pages. `WebPage()` registers all the routes listed in the table above.
+Functions to start a WIFI connection and serve the web pages.
+
+ `WebPage()` registers all the routes listed in the table below.
+
+| Route | Page |
+|-------|------|
+| `/`             | Main clock page (Webpage.h) |
+| `/menu`         | Touch menu page (MenuPage.h) |
+| `/log`          | Full log viewer (LogViewer.h) |
+| `/tekstprint`   | Last ~500 log lines (used by the live log windows) |
+| `/tekstdownload`| Full log buffer download |
+| `/colourpick`   | Colour picker (ColourPick.h) |
+| `/update`       | OTA firmware update (OTAhtml.h) |
+
+The main page and the menu page each embed a small **live log window** — a read-only text area that fetches `/tekstprint` every 5 seconds, shows the last 50 lines and auto-scrolls to the bottom *only* when you are already at the bottom (so you can scroll up to read history without being yanked back). A checkbox on the main page toggles the window on/off.
 
 ```cpp
-bool StartWIFI_NTP(void)                    // WIFI Start WIFI connection and NTP service
-void WebPage(void)                          // WIFI Register all web server routes and start server
-void notFound(AsyncWebServerRequest *request) // WIFI Handle unknown requests
+
+void WiFiEvent(WiFiEvent_t event)              // WIFI Handle WIFI events.
+bool CheckforWIFINetwork(void)                 // WIFI Scan for configured WIFI network (print=true).
+bool CheckforWIFINetwork(bool PrintIt)         // WIFI Scan for configured WIFI network, optionally silent.
+void ScanWIFI(void)                            // WIFI Scan and print list of available WIFI networks.
+void ConnectWIFI(void)                         // WIFI Connect to WIFI router using stored SSID and password.
+void CheckRestoreWIFIconnectivity(void)        // WIFI Check WIFI connection and restore if lost.
+bool StartWIFI_NTP(void)                       // WIFI Start WIFI connection and NTP service.
+void NTPnotify(struct timeval* tv)             // NTP Callback: set ntpJustSynced flag on NTP sync.
+void CheckandPrintNTPsynced(void)              // NTP Check and print NTP sync confirmation.
+void setTimezone(void)                         // NTP Apply stored timezone to system.
+void initSNTP(void)                            // NTP Initialise SNTP client.
+bool wait4SNTP(void)                           // NTP Wait up to 2.5 s for SNTP synchronisation.
+void CheckWIFIcommand(void)                    // WIFI Process pending command received from web page.
+void WebPage(void)                             // WIFI Register all web server routes and start server.
+void notFound(AsyncWebServerRequest *request)  // WIFI Handle unknown web page requests.
+void StartAPMode(void)                         // WIFI Start Access Point for entering WIFI credentials.
+void wpsInitConfig(void)                       // WIFI Initialise WPS configuration.
+void wpsStart(void)                            // WIFI Start WPS push-button connection.
+void wpsStop(void)                             // WIFI Stop WPS.
+String wpspin2string(uint8_t a[])              // WIFI Convert WPS PIN byte array to string.
+
 ```
