@@ -1,0 +1,4 @@
+{
+    "configuration": "PartitionScheme=default,PinNumbers=byGPIONumber,USBMode=default",
+    "board": "arduino:esp32:nano_nora"
+}
