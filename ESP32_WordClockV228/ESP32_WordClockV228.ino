@@ -38,6 +38,11 @@
  Changes V224: Added colourpicker.h to choose colours
  Changes V225: Corrected bugs, black after reset, DimmedLeds with SK6812 white LED. 
                Added French, English single language designes and corrected LED position in German design
+ Changes V226: Renamed Laatzien to SelftestFlash with instant-abort behaviour, 
+               added web settings menu (MenuPage.h) with sliders, 24h clock picker, and colour picker link.
+ Changes V227: Added auto-scrolling log windows to main/menu pages, made the LED test interruptible, 
+               added rocket/menu icons, and shrank the menu buttons and brightness section.
+ Changes V228: check all clock definitions and corrected error. Added ClearTestStrip()
 
 *********************
 How to compile: 
@@ -56,10 +61,10 @@ Select below, with only one #define selected, the clock variant
 // ------------------>   Define only one clock type
 #define NL144CLOCK              // Dutch display for 12 x 12 Front
 //#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
-//#define NL92CLOCK               // Dutch display for one LED behind every character
-//#define UK144CLOCK              // English display for 12 x 12 Front 
-//#define FR144CLOCK              // French display for 12 x 12 Front
-//#define DE144CLOCK              // German display for 12 x 12 Front
+//#define NL92CLOCK               // Dutch display for one LED-strip behind every word
+//#define UK144CLOCK              // English display for 12 x 12 Front.
+//#define FR144CLOCK              // French display for 12 x 12 Front.
+//#define DE144CLOCK              // German display for 12 x 12 Front.
 //#define NLM1M2M3M4L94           // NL clock with four extra LEDs for the minutes to light up 
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up 
@@ -218,24 +223,24 @@ uint32_t MINColor      = chromeyellow;
 uint32_t SECColor      = chromeyellow;
   
                                              #if defined FOURLANGUAGECLOCK || defined VIERTALENKLOK
-uint32_t DefaultColor  = white;   
-uint32_t LetterColor   = white; 
-uint32_t UKLetterColor = green; 
+uint32_t DefaultColor  = white;
+uint32_t LetterColor   = white;
+                                             #else
+uint32_t DefaultColor  = chromeyellow;
+uint32_t LetterColor   = chromeyellow;
+                                             #endif //FOURLANGUAGECLOCK
+uint32_t UKLetterColor = green;
 uint32_t UKMINColor    = UKLetterColor;
-uint32_t UKSECColor    = UKLetterColor;   
+uint32_t UKSECColor    = UKLetterColor;
 uint32_t DELetterColor = red;
 uint32_t DEMINColor    = DELetterColor;
-uint32_t DESECColor    = DELetterColor; 
+uint32_t DESECColor    = DELetterColor;
 uint32_t FRLetterColor = yellow;
 uint32_t FRMINColor    = FRLetterColor;
-uint32_t FRSECColor    = FRLetterColor; 
+uint32_t FRSECColor    = FRLetterColor;
 uint32_t UKDefaultColor= UKLetterColor;
 uint32_t DEDefaultColor= DELetterColor;
 uint32_t FRDefaultColor= FRLetterColor;
-                                             #else
-uint32_t DefaultColor  = chromeyellow;   
-uint32_t LetterColor   = chromeyellow;   
-                                             #endif //FOURLANGUAGECLOCK
 
 uint32_t OwnColour     = 0X002345DD;        // Blueish
 uint32_t WheelColor    = blue;
@@ -410,6 +415,7 @@ static const unsigned long CONNECT_TIMEOUT_MS = 10000;                         /
 #include "OTAhtml.h"                                                                          // OTA update page
 #include "LogViewer.h"                                                                        // Log vieuwer page
 #include "ColourPick.h"                                                                       // Colour Picker page
+#include "MenuPage.h"                                                                          // Menu page at /menu
 WiFiEventId_t wifiEventHandler;                                                               // To stop the interrupts or callbacks triggered by WiFi.onEvent(WiFiEvent);, you need to deregister the event handler.
 bool WIFIwasConnected       = false;                                                          // Is WIFI connected?
 bool InApMode               = false;
@@ -421,6 +427,8 @@ DNSServer dnsServer;
 bool shouldReboot           = false;
 bool OptionYRainbow         = false;
 bool DoNotLog               = false;                                                          // Use this flag to suspress Logging to Logviewer 
+volatile bool StopTest      = false;                                                          // Set true to interrupt the running LED test
+volatile bool LEDtestBusy   = false;                                                          // True while LEDtest() is running
 byte NoConnectionCounter    = 0;                                                              // Count times minutes with no WIFI connection
 String PendingCommand = "";
 //----------------------------------------                                                    //
@@ -452,7 +460,7 @@ bool      NoTextInLeds      = false;                                            
 int       Previous_LDR_read = 512;                                                            // The actual reading from the LDR + 4x this value /5
 uint16_t  MilliSecondValue  = 10;                                                             // The duration of a second  minus 1 ms. Used in Demo mode
 uint32_t  Loopcounter       = 100;                                                            // ESP will restart if <10. so start with a larger start value
-static const uint32_t MCURESTART_RESET_AFTER_MS = 600000;                                     // 10 minutes
+static const uint32_t MCURESTART_RESET_AFTER_MS = 120000;                                     // 2 minutes
 static bool mcuRestartCounterCleared = false;
 
 struct    EEPROMstorage {                                                                     // Data storage in EEPROM to maintain them after power loss
@@ -543,7 +551,7 @@ const char *menu[] = {
  
  const char *menusmall[] = {
  "F Own colour (Hex FWWRRGGBB)",
- "I Menu, II long menu",
+ "I Info menu, II long menu",
  "N Display off between Nhhhh (N2208)",
  "O Display On/Off",
  "Q Display colour choice (Q0)",
@@ -562,6 +570,7 @@ void setup()
  int32_t Tick = millis(); 
  InitStorage();                                                                               // Load settings from storage and check validity   
  StartLeds();                                                                                 // Select the SK6812 or WS2812 LED strip and initialysed
+ if (NUM_LEDS < 256) ClearTestStrip();                                                        // Testing on a 256-LED strip: blank the surplus LEDs left lit after upload
  SetStatusLED(0,10,0);                                                                        // Set the status LED to red
  while (!Serial && ( (millis()-Tick) < 2002)) { LEDstartup(green);delay(500); }               // Wait max 1.5 sec to establish serial connection
  SetStatusLED(10,0,10);                                                                       // Set the status LED to red
@@ -1042,7 +1051,7 @@ void SWversion(bool Small)
  snprintf(sptext, sizeof(sptext),"BLE name: %s", Mem.BLEbroadcastName);                         WTekstprintln(sptext,"<span class=\"verdana-red\">","</span>");
  snprintf(sptext, sizeof(sptext),"IP-address: %d.%d.%d.%d", WiFi.localIP()[0], WiFi.localIP()[1], 
                                            WiFi.localIP()[2], WiFi.localIP()[3] );              WTekstprint(sptext);
- snprintf(sptext, sizeof(sptext),"/update");                                                    WTekstprintln(sptext," <a href=" , "> /update</a>");                                            
+ snprintf(sptext, sizeof(sptext),"/update");                                                    WTekstprintln(sptext," <a href=" , "> &#128640; Update</a>");
  if(!Small) {snprintf(sptext, sizeof(sptext),"Timezone:%s", Mem.Timezone);                      WTekstprintln(sptext); }
  snprintf(sptext, sizeof(sptext),"%s %s %s %s", Mem.WIFIOn?"WIFI=On":"WIFI=Off", 
                                Mem.NTPOn? "NTP=On":"NTP=Off",
@@ -1474,8 +1483,8 @@ void ReworkInputString(String InputString)
     case 'Y':                                                                                 // LEDtest
       if(len == 1) 
        {
-        LEDtest();                                                                     // Force a minute update
-        snprintf(sptext, sizeof(sptext), "**** LED test");
+        if(LEDtestBusy) { StopTest = true; snprintf(sptext, sizeof(sptext), "**** LED test stopped"); }
+        else {snprintf(sptext, sizeof(sptext), "**** LED test"); Tekstprintln(sptext);   LEDtest();   }
        }
       break;
       
@@ -1897,17 +1906,29 @@ void DimLeds(bool print)
 //--------------------------------------------                                                //
 // CLOCK LED test
 //--------------------------------------------
+//--------------------------------------------                                                //
+// LED Interruptible replacement for delay() used during LEDtest
+//--------------------------------------------
+void Dlay(uint32_t ms)
+{
+ uint32_t t = millis();
+ while (millis()-t < ms) { CheckDevices(); if (StopTest) return; }                           // Keep handling input so a Y command can abort
+}
+//--------------------------------------------                                                //
+// LED Test routine
+//--------------------------------------------
 void LEDtest()
 {
+ StopTest = false; LEDtestBusy = true;
  SetBrightnessLeds(20);
  RainbowCycle(10);
  for(int i=0; i<NUM_LEDS; i++)  { ColorLeds("",i,i,chromeyellow); } 
  ShowLeds();
- delay(2000);
  LedsOff();
  WhiteOverRainbow(25, 50, 5 ); 
  WhiteOverRainbow(5, 5, 5 );  // wait, whiteSpeed, whiteLength
  LedsOff();
+ LEDtestBusy = false;
 }    
 
 // --------------------Colour Clock Light functions -----------------------------------
@@ -1935,16 +1956,6 @@ void LedsOff(void) { LedsOff(false); }
 void LedsOff(bool ClearOff)
 { 
  Stripfill(ClearOff ? 0 : Mem.DimmedLetter, 0, NUM_LEDS );                                    // If true use 0 else Mem.DimmedLetter
-}
-//--------------------------------------------                                                //
-// LED Turn On and the LEDs off after Delaymsec milliseconds
-//--------------------------------------------
-void Laatzien(int Delaymsec) 
-{ 
- ShowLeds(); 
- delay(Delaymsec);
- LedsOff(); 
- CheckDevices();                                                                              // Check for input from input devices
 }
 
 //--------------------------------------------                                                //
@@ -1996,22 +2007,19 @@ void LEDstartup(uint32_t LEDColour)
 }
 
 //--------------------------------------------                                                //
-// LED covert 0x00rrggbb to 0Xww000000 for WS2812 LEDstrip
+// LED convert white 0x00rrggbb to 0Xww000000 for RGBW 6812 LEDstrip
 //--------------------------------------------
 void FixDimmedLetterForStrip(uint32_t &colour)
-  {
-  uint8_t w = Cwhite(colour);
-  uint8_t r = Cred(colour);
-  uint8_t g = Cgreen(colour);
-  uint8_t b = Cblue(colour);
+{
+ uint8_t w = Cwhite(colour);
+ uint8_t r = Cred(colour);
+ uint8_t g = Cgreen(colour);
+ uint8_t b = Cblue(colour);
+ if (Mem.LEDstrip == 0)                                                                      // SK6812 RGBW
+    if (w == 0 && r == g && g == b && r > 0)  colour = ((uint32_t)r << 24);                 // Pure gray stored as RGB                                                                               // WS2812 — leave as 0x00RRGGBB
+}
 
-  if (Mem.LEDstrip == 0)                       // SK6812 RGBW
-    {
-    if (w == 0 && r == g && g == b && r > 0)   // pure gray stored as RGB
-      colour = ((uint32_t)r << 24);            // move to W channel
-    }
-  // WS2812 — leave as 0x00RRGGBB
-  }
+
 //--------------------------------------------                                                //
 // LED convert HSV to RGB  h is from 0-360, s,v values are 0-1
 // r,g,b values are 0-255
@@ -2111,9 +2119,23 @@ void StartLeds(void)
               wgray  = 0xAA000000;     
     }
 LEDstrip.begin();
-LEDstrip.setBrightness(48);  
-LedsOff();                                                                                    // Set initial brightness of LEDs  (0-255)  
+LEDstrip.setBrightness(48);
+LedsOff();                                                                                    // Set initial brightness of LEDs  (0-255)
 ShowLeds();
+}
+//--------------------------------------------                                                //
+// LED Clear an oversized test strip (testing helper)
+// When testing a clock build with < 256 LEDs on a 256-LED strip, the surplus
+// LEDs keep whatever they held after upload. Grow the buffer to 256, blank the
+// whole strip, then shrink back to NUM_LEDS so the clock runs at its real size.
+//--------------------------------------------
+void ClearTestStrip(void)
+{
+ const uint16_t TESTLEDS = 256;                                                               // Physical length of the test strip
+ LEDstrip.updateLength(TESTLEDS);                                                             // Grow buffer; all pixels reset to off
+ LEDstrip.clear();                                                                            // Make sure every pixel is black
+ LEDstrip.show();                                                                             // Push the blank frame to all 256 LEDs
+ LEDstrip.updateLength(NUM_LEDS);                                                             // Shrink back to the real clock size
 }
 //--------------------------------------------                                                //
 // DISPLAY change display choice
@@ -2138,7 +2160,7 @@ void RainbowCycle(uint8_t wait)
    {                                                                                          // 5 cycles of all colors on wheel
     for(i=0; i< NUM_LEDS; i++) ColorLeds("",i,i,Wheel(((i * 256 / NUM_LEDS) + j) & 255));
     ShowLeds();
-    delay(wait);
+    Dlay(wait); if (StopTest) return;
   }
 }
 
@@ -2172,7 +2194,7 @@ void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength )
       head %= NUM_LEDS;
       tail %= NUM_LEDS;
       ShowLeds();
-     delay(wait);
+     Dlay(wait); if (StopTest) return;
     }
 }
 
@@ -3411,6 +3433,43 @@ void WebPage(void)
   snprintf(buf, sizeof(buf), "%08" PRIX32, Mem.DimmedLetter); page.replace("%%COLBG%%", buf);
   request->send(200, "text/html", page);
   });
+ server.on("/menu", HTTP_GET, [](AsyncWebServerRequest *request)                              // Serve the settings menu page
+   {  request->send(200, "text/html", menu_html);  });
+
+ server.on("/menustate", HTTP_GET, [](AsyncWebServerRequest *request)                         // Return current Mem toggle states as JSON
+  {
+   char json[420];
+   snprintf(json, sizeof(json),
+     "{\"t0\":%d,\"t1\":%d,\"t2\":%d,\"t3\":%d,\"t5\":%d,\"t8\":%d,"
+     "\"tj\":%d,\"tself\":%d,\"tdemo\":%d,\"t9\":%d,"
+     "\"hi\":\"h0%d\",\"qval\":%d,"
+     "\"sval\":%d,\"lval\":%d,\"mval\":%d,"
+     "\"noff\":%d,\"non\":%d,"
+     "\"ds3231hw\":%d,\"rtcsrc\":\"%s\"}",
+     Mem.HetIsWasOff      ? 0 : 1,  // t0 )  HET IS WAS ON when HetIsWasOff==0
+     Mem.EdSoftLEDSOn     ? 1 : 0,  // t1 (
+     LEDsAreOff           ? 0 : 1,  // t2 O  ON when display is on
+     Mem.StatusLEDOn      ? 1 : 0,  // t3 P
+     Mem.NTPOn            ? 1 : 0,  // t5 X
+     Mem.Ringbufcnt       ? 1 : 0,  // t8 }
+     Mem.UseDS3231        ? 1 : 0,  // tj J
+     Zelftest             ? 1 : 0,  // tself #
+     Demo                 ? 1 : 0,  // tdemo U
+     Mem.TimeReceiver     ? 1 : 0,  // t9 H05
+     (int)Mem.TimeInput,            // hi  h00-h04
+     (int)Mem.DisplayChoice,        // qval Q0-Q8
+     (int)Mem.LightReducer,         // sval S
+     (int)Mem.LowerBrightness,      // lval L
+     (int)Mem.UpperBrightness,      // mval M
+     (int)Mem.TurnOffLEDsAtHH,      // noff N off-hour
+     (int)Mem.TurnOnLEDsAtHH,       // non  N on-hour
+     DS3231Installed      ? 1 : 0,  // ds3231hw hardware present
+     (Mem.UseDS3231 && DS3231Installed) ? "DS3231" :
+       (Mem.NTPOn ? "NTP" : "ESP32") // rtcsrc active time source
+   );
+   request->send(200, "application/json", json);
+  });
+
  server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request)
    {
     String inputMessage;
@@ -3418,6 +3477,7 @@ void WebPage(void)
     PendingCommand = inputMessage;                                                            //  Command → queue it and redirect
     request->redirect("/wait");
 });
+
  server.on("/wait", HTTP_GET, [](AsyncWebServerRequest *request)
    {
    if (PendingCommand.length() == 0) { request->redirect("/"); return; }                      // Command finished → show updated page
@@ -3430,24 +3490,24 @@ void WebPage(void)
 
  server.on("/setcolours", HTTP_GET, [](AsyncWebServerRequest *request)
   {                                                                                           // Save the colour chosen
-  if(request->hasParam("NL")) Mem.ColourNL = (uint32_t)strtoul(request->getParam("NL")->value().c_str(), nullptr, 16);
-  if(request->hasParam("DE")) Mem.ColourDE = (uint32_t)strtoul(request->getParam("DE")->value().c_str(), nullptr, 16);
-  if(request->hasParam("FR")) Mem.ColourFR = (uint32_t)strtoul(request->getParam("FR")->value().c_str(), nullptr, 16);
-  if(request->hasParam("UK")) Mem.ColourUK = (uint32_t)strtoul(request->getParam("UK")->value().c_str(), nullptr, 16);
+  if(request->hasParam("NL")) Mem.OwnColour = Mem.ColourNL = (uint32_t)strtoul(request->getParam("NL")->value().c_str(), nullptr, 16);
+  if(request->hasParam("DE")) Mem.OwnColour = Mem.ColourDE = (uint32_t)strtoul(request->getParam("DE")->value().c_str(), nullptr, 16);
+  if(request->hasParam("FR")) Mem.OwnColour = Mem.ColourFR = (uint32_t)strtoul(request->getParam("FR")->value().c_str(), nullptr, 16);
+  if(request->hasParam("UK")) Mem.OwnColour = Mem.ColourUK = (uint32_t)strtoul(request->getParam("UK")->value().c_str(), nullptr, 16);
   if(request->hasParam("BG")) Mem.DimmedLetter = (uint32_t)strtoul(request->getParam("BG")->value().c_str(), nullptr, 16);                                                        
 
-  if (Mem.LEDstrip == 1 && Mem.ColourNL == 0xFF000000) Mem.ColourNL = 0x00FFFFFF;           // if WS2812 strip change the pure white that is returned by the HTML page to turn on the white LED in the SK6812
+  if (Mem.LEDstrip == 1 && Mem.ColourNL == 0xFF000000) Mem.ColourNL = 0x00FFFFFF;             // If WS2812 strip change the pure white that is returned by the HTML page to turn on the white LED in the SK6812
   if (Mem.LEDstrip == 1 && Mem.ColourDE == 0xFF000000) Mem.ColourDE = 0x00FFFFFF;
   if (Mem.LEDstrip == 1 && Mem.ColourFR == 0xFF000000) Mem.ColourFR = 0x00FFFFFF;
   if (Mem.LEDstrip == 1 && Mem.ColourUK == 0xFF000000) Mem.ColourUK = 0x00FFFFFF;  
-  //if (Mem.LEDstrip == 1 && Mem.DimmedLetter == 0xFF000000) Mem.DimmedLetter = 0x00FFFFFF;   
-   FixDimmedLetterForStrip(Mem.DimmedLetter);
-  StoreStructInFlashMemory();                                                                // Store the 4-language Colour values in Mem2
+
+  FixDimmedLetterForStrip(Mem.DimmedLetter);                                                  // If RGB gray and RGBW LED then convert to 0xWW000000
+  StoreStructInFlashMemory();                                                                 // Store the 4-language Colour values in Mem2
   ReworkInputString("Q3");                                                                    // Force a minute update  
    request->send(200, "text/plain", "OK"); 
 }); 
  server.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)                            // Serve the OTA upload page
-    {  request->send(200, "text/html", OTA_html);});
+   {  request->send(200, "text/html", OTA_html);});
  server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request)                           // Handle the actual OTA upload
    {
     shouldReboot = !Update.hasError();

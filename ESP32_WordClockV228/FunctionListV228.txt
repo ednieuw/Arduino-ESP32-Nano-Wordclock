@@ -1,8 +1,8 @@
 // ============================================================
-// ESP32_WordClockV227 — Function List
+// ESP32_WordClockV228 — Function List
 // ============================================================
 
-// ESP32_WordClockV227.ino
+// ESP32_WordClockV228.ino
 void setup()                                                                                // ARDUINO Setup.
 void loop()                                                                                 // ARDUINO Loop.
 void CheckDevices(void)                                                                     // COMMON Check connected input devices.
@@ -70,9 +70,14 @@ void LEDstartup(uint32_t LEDColour)                                             
 void FixDimmedLetterForStrip(uint32_t &colour)                                              // LED Adjust dimmed letter colour for LED strip type.
 uint32_t HSVToRGB(double H, double S, double V)                                             // LED Convert HSV to RGB (H 0–360, S/V 0–1).
 uint32_t FuncCRGBW(uint32_t Red, uint32_t Green, uint32_t Blue, uint32_t White)             // LED Compose RGBW colour value.
+uint8_t Cwhite(uint32_t c)                                                                  // LED Extract white channel from an RGBW colour value.
+uint8_t Cred(uint32_t c)                                                                    // LED Extract red channel from an RGBW colour value.
+uint8_t Cgreen(uint32_t c)                                                                  // LED Extract green channel from an RGBW colour value.
+uint8_t Cblue(uint32_t c)                                                                   // LED Extract blue channel from an RGBW colour value.
 void ClearScreen(void)                                                                      // DISPLAY Clear the LED display.
 uint32_t Wheel(byte WheelPos)                                                               // DISPLAY Colour wheel: r→g→b→r transition.
 void StartLeds(void)                                                                        // DISPLAY Initialise LED strip for WS2812 or SK6812.
+void ClearTestStrip(void)                                                                   // LED Blank a 256-LED test strip, then shrink buffer back to NUM_LEDS.
 void ChangeRandomDisplay(void)                                                              // DISPLAY Change to next random display choice.
 void RainbowCycle(uint8_t wait)                                                             // DISPLAY Rainbow cycle animation (interruptible via Dlay).
 void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength)              // DISPLAY White over rainbow animation (interruptible via Dlay).
@@ -84,11 +89,14 @@ void SetSystemTimeToCompileTime(void)                                           
 time_t GetTijd(bool printit)                                                                // TIME Get current time from best available source.
 DateTime GetLocalDateTime(void)                                                             // TIME Return local time as RTClib DateTime.
 bool GetNTPtime(bool printit)                                                               // NTP Get and print NTP time for configured timezone.
+const char* PrintNTPtime(void)                                                              // NTP Return NTP time as a formatted string.
+const char* PrintUTCtime(void)                                                              // NTP Return UTC time as a formatted string.
 bool IsDS3231I2Cconnected(void)                                                             // DS3231 Check for I2C connection.
 float GetDS3231Temp(void)                                                                   // DS3231 Read temperature from DS3231.
 void SetDS3231Time(void)                                                                    // DS3231 Write ESP32 time to DS3231.
 void GetDS3231Time(bool printit)                                                            // DS3231 Read time from DS3231 module.
 const char* PrintRTCTime(void)                                                              // RTC Return time string as dd-mmm-yy hh:mm:ss.
+const char* PrintDS3231Time(void)                                                           // RTC Return DS3231 RTC time as a formatted string.
 void PrintTimeHMS(void)                                                                     // RTC Print time hh:mm:ss with linefeed.
 void PrintTimeHMS(byte format)                                                              // RTC Print time in specified format.
 void SetRTCTime(void)                                                                       // RTC Set ESP32 internal RTC from global timeinfo struct.
@@ -104,6 +112,8 @@ void ReconnectTimeReceiver(void)                                                
 void StartTimeReceiverScan(void)                                                            // BLE Start scanning for Time Receiver device.
 void StopTimeReceiver(void)                                                                 // BLE Stop Time Receiver and clean up.
 void CheckTimeReceiverClient(void)                                                          // BLE Check Time Receiver client connection and data.
+static void Connect_TimeReceiver(void)                                                      // BLE Connect to the Time Receiver BLE server.
+static void TimeReceiverNotifyCB(NimBLERemoteCharacteristic*, uint8_t* data, size_t len, bool notify) // BLE Notification callback: handle incoming Time Receiver data.
 void WiFiEvent(WiFiEvent_t event)                                                           // WIFI Handle WIFI events.
 bool CheckforWIFINetwork(void)                                                              // WIFI Scan for configured WIFI network (print=true).
 bool CheckforWIFINetwork(bool PrintIt)                                                      // WIFI Scan for configured WIFI network, optionally silent.

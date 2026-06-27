@@ -15,15 +15,15 @@ void SetSecondColour(void)
   MINColor = FuncCRGBW(15 + timeinfo.tm_min * 4, 255 - timeinfo.tm_min * 4, 0, 0); 
   SECColor = FuncCRGBW(15 + timeinfo.tm_sec * 4, 255 - timeinfo.tm_sec * 4, 0, 0 );   
   
-                               # if defined NL144CLOCK || defined NL92CLOCK
+  #if defined(NLEDSOFT) || defined(NLM1M2M3M4)
   Mem.OwnColour = Mem.ColourNL;
-                               #elif UK144CLOCK                                               // English display for 12 x 12 Front 
+                            #elif defined(UK144CLOCK)                                          // English display for 12 x 12 Front
   Mem.OwnColour = Mem.ColourUK;
-                               #elif FR144CLOCK                                               // French display for 12 x 12 Front
+                            #elif defined(FR144CLOCK)                                          // French display for 12 x 12 Front
   Mem.OwnColour = Mem.ColourFR;
-                              #elif DE144CLOCK                                                // German display for 12 x 12 Front
+                            #elif defined(DE144CLOCK)                                          // German display for 12 x 12 Front
   Mem.OwnColour = Mem.ColourDE;
-                              #endif
+                            #endif
                                                                                                // Light up  IS or WAS with the proper colour  
  switch (Mem.DisplayChoice)
   {
@@ -39,10 +39,15 @@ void SetSecondColour(void)
   }
  if(Mem.HetIsWasOff){MINColor = SECColor = Mem.DimmedLetter;}                                 // If HET IS WAS is turned off in menu
  NoTextInLeds  = true;                                                                        // Flag to control printing of the text IS en WAS in serial
-                    #ifdef DE144CLOCK  
- if(Is) {IST;} else {WAR;}                      
-                    #endif  //DE144CLOCK                      
+                            #if defined(NLEDSOFT) || defined(NLM1M2M3M4) 
  if(Is) {IS;}  else {WAS;} 
+                            #elif defined(UK144CLOCK)                                          // English display for 12 x 12 Front
+ if(Is) {ISUK;} else {WASUK;}    
+                            #elif defined(FR144CLOCK)                                          // French display for 12 x 12 Front
+ if(Is) {EST;} else {ETAIT;}    
+                            #elif defined(DE144CLOCK)                                          // German display for 12 x 12 Front
+  if(Is) {IST;} else {WAR;}    
+                            #endif
  if (Mem.DisplayChoice == RAINBOW ) Displaytime();                                            // Now we have to send the time to the display every second 
  NoTextInLeds  = false;                                                                       // Flag to control printing of the text IS en WAS in serial
  ShowLeds();                                                                                  // Updating IS and WAS with ShowLeds is done here to avoid updating all letters every second with Displaytime function
@@ -255,9 +260,9 @@ void Displaytime(void)
  if( Mem.DisplayChoice == DIGITAL ) { TimePlaceDigit(timeinfo.tm_hour,timeinfo.tm_min); }
  else                                                                                        // If not a digital display 
    {
-                     #if defined NL144CLOCK || defined NL92CLOCK
-    Dutch();                                                                                 //     
-                     #endif  //NL144CLOCK || defined NL92CLOCK
+                     #if defined NLEDSOFT
+    Dutch();                                                                                 //
+                     #endif  //NLEDSOFT
                      #ifdef DE144CLOCK
     German();                                                                                 //   
                      #endif  //DE144CLOCK
@@ -275,51 +280,46 @@ void Displaytime(void)
  ShowLeds();                                                                                  // And turn on the LEDs
 }
 
-                       #ifdef DE144CLOCK                                        
-//--------------------------------------------
-// CLOCK Blink UHR
+// Select the language-specific words. Only the macros differ per clock;
+// the three Blink functions below are identical for every language.
+                       #ifdef DE144CLOCK
+#define BLINKHOUR     UHR                  // "o'clock"
+#define BLINKISWAS    ES; IST; WAR         // "it is / was"
+#define BLINKTWELVE   ZWOLF                // "twelve"
+                     #elif defined(UK144CLOCK)
+#define BLINKHOUR     OCLOCK
+#define BLINKISWAS    IT; ISUK; WASUK
+#define BLINKTWELVE   TWELVE
+                     #elif defined(FR144CLOCK)
+#define BLINKHOUR     HEURES
+#define BLINKISWAS    IL; EST; ETAIT
+#define BLINKTWELVE   MIDI
+                     #else                                                                       // Dutch (default)
+#define BLINKHOUR     UUR
+#define BLINKISWAS    HET; IS; WAS
+#define BLINKTWELVE   TWAALF
+                     #endif //DE144CLOCK / UK144CLOCK / FR144CLOCK
+//--------------------------------------------                                                //
+// CLOCK Blink the "o'clock" word (UHR / OCLOCK / HEURES / UUR)
 //--------------------------------------------
 void BlinkUUR(int NoofBlinks, int Delayms)
 {
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms);  UHR; SelftestFlash(Delayms); } 
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); BLINKHOUR; SelftestFlash(Delayms); }
 }
 //--------------------------------------------                                                //
-// CLOCK Blink ES IST WAR
-//--------------------------------------------
-void BlinkHETISWAS (int NoofBlinks, int Delayms)
-{ 
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms);  ES; IST; WAR; SelftestFlash(Delayms); } 
-}
-//--------------------------------------------                                                //
-// CLOCK Blink ZWOLF
-//--------------------------------------------
-void BlinkTWAALF(int NoofBlinks, int Delayms)
-{
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); ZWOLF; SelftestFlash(Delayms); } 
-}
-                     #else
-//--------------------------------------------                                                //
-// CLOCK Blink UUR
-//--------------------------------------------
-void BlinkUUR(int NoofBlinks, int Delayms)
-{
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms);  UUR; SelftestFlash(Delayms); } 
-}
-//--------------------------------------------                                                //
-// CLOCK Blink HET IS WAS
+// CLOCK Blink the "it is / was" words
 //--------------------------------------------
 void BlinkHETISWAS (int NoofBlinks, int Delayms)
 {
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms);  HET; IS; WAS; SelftestFlash(Delayms); } 
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); BLINKISWAS; SelftestFlash(Delayms); }
 }
 //--------------------------------------------                                                //
-// CLOCK Blink TWAALF
+// CLOCK Blink the "twelve" word (ZWOLF / TWELVE / MIDI / TWAALF)
 //--------------------------------------------
 void BlinkTWAALF(int NoofBlinks, int Delayms)
 {
-for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); TWAALF; SelftestFlash(Delayms); } 
+for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); BLINKTWELVE; SelftestFlash(Delayms); }
 }
-                     #endif //DE144CLOCK
 //------------------------------------------------------------------------------              //
 // CLOCK Demo mode
 //------------------------------------------------------------------------------
