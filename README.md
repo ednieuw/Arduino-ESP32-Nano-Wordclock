@@ -178,11 +178,11 @@ Place the spacer plate over the LEDs, then a sheet of white paper and finally th
 
 # Software
 
-The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to a WIFI router and receives the time from a NTP server.
+The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to a WIFI router and receives the time from a NTP server or a Timesender app.
 
 An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
-The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
+The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML BLE terminal web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
 
 Several designs can be selected before compiling.  (If you have a word clockface plate, of course.)<br>
 Use a word clockface plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software.<br>
@@ -191,9 +191,12 @@ Use a word clockface plate design [from this repository](WordPlateFrontCovers)  
 
 Select one of the word clock designs
 ```
-//#define FOURLANGUAGECLOCK
-#define NL144CLOCK
-//#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up
+#define NL144CLOCK              // Dutch display for 12 x 12 Front
+//#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
+//#define NL92CLOCK               // Dutch display for one LED behind every word
+//#define UK144CLOCK              // English display for 12 x 12 Front.
+//#define FR144CLOCK              // French display for 12 x 12 Front.
+//#define DE144CLOCK              // German display for 12 x 12 Front.
 ...
 ```
 
@@ -255,11 +258,11 @@ To connect to the internet the name of the WIFI station and its password must be
 ### Connect to WIFI
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
 
-If the clock software is started without a SSID it will start a WIFI station you can connect to. 
+If the clock software is started without a SSID router name it will start a WIFI station you can connect to. 
 - Open in your phone, tablet or PC the WIFI connections. In the list of WIFI stations there will be one named: StartWordClock. 
 - Connect to it and enter the password: 12345678
 - Enter the SSID and password of your WIFI router. You can find these credentials often at the bottom of your router.
-- When Submit is pressed the clock will restart and connect to the internet
+- When Submit is pressed the clock will restart and connect to the internet.
 
 ### Connect via Bluetooth
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.<br>
