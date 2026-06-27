@@ -24,7 +24,7 @@ extern void DitLeHeure(void);
 #define DE4
 #define FR4    
                      #endif //FOURLANGUAGECLOCK                     
-                     #if defined NL144CLOCK ||defined NL92CLOCK
+                     #if defined NL144CLOCK || defined NL92CLOCK
 #define NLEDSOFT
                      #endif
                      #if defined NLM1M2M3M4L94 ||defined NLM1M2M3M4L114 || (defined NLM1M2M3M4L256) || (defined NLM1M2M3M4L294) || (defined NLM1M2M3M4L144) || (defined NLM1M2M3M4L161)
@@ -33,14 +33,14 @@ extern void DitLeHeure(void);
 
 
                      #ifdef NL144CLOCK
-// const uint32_t NUM_LEDS    = 144+4;                                                          // How many leds in  strip? + 4 for the minutes
-// const  uint32_t LEDNEARLDR = 132;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
-// const byte MATRIX_WIDTH    =  12;                                                            // Grid size For digital display mode.  
-// const byte MATRIX_HEIGHT.  =  12;                                                           // Grid size For digital display mode.
-const uint32_t NUM_LEDS    =  256;                                                            // Temporary for testinf with 16x16LED WS2812. To clear all LEDs. During uploading LEDs get randomly On and Off
-const uint32_t LEDNEARLDR  = 132;                                                             // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
-const byte MATRIX_WIDTH    =  16;                                                             // Grid size For digital display mode.
-const byte MATRIX_HEIGHT   =  16;                                                             // Grid size For digital display mode.
+const uint32_t NUM_LEDS    = 144+4;                                                          // How many leds in  strip? + 4 for the minutes
+const  uint32_t LEDNEARLDR = 132;                                                            // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+const byte MATRIX_WIDTH    =  12;                                                            // Grid size For digital display mode.  
+const byte MATRIX_HEIGHT   =  12;                                                            // Grid size For digital display mode.
+// const uint32_t NUM_LEDS    =  256;                                                            // Temporary for testinf with 16x16LED WS2812. To clear all LEDs. During uploading LEDs get randomly On and Off
+// const uint32_t LEDNEARLDR  = 132;                                                             // Pos of LDR near a LED then. Turn ot one second ofd to read LDR
+// const byte MATRIX_WIDTH    =  16;                                                             // Grid size For digital display mode.
+// const byte MATRIX_HEIGHT   =  16;                                                             // Grid size For digital display mode.
 
 #define HET     ColorLeds("Het",     0,   2, MINColor);   
 #define IS      ColorLeds("is",      4,   5, SECColor);  ColorLeds("", 8,10, Mem.DimmedLetter); Is = true;   // Turn off the WAS LEDs
@@ -160,9 +160,9 @@ const uint32_t LEDNEARLDR  = 9999;                                              
 const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
 const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
 
-#define IL      ColorLeds("| Il",     0,   1, FRMINColor);
-#define EST     ColorLeds("est",      3,   5, FRSECColor);  ColorLeds("", 7, 11, Mem.DimmedLetter); Is = true;   // Turn off the ETAIT LEDs
-#define ETAIT   ColorLeds("etait",    7,  11, FRSECColor);  ColorLeds("", 3,  5, Mem.DimmedLetter); Is = false;  // Turn off the EST LEDs
+#define IL      ColorLeds("| Il",     0,   1, MINColor);
+#define EST     ColorLeds("est",      3,   5, SECColor);  ColorLeds("", 7, 11, Mem.DimmedLetter); Is = true;   // Turn off the ETAIT LEDs
+#define ETAIT   ColorLeds("etait",    7,  11, SECColor);  ColorLeds("", 3,  5, Mem.DimmedLetter); Is = false;  // Turn off the EST LEDs
 #define EXACT   ColorLeds("exact",   18,  22, FRLetterColor);
 #define SIX     ColorLeds("six",     14,  16, FRLetterColor);
 #define DEUX    ColorLeds("deux",    25,  28, FRLetterColor);
@@ -197,9 +197,9 @@ const uint32_t LEDNEARLDR  = 9999;                                              
 const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
 const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
 
-#define ES      ColorLeds("Es",       1,   2, DEMINColor);
-#define IST     ColorLeds("ist",      4,   6, DESECColor);  ColorLeds("", 8, 10, Mem.DimmedLetter); Is = true;   // Turn off the WAR LEDs
-#define WAR     ColorLeds("war",      8,  10, DESECColor);  ColorLeds("", 4,  6, Mem.DimmedLetter); Is = false;  // Turn off the IST LEDs
+#define ES      ColorLeds("Es",       1,   2, MINColor);
+#define IST     ColorLeds("ist",      4,   6, SECColor);  ColorLeds("", 8, 10, Mem.DimmedLetter); Is = true;   // Turn off the WAR LEDs
+#define WAR     ColorLeds("war",      8,  10, SECColor);  ColorLeds("", 4,  6, Mem.DimmedLetter); Is = false;  // Turn off the IST LEDs
 #define GENAU   ColorLeds("genau",   18,  22, DELetterColor);
 #define MZEHN   ColorLeds("zehn",    13,  16, DELetterColor);
 #define MFUNF   ColorLeds("funf",    24,  27, DELetterColor);
@@ -231,9 +231,9 @@ const uint32_t LEDNEARLDR  = 9999;                                              
 const byte MATRIX_WIDTH    =  12;                                                             // Grid size For digital display mode.
 const byte MATRIX_HEIGHT   =  12;                                                             // Grid size For digital display mode.
 
-#define IT      ColorLeds("| It",     1,   2, UKMINColor);
-#define ISUK    ColorLeds("is",       4,   5, UKSECColor);  ColorLeds("", 7, 9, Mem.DimmedLetter); Is = true;   // Turn off the WAS LEDs
-#define WASUK   ColorLeds("was",      7,   9, UKSECColor);  ColorLeds("", 4, 5, Mem.DimmedLetter); Is = false;  // Turn off the IS LEDs
+#define IT      ColorLeds("| It",     1,   2, MINColor);
+#define ISUK    ColorLeds("is",       4,   5, SECColor);  ColorLeds("", 7, 9, Mem.DimmedLetter); Is = true;   // Turn off the WAS LEDs
+#define WASUK   ColorLeds("was",      7,   9, SECColor);  ColorLeds("", 4, 5, Mem.DimmedLetter); Is = false;  // Turn off the IS LEDs
 #define EXACTUK ColorLeds("exact",   18,  22, UKLetterColor);
 #define HALFUK  ColorLeds("half",    13,  16, UKLetterColor);
 #define TWENTY  ColorLeds("twenty",  24,  29, UKLetterColor);

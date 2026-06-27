@@ -1,6 +1,6 @@
 const char* PARAM_INPUT_1 = "input1";
 #define MAXSIZE_HTML_INFO 6000
-#define MAXSIZE_HTML_PAGE 8000
+#define MAXSIZE_HTML_PAGE 10000
 char html_info[MAXSIZE_HTML_INFO] = {0};
 char HTML_page[MAXSIZE_HTML_PAGE] = {0};
 const char index_html_top[]  = 
@@ -100,21 +100,45 @@ R"rawliteral(
 <body style="color: #FFFFFF; background-color: #000000; font-family: Verdana, Geneva, Tahoma, sans-serif;">
   <table class="borders-table">
     <tr><td colspan="4"  class="center">
-      <span class="darkorange"><h2>ESP32-Nano Word Clock</h2></span>
+      <span class="darkorange"><h2 style="margin:4px 0;">ESP32-Nano Word Clock</h2></span>
     </td></tr>
     <tr>
       <td style="width: 60px"><a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock">Home</a></td>
-      <td style="width: 100px"><a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual-Instructions/Manual_ArduinoESP32Nano.pdf">Manual UK</a></td>
-      <td style="width: 100px"><a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual-Instructions/Handleiding_ArduinoESP32Nano-NL.pdf">Manual NL</a></td>
-      <td style="width: 80px"><a href="https://www.ednieuw.nl">ednieuw.nl</a></td>
+      <td style="width: 95px"><a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual-Instructions/Manual_ArduinoESP32Nano.pdf">Manual UK</a></td>
+      <td style="width: 95px"><a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/blob/main/Manual-Instructions/Handleiding_ArduinoESP32Nano-NL.pdf">Manual NL</a></td>
+      <td style="width: 90px"><a href="https://www.ednieuw.nl">ednieuw.nl</a></td>
     </tr>
     <tr>
-	 	  <td style="width: 60px">&nbsp;</td>
-		  <td style="width: 113px"><a href="/log">Log view</a></td>
-		  <td style="width: 107px"><a href="/tekstdownload">All log files</a></td>
-    </tr>     
+        <td style="width: 60px"><label><input type="checkbox" id="logToggle" checked> Log</label></td>
+        <td style="width: 95px"><a href="/log">Log view</a></td>
+        <td style="width: 95px"><a href="/tekstdownload">All log files</a></td>
+        <td style="width: 90px"><a href=/menu>&#9776; Menu</a></td>
+    </tr>
   </table>
-  <form id="commandForm" > 
+  <textarea id="lastlog" readonly style="font-family:monospace; font-size:12px; color:#aaa; background-color:#111; border:1px solid #444; padding:4px; box-sizing:border-box; height:100px; width:354px; resize:none; margin-bottom:8px;"></textarea>
+  <script>
+    var logEnabled = true;
+    var logTimer = null;
+    document.getElementById('logToggle').addEventListener('change', function() {
+      logEnabled = this.checked;
+      var el = document.getElementById('lastlog');
+      if (!logEnabled) { clearTimeout(logTimer); el.style.display = 'none'; }
+      else { el.style.display = ''; fetchLastLog(); }
+    });
+    function fetchLastLog() {
+      if (!logEnabled) return;
+      fetch('/tekstprint').then(function(r){return r.text();}).then(function(t){
+        var lines = t.split('\n').filter(function(l){return l.trim()!='';}); 
+        var el = document.getElementById('lastlog');
+        var atBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 30;
+        el.value = lines.slice(-50).join('\n');
+        if (atBottom) el.scrollTop = el.scrollHeight;
+      }).catch(function(){});
+      logTimer = setTimeout(fetchLastLog, 5000);
+    }
+    fetchLastLog();
+  </script>
+  <form id="commandForm" >
     <strong>
       <input name="submit" type="submit" class="button" style="height: 40px" value="Send">
     </strong>&nbsp;
