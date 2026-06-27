@@ -1,6 +1,26 @@
 
 # Arduino-ESP32-Nano-Word clock
 
+V228 compile results
+
+| #  | Build              | Result |
+|---:|--------------------|:------:|
+| 1  | NL144CLOCK         | ✅     |
+| 2  | NL92CLOCK          | ✅     |
+| 3  | UK144CLOCK         | ✅     |
+| 4  | FR144CLOCK         | ✅     |
+| 5  | DE144CLOCK         | ✅     |
+| 6  | FOURLANGUAGECLOCK  | ✅     |
+| 7  | VIERTALENKLOK      | ✅     |
+| 8  | NLM1M2M3M4L94      | ✅     |
+| 9  | NLM1M2M3M4L114     | ✅     |
+| 10 | NLM1M2M3M4L144     | ✅     |
+| 11 | NLM1M2M3M4L161     | ✅     |
+| 12 | NLM1M2M3M4L256     | ✅     |
+| 13 | NLM1M2M3M4L294     | ✅     |
+
+<br>
+
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
@@ -29,6 +49,7 @@ The clock can be controlled with a:
 
 To connect the clock to WIFI the SSID and password of the router can be entered by the BLE serial terminal app or the WPS function can be used.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
+
 
 
 | | |
