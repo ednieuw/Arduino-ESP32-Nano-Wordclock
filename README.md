@@ -1,6 +1,26 @@
 
 # Arduino-ESP32-Nano-Word clock
 
+V228 compile results
+
+| #  | Build              | Result |
+|---:|--------------------|:------:|
+| 1  | NL144CLOCK         | ✅     |
+| 2  | NL92CLOCK          | ✅     |
+| 3  | UK144CLOCK         | ✅     |
+| 4  | FR144CLOCK         | ✅     |
+| 5  | DE144CLOCK         | ✅     |
+| 6  | FOURLANGUAGECLOCK  | ✅     |
+| 7  | VIERTALENKLOK      | ✅     |
+| 8  | NLM1M2M3M4L94      | ✅     |
+| 9  | NLM1M2M3M4L114     | ✅     |
+| 10 | NLM1M2M3M4L144     | ✅     |
+| 11 | NLM1M2M3M4L161     | ✅     |
+| 12 | NLM1M2M3M4L256     | ✅     |
+| 13 | NLM1M2M3M4L294     | ✅     |
+
+<br>
+
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
@@ -29,6 +49,7 @@ The clock can be controlled with a:
 
 To connect the clock to WIFI the SSID and password of the router can be entered by the BLE serial terminal app or the WPS function can be used.<br>
 Software updates can be uploaded with OTA (Over the Air).<br>
+
 
 
 | | |
@@ -178,11 +199,11 @@ Place the spacer plate over the LEDs, then a sheet of white paper and finally th
 
 # Software
 
-The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to a WIFI router and receives the time from a NTP server.
+The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED strips into a Word clock with connection to a WIFI router and receives the time from a NTP server or a Timesender app.
 
 An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
-The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
+The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML BLE terminal web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
 
 Several designs can be selected before compiling.  (If you have a word clockface plate, of course.)<br>
 Use a word clockface plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software.<br>
@@ -191,9 +212,12 @@ Use a word clockface plate design [from this repository](WordPlateFrontCovers)  
 
 Select one of the word clock designs
 ```
-//#define FOURLANGUAGECLOCK
-#define NL144CLOCK
-//#define NLM1M2M3M4L94          // NL clock with four extra LEDs for the minutes to light up
+#define NL144CLOCK              // Dutch display for 12 x 12 Front
+//#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs 
+//#define NL92CLOCK               // Dutch display for one LED behind every word
+//#define UK144CLOCK              // English display for 12 x 12 Front.
+//#define FR144CLOCK              // French display for 12 x 12 Front.
+//#define DE144CLOCK              // German display for 12 x 12 Front.
 ...
 ```
 
@@ -255,11 +279,11 @@ To connect to the internet the name of the WIFI station and its password must be
 ### Connect to WIFI
 The name of the WIFI-station and password has to be entered once. These credentials will be stored in memory of the microprocessor.
 
-If the clock software is started without a SSID it will start a WIFI station you can connect to. 
+If the clock software is started without a SSID router name it will start a WIFI station you can connect to. 
 - Open in your phone, tablet or PC the WIFI connections. In the list of WIFI stations there will be one named: StartWordClock. 
 - Connect to it and enter the password: 12345678
 - Enter the SSID and password of your WIFI router. You can find these credentials often at the bottom of your router.
-- When Submit is pressed the clock will restart and connect to the internet
+- When Submit is pressed the clock will restart and connect to the internet.
 
 ### Connect via Bluetooth
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.<br>
