@@ -546,7 +546,7 @@ Functions to start a WIFI connection and serve the web pages.
 | `/colourpick`   | Colour picker (ColourPick.h) |
 | `/update`       | OTA firmware update (OTAhtml.h) |
 
-The main page and the menu page each embed a small **live log window** — a read-only text area that fetches `/tekstprint` every 5 seconds, shows the last 50 lines and auto-scrolls to the bottom *only* when you are already at the bottom (so you can scroll up to read history without being yanked back). A checkbox on the main page toggles the window on/off.
+The main page and the menu page each embed a small **live log window** — a read-only text area that fetches `/tekstprint` every second, shows the last 50 lines and auto-scrolls to the bottom *only* when you are already at the bottom (so you can scroll up to read history without being yanked back). A checkbox on the main page toggles the window on/off.
 
 ```cpp
 
