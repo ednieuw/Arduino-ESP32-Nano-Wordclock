@@ -1,0 +1,184 @@
+// ============================================================
+// WordFiboClockV230 - Function List
+// Unified WordClock + Fibonacci sketch (variant selected by #define).
+// ============================================================
+
+// WordFiboClockV230.ino
+void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override                    // BLE Server callback for TimeSender client connect/disconnect.
+void BLETimeSenderStart(void)                                                               // TIMESENDER Time Sender Start.
+void BLETimeSenderStop(void)                                                                // TIMESENDER Time Sender Stop.
+void CheckTimeSender(void)                                                                  // TIMESENDER Time Sender Send Time and Date.
+void InitHC12(void)                                                                         // HC12 Initialise HC-12 433MHz serial connection.
+void SendHC12TimeString(void)                                                               // HC12 Send time string via HC-12 433MHz transmitter.
+void setup()                                                                                // ARDUINO Setup.
+void loop()                                                                                 // ARDUINO Loop.
+void CheckDevices(void)                                                                     // COMMON Check connected input devices.
+void EverySecondCheck(void)                                                                 // COMMON Update routine performed every second.
+void EveryMinuteUpdate(void)                                                                // COMMON Update routine performed every minute.
+void EveryHourUpdate(void)                                                                  // COMMON Update routine performed every hour.
+void EveryDayUpdate(void)                                                                   // COMMON Update routine performed every day.
+void UpdateStatusLEDs(bool Toggle)                                                          // COMMON Update the status LEDs on the PCB.
+void SetStatusLED(int Red, int Green, int Blue)                                             // COMMON Control the RGB status LEDs on the Nano ESP32.
+void SerialCheck(void)                                                                      // COMMON Check for serial input.
+void InitResetpin(void)                                                                     // COMMON Initialise reset pin when installed.
+void CheckResetPin(void)                                                                    // COMMON Check reset button on RST_PIN.
+void Reset(void)                                                                            // COMMON Reset to default settings. BLE On, WIFI NTP Off.
+void ResetCredentials(void)                                                                 // COMMON Reset WIFI/NTP/BLE credentials to empty.
+void Tekstprintf(const char* fmt, ...)                                                      // COMMON Formatted print.
+void Tekstprintlnf(const char* fmt, ...)                                                    // COMMON Formatted print with newline.
+void WTekstappend(char const *tekst, char const *prefix, char const *suffix, bool newline)  // COMMON Append text to HTML info buffer.
+void WTekstprintln(char const *tekst, char const *prefix, char const *suffix)               // COMMON Append text with prefix/suffix to HTML info buffer.
+void WTekstprint(char const *tekst, char const *prefix, char const *suffix)                 // COMMON Append text with prefix/suffix without newline.
+void InitStorage(void)                                                                      // COMMON Init and check contents of flash storage.
+void StoreStructInFlashMemory(void)                                                         // COMMON Store Mem struct in flash storage.
+void StoreIRRemoteInFlashMemory(void)                                                       // COMMON Save IR remote settings to flash.
+void GetStructFromFlashMemory(void)                                                         // COMMON Load Mem struct from flash storage.
+void GetIRRemoteFromFlashMemory(void)                                                       // COMMON Load IR remote settings from flash.
+const char* SoftwareName(void)                                                              // COMMON Return software version string.
+void SWversion(bool Small)                                                                  // COMMON Print version info, Small=true for short menu.
+void PrintLine(byte Lengte)                                                                 // COMMON Print a divider line of n underscores.
+void CheckMCURestartCounter(void)                                                           // COMMON Check and reset MCU restart counter after stable run.
+void ReworkInputString(String InputString)                                                  // COMMON Process input from Serial, BLE or web page.
+bool parseColourInput(const String& InputString, int len, uint32_t& Color)                  // COMMON Parse hex colour input string.
+void PrintDisplayChoice(bool PrintIt)                                                       // COMMON Print display choice, optionally suppress output.
+void PrintTimeInputMethod(byte Im)                                                          // COMMON Print current time input method.
+void PrintMem(void)                                                                         // COMMON Print all Mem struct values.
+void StoredStartHeaps(bool Store)                                                           // COMMON Print or store heap usage.
+void PrintHeaps(void)                                                                       // COMMON Print current heap memory usage.
+int ReadLDR(void)                                                                           // COMMON LDR reading scaled to 0–255.
+void ReadAndAverageLDR(bool clean)                                                          // CLOCK Read and average LDR; clean=true resets accumulators.
+void DimLeds(bool print)                                                                    // CLOCK Update LED brightness from LDR reading.
+void Dlay(uint32_t ms)                                                                      // LED Interruptible delay used during LEDtest; polls CheckDevices and aborts on StopTest.
+void LEDtest()                                                                              // CLOCK LED test — light up all LEDs; interruptible by a second Y command.
+void ColorLeds(char const *Tekst, int FirstLed, int LastLed, uint32_t RGBWColor)            // LED Set colour for a range of LEDs and print label.
+void ColorLed(int Lednr, uint32_t RGBWColor)                                                // LED Set colour for a single LED.
+void LedsOff(bool ClearOff)                                                                 // LED Clear LED display; ClearOff=true also clears background.
+void SetBrightnessLeds(byte Bright)                                                         // LED Set brightness of LED strip.
+void Stripfill(uint32_t RGBWColor, int FirstLed, int NoofLEDs)                              // LED Fill a range of LEDs with one colour.
+uint32_t StripGetPixelColor(int Lednr)                                                      // LED Get the colour of one LED.
+void LEDstartup(uint32_t LEDColour)                                                         // LED Show startup colour on LEDs and sync status LED.
+void FixDimmedLetterForStrip(uint32_t &colour)                                              // LED Adjust dimmed letter colour for LED strip type.
+uint32_t HSVToRGB(double H, double S, double V)                                             // LED Convert HSV to RGB (H 0–360, S/V 0–1).
+uint32_t FuncCRGBW( uint32_t Red, uint32_t Green, uint32_t Blue, uint32_t White)            // LED function to make RGBW colour.
+void ClearScreen(void)                                                                      // DISPLAY Clear the LED display.
+uint32_t Wheel(byte WheelPos)                                                               // DISPLAY Colour wheel: r→g→b→r transition.
+void StartLeds(void)                                                                        // DISPLAY Initialise LED strip for WS2812 or SK6812.
+void ClearTestStrip(void)                                                                   // LED Blank a 256-LED test strip, then shrink buffer back to NUM_LEDS.
+void ChangeRandomDisplay(void)                                                              // DISPLAY Change to next random display choice.
+void RainbowCycle(uint8_t wait)                                                             // DISPLAY Rainbow cycle animation (interruptible via Dlay).
+void WhiteOverRainbow(uint32_t wait, uint8_t whiteSpeed, uint32_t whiteLength )             // DISPLAY White over rainbow animation (interruptible via Dlay).
+void WriteLightReducer(int amount)                                                          // CLOCK Increase or decrease brightness slope value.
+void InitTimeSystem(void)                                                                   // TIME Initialise time system (DS3231 + NTP + internal RTC).
+void SetSystemTimeToCompileTime(void)                                                       // TIME Set system time to compile time.
+time_t GetTijd(bool printit)                                                                // TIME Get current time from best available source.
+bool GetNTPtime(bool printit)                                                               // NTP Get and print NTP time for configured timezone.
+const char* PrintNTPtime(void)                                                              // NTP Return NTP time as a formatted string.
+const char* PrintUTCtime(void)                                                              // NTP Return UTC time as a formatted string.
+bool IsDS3231I2Cconnected(void)                                                             // DS3231 Check for I2C connection.
+float GetDS3231Temp(void)                                                                   // DS3231 Read temperature from DS3231.
+void SetDS3231Time(void)                                                                    // DS3231 Write ESP32 time to DS3231.
+void GetDS3231Time(bool printit)                                                            // DS3231 Read time from DS3231 module.
+const char* PrintDS3231Time(void)                                                           // RTC Return DS3231 RTC time as a formatted string.
+const char* PrintRTCTime()                                                                  // RTC Return time string as dd-mmm-yy hh:mm:ss.
+void PrintTimeHMS(byte format)                                                              // RTC Print time in specified format.
+void SetRTCTime(void)                                                                       // RTC Set ESP32 internal RTC from global timeinfo struct.
+void SetSystemTime(time_t t)                                                                // RTC Set RTC using Unix timestamp.
+void PrintAllClockTimes(void)                                                               // CLOCK Print all available time sources.
+uint32_t HexToDec(const String& hexString)                                                  // COMMON Convert hex string to uint32.
+void SendMessageBLE(std::string Message)                                                    // BLE Send message via BLE in packets of 20 chars.
+void StartBLEService(void)                                                                  // BLE Start BLE UART service.
+void DisconnectBLE(void)                                                                    // BLE Disconnect BLE client.
+void CheckBLE(void)                                                                         // BLE Check BLE input and process string.
+static void TimeReceiverNotifyCB(NimBLERemoteCharacteristic*, uint8_t* data, size_t len, bool notify)  // BLE Notification callback: handle incoming Time Receiver data.
+void SendMessageTimeReceiver(const char* msg)                                               // BLE Send message to Time Receiver client.
+void StartTimeReceiverScan(void)                                                            // BLE Start scanning for Time Receiver device.
+void StopTimeReceiver(void)                                                                 // BLE Stop Time Receiver and clean up.
+static void Connect_TimeReceiver(void)                                                      // BLE Connect to the Time Receiver BLE server.
+void ReconnectTimeReceiver(void)                                                            // BLE Reconnect to Time Receiver device.
+void CheckTimeReceiverClient(void)                                                          // BLE Check Time Receiver client connection and data.
+void WiFiEvent(WiFiEvent_t event)                                                           // WIFI Handle WIFI events.
+void ScanWIFI(void)                                                                         // WIFI Scan and print list of available WIFI networks.
+void ConnectWIFI(void)                                                                      // WIFI Connect to WIFI router using stored SSID and password.
+void CheckRestoreWIFIconnectivity(void)                                                     // WIFI Check WIFI connection and restore if lost.
+bool StartWIFI_NTP(void)                                                                    // WIFI Start WIFI connection and NTP service.
+void NTPnotify(struct timeval* tv)                                                          // NTP Callback: set ntpJustSynced flag on NTP sync.
+void CheckandPrintNTPsynced(void)                                                           // NTP Check and print NTP sync confirmation.
+void initSNTP(void)                                                                         // NTP Initialise SNTP client.
+bool wait4SNTP(void)                                                                        // NTP Wait up to 2.5 s for SNTP synchronisation.
+void BuildHTMLPage(bool Log)                                                                // WIFI Build HTML info page from current clock state.
+void CheckWIFIcommand(void)                                                                 // WIFI Process pending command received from web page.
+void WebPage(void)                                                                          // WIFI Register all web server routes and start server.
+void notFound(AsyncWebServerRequest *request)                                               // WIFI Handle unknown web page requests.
+void StartAPMode(void)                                                                      // WIFI Start Access Point for entering WIFI credentials.
+void wpsInitConfig(void)                                                                    // WIFI Initialise WPS configuration.
+void wpsStart(void)                                                                         // WIFI Start WPS push-button connection.
+void wpsStop(void)                                                                          // WIFI Stop WPS.
+String wpspin2string(uint8_t a[])                                                           // WIFI Convert WPS PIN byte array to string.
+void OnewireKeypad3x4Check(void)                                                            // KEYPAD Check for one-wire 3x4 keypad input.
+void OnewireKeypad3x1Check(void)                                                            // KEYPAD Check for one-wire 3x1 keypad input.
+void Keypad3x1Check(void)                                                                   // KEYPAD Read 3x1 keypad and process key press.
+void RotaryEncoderCheck(void)                                                               // ROTARY Check if rotary encoder is moving or pressed.
+void ProcessKeyPressTurn(int encoderPos)                                                    // CLOCK Process rotary or membrane keypad input.
+void Start_IRreceiver(void)                                                                 // IR Start large or tiny IR receiver.
+void Init_IRreceiver(String* ButtonTempNames, byte numButtons)                              // IR Initialise IR receiver with button name mapping.
+uint16_t IrReceiverDecode(void)                                                             // IR Decode received IR signal.
+void ProcessLearningMode(decode_type_t protocol, uint16_t command, uint16_t address)        // IR Process signal in learning mode.
+void ProcessRecognitionMode(decode_type_t protocol, uint16_t command, uint16_t address)     // IR Process signal in recognition mode.
+void StartIRLearning(void)                                                                  // IR Initialise IR learning mode.
+void PrintAllMappings(void)                                                                 // IR Print all learned IR button mappings.
+void ResetAllIRremoteSettings(void)                                                         // IR Reset all learned IR remote settings.
+int RecognizeButton(decode_type_t protocol, uint16_t command, uint16_t address)             // IR Identify which button was pressed.
+void ReworkIRremoteValue(int ButtonNamesNr)                                                 // IR Process IR remote button action.
+void AdjustTime(int DeltaHours, int DeltaMinutes, int DeltaSeconds)                         // IR Adjust current time by delta hours/minutes/seconds.
+void ToggleIRpower(void)                                                                    // IR Toggle IR remote power state on/off.
+void InitLogBuffer()                                                                        // LOGBUFFER Initialize circular logging buffer.
+void AddLog(const char* msg)                                                                // LOGBUFFER Append message to circular log buffer.
+void HandleTekstPrint(AsyncWebServerRequest* request)                                       // LOGBUFFER Serve last 500 log lines to web client.
+void HandleTekstDownload(AsyncWebServerRequest *request)                                    // LOGBUFFER Stream full circular log buffer to web client.
+
+// WordClock.h  (compiled only for WORDCLOCK builds)
+void Zet_Pixel(byte Cijfer,byte Pos_X, byte Pos_Y)                                          // DISPLAY Place digit 0–9 in matrix display.
+void TimePlaceDigit(byte uur, byte minuut)                                                  // DISPLAY Show time as four digits in display.
+void SetSecondColour(void)                                                                  // CLOCK Set IS/WAS colour each second (single-language clocks).
+void SetColours(void)                                                                       // CLOCK Set colours each second (four-language clock).
+void SelftestFlash(int Delaymsec)                                                           // CLOCK Show LEDs, wait (if selftest active), then clear.
+void Selftest(int Delayms)                                                                  // CLOCK Run self-test sequence with given delay per word.
+void Displaytime(void)                                                                      // CLOCK Display current time on LED matrix.
+void BlinkUUR(int NoofBlinks, int Delayms)                                                  // CLOCK Blink UUR / O'CLOCK (NL/UK/DE/FR).
+void BlinkHETISWAS (int NoofBlinks, int Delayms)                                            // CLOCK Blink HET IS WAS / ES IST WAR.
+void BlinkTWAALF(int NoofBlinks, int Delayms)                                               // CLOCK Blink TWAALF / TWELVE / ZWOLF.
+void Demomode(void)                                                                         // CLOCK Demo mode — step through minutes at speed.
+void FireMode(void)                                                                         // CLOCK Fire animation on LED matrix.
+uint8_t clamp_sub(uint8_t val, uint8_t sub) { return (val > sub) ? (val - sub)              // FIRE Subtract with clamp to zero.
+void HeatColor(uint8_t temperature, uint8_t &r, uint8_t &g, uint8_t &b)                     // FIRE Map heat value to RGB colour.
+uint16_t XY(uint8_t x, uint8_t y)                                                           // FIRE Map 2D matrix coordinates to LED strip index.
+void Fire2023_2D()                                                                          // FIRE 2D fire simulation logic.
+void Dutch(void)                                                                            // CLOCK Dutch display — NL144 / NL92 clock.
+void Dutch(void)                                                                            // CLOCK Dutch display — NL144 / NL92 clock.
+void English(void)                                                                          // CLOCK English display — FOURLANGUAGECLOCK.
+void German(void)                                                                           // CLOCK German display — FOURLANGUAGECLOCK / DE144.
+void French(void)                                                                           // CLOCK French display — FOURLANGUAGECLOCK.
+void DitLeHeure(void)                                                                       // CLOCK French helper — determine "heure/heures".
+void Dutch(void)                                                                            // CLOCK Dutch display — NL144 / NL92 clock.
+void English(void)                                                                          // CLOCK English display — FOURLANGUAGECLOCK.
+void German(void)                                                                           // CLOCK German display — FOURLANGUAGECLOCK / DE144.
+void French(void)                                                                           // CLOCK French display — FOURLANGUAGECLOCK.
+void DitLeHeure(void)                                                                       // CLOCK French helper — determine "heure/heures".
+
+// Fibonacci.h  (compiled only for FIBONACCI builds)
+void RefreshOwnColours(void)                                                                // FIBONACCI Load the Q3 'Own' palette from Mem colours.
+void Displaytime(void)                                                                      // CLOCK Say the time and load the LEDs.
+void LEDsetTime(byte hours, byte minutes)                                                   // FIBONACCI Light the cells for the given time.
+void MakeFibonacciList(byte Value)                                                          // FIBONACCI Build the list of Fibonacci cells representing a value (0-12).
+void MakeChronoList(byte Hours, byte Minutes,byte Seconds)                                  // FIBONACCI Build the chrono (digit) display list.
+void setPixel(byte pixel, uint32_t kleur)                                                   // FIBONACCI Set a Fibonacci cell (group of LEDs) to a colour.
+void SetSecondColour(void)                                                                  // CLOCK Set IS/WAS colour each second (single-language clocks). (no-op stub)
+void Demomode(void)                                                                         // CLOCK Demo mode — step through minutes at speed. (no-op stub)
+void FireMode(void)                                                                         // CLOCK Fire animation on LED matrix. (no-op stub)
+void Selftest(int Delayms)                                                                  // CLOCK Run self-test sequence with given delay per word. (no-op stub)
+void Selftest(void)                                                                         // CLOCK Run self-test with default 900 ms delay. (no-op stub)
+void BlinkUUR(int NoofBlinks, int Delayms)                                                  // CLOCK Blink UUR / O'CLOCK (NL/UK/DE/FR). (no-op stub)
+void BlinkHETISWAS(int NoofBlinks, int Delayms)                                             // CLOCK Blink HET IS WAS / ES IST WAR. (no-op stub)
+void BlinkTWAALF(int NoofBlinks, int Delayms)                                               // CLOCK Blink TWAALF / TWELVE / ZWOLF. (no-op stub)
+
+// ClockFaces.h
