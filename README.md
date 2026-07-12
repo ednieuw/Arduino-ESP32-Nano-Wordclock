@@ -89,7 +89,7 @@ For level switching the 74HCT125 level shifter IC is used. It has four ports. Th
 
 A SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32 without using the 74HCT125 level shifter IC. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
 
-The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter.  But success is not guaranteed.
+The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter. <br> But success is not guaranteed.
  
 ![Nano-ESP32-V04](https://github.com/user-attachments/assets/3ad06452-0dd4-4310-8b51-25c115ec3959)
 
@@ -363,7 +363,7 @@ Then Bmy-passwordand send the password.(for example: bSecret<br>
  
 Cbroadcastname will change to name displayed in the Bluetooth connection list. <br>
 If the length of the SSID and/or password is less then 5 characters the WIFI will be turned off automatically. This will speed up startup time if no internet connection is available <br>
-Use a length of minimal 8 characters for SSID and password. <br>
+Use a length of minimal 8 characters for the password and 3 characters for the SSID. <br>
 Check in the menu (third row from the bottom) if WIFI and NTP are on. <br>
 If WIFI is connected the LED on the MCU will pulse green. <br>
 <br> Enter @ to reset the MCU. It will restart and connections will be made.<br>
@@ -429,17 +429,21 @@ Enter 'wordclock.local' as URL in the browser.
 
   - Point your browser to http://wordclock.local, you should see a response.
 
-Or 
-Open the BLE terminal app. (in some apps you have to press a CONNECT-button)
+The menu, left in the picture below will appear. With these menus almost all functionality of the clock can be set, changed, and many more.
+
+![alt text](WordFiboClockmenusS.jpg)
+
+
+Or open the BLE terminal app. (in some apps you have to press a CONNECT-button).<br>
 Look for the WordClock to connect to and connect.
 
-for Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> on the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
+For Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> in the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
 
 For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
 nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
 Serial Bluetooth terminal</a>. <br>
-Unfortunately these Android apps can not read strings longer than 20 characters. <br>
-If you see a garbled menu enter and send the character '+' to select the slower transmission mode. 
+<br>
+If you see a garbled menu and have FASTBLE turned on then send the character '+' to toggle the FASTBLE off the slower transmission mode. 
  
 Settings are set by entering the first character of a command following by parameters if necessary.<br>
 For example to set the colours of the characters in the display to white enter: Q2 <br>
@@ -472,6 +476,11 @@ These preferences are permanently stored in the Arduino Nano ESP32 storage space
 
 Enter the first character in the menu of the item to be changed followed with the parameter. <br>
 For most entries upper and lower case are identical. 
+With the HTML menu pages many of these entries can be selected with button, sliders or colour palettes.
+
+### Update software<br>
+Software can be updated with a .bin file. A bin files is made in the Arduino IDE from the menu Sketch -> Export compiled binary. In the folder where the sketch was saved several files are placed in the folder "build". The WordFiboBlockVxxx.ino.bin of approx. 1.5 Mb is the file to upload.  
+
 
 ### A SSID B Password C BLE beacon name<br>
 Change the name of the SSID of the router to be connected to.<br>
@@ -501,6 +510,9 @@ You will loose your credentials too with this reset! and have to reenter your SS
 
 ### Own colour (FWWRRGGBB or Fwrgb) <br>
 With option Q3 and Q4 from the menu you can set your own colours for the clock to display.
+
+Or press in the HTML menu page de link "🌈 Set colours".<br> Here the colour of the display can be selected with a colour palalette. When selected the display choice; "Q3 uses you own defined colours" automatically selected. 
+
 The format to be entered is hexadecimal, 0123456789ABCDEF or decimal, 0123456789. <br>
 The decimal range is made for users that are not familiar with hexadecimal arithmetic.<br>
 The hexadecimal command is 2 characters for white followed with two characters for Red followed with two characters for Green and ending with two digits for Blue.<br>
