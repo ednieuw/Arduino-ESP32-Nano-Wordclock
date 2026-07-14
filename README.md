@@ -18,8 +18,8 @@ But of course you can also send time with an IOS app or with a web page using th
 
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
-- [BLE terminal in a browser](https://arach.nl/BLESerial/BLE_UART_Terminal.html), 
-- [BLE serial terminal app](https://arach.nl/BLESerial/IOSappMain.html)
+- [BLE terminal in a browser](https://mijnweb.site/BLESerial/BLE_UART_Terminal.html), 
+- [BLE serial terminal app](https://mijnweb.site/BLESerial/IOSappMain.html)
 - Serial cable connected to your PC, 
 - Rotary encoder, 
 - IR-remote controller, 
