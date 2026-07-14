@@ -1,36 +1,19 @@
 
 # Arduino-ESP32-Nano-Word clock
 
-V228 compile results
-
-| #  | Build              | Result |
-|---:|--------------------|:------:|
-| 1  | NL144CLOCK         | ✅     |
-| 2  | NL92CLOCK          | ✅     |
-| 3  | UK144CLOCK         | ✅     |
-| 4  | FR144CLOCK         | ✅     |
-| 5  | DE144CLOCK         | ✅     |
-| 6  | FOURLANGUAGECLOCK  | ✅     |
-| 7  | VIERTALENKLOK      | ✅     |
-| 8  | NLM1M2M3M4L94      | ✅     |
-| 9  | NLM1M2M3M4L114     | ✅     |
-| 10 | NLM1M2M3M4L144     | ✅     |
-| 11 | NLM1M2M3M4L161     | ✅     |
-| 12 | NLM1M2M3M4L256     | ✅     |
-| 13 | NLM1M2M3M4L294     | ✅     |
-
-<br>
-
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
 
-This sketch stripped from the word clock functions is [here.](https://github.com/ednieuw/ESP32Communications)<br>
-In july 2026 I combined the word clock with the Fibonacci clock sketch in order to make maintenance easier.<br>
-Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added.<br>
+In july 2026 I combined the word clock with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) in order to make maintenance easier.<br>
+
+Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
+But of course you can also send time with an IOS app or a web page via Bluetooth. See below.
+
 Splitting the two clock sketches is made easy with #defines at a few places.<br> 
-The coding of Fibonacci clock is the most easy one to adapt to another project. 
+
+The sketch can be stripped from the clock functions by a simple: #define NOCLOCK<br> 
 
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
@@ -55,11 +38,9 @@ To connect the clock to WIFI the SSID and password of the router can be entered 
 Software updates can be uploaded with OTA (Over the Air).<br>
 
 
-
 | | |
 |---|---|
 | <img alt="image" src="https://github.com/user-attachments/assets/977bcfa9-2a1c-4b1b-8453-d60769866224" width="650px" /><br><strong>Full menu</strong> | The clock will keep its time correct within the second using the internet Network Time Protocol (NTP) with daylight-saving corrections when a timezone is entered.<br><br>If no internet is available a DS3231 RTC-module can be attached to the PCB to get an accurate time.<br>With a rotary, membrane pad, time sender app or almost any IR-remote controller time can be set.<br><br>An LDR (light-dependent resistor) is used to give the LEDs an optimal brightness.<br><br>The ESP32 has an Espressif BLE/WIFI module. Bluetooth LE does not use the TI CC2541 chip but a Nordic nRF52 chip.<br>That means you have to use a different BLE service for the serial communication — not characteristic FFE0 but 6e400001-b5a3-... etc. in your serial terminal app that communicates with the clock’s settings.<br><br>See here: <a href="https://github.com/ednieuw/nRF-ESP32">Use BLE on mobile to control the ESP32</a><br><br>An user manual in Dutch and English can be found in this repository: <a href="https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions">here</a> |<br><br><br><br>
-
 
 
 ![image](https://github.com/user-attachments/assets/f187786c-b6db-49a8-9e91-708b93361390)
