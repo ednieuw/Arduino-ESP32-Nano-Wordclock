@@ -6,21 +6,20 @@
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
 The sketch will also work with other ESP32 boards but with different pin numbering.<br>
 
-In july 2026 I combined the word clock with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) in order to make maintenance easier.<br>
-
-Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
-But of course you can also send time with an IOS app or a web page via Bluetooth. See below.
+In V230 the word clock sketch was combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) in order to make maintenance easier.<br>
 
 Splitting the two clock sketches is made easy with #defines at a few places.<br> 
 
 The sketch can be stripped from the clock functions by a simple: #define NOCLOCK<br> 
+Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
+But of course you can also send time with an IOS app or with a web page using the Bluetooth of your device. See below.
 
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
-- [BLE terminal in a browser](https://ednieuw.nl/BLESerial/BLE_UART_Terminal.html), 
-- [BLE serial terminal app](https://ednieuw.nl/BLESerial/IOSappMain.html)
+- [BLE terminal in a browser](https://arach.nl/BLESerial/BLE_UART_Terminal.html), 
+- [BLE serial terminal app](https://arach.nl/BLESerial/IOSappMain.html)
 - Serial cable connected to your PC, 
 - Rotary encoder, 
 - IR-remote controller, 
