@@ -24,6 +24,6 @@ void Demomode(void)         {}
 void FireMode(void)         {}
 void Selftest(int Delayms)  {}
 void Selftest(void)         {}
-void BlinkUUR(int NoofBlinks, int Delayms)      {}
-void BlinkHETISWAS(int NoofBlinks, int Delayms) {}
-void BlinkTWAALF(int NoofBlinks, int Delayms)   {}
+void RotPressOne(void)   {}
+void RotPressTwo(void)   {}
+void RotPressThree(void) {}

@@ -112,7 +112,7 @@ R"rawliteral(
         <td style="width: 90px"><a href=/menu>&#9776; Menu</a></td>
     </tr>
   </table>
-  <textarea id="lastlog" readonly style="font-family:monospace; font-size:12px; color:#aaa; background-color:#111; border:1px solid #444; padding:4px; box-sizing:border-box; height:100px; width:354px; resize:none; margin-bottom:8px;"></textarea>
+  <textarea id="lastlog" readonly style="font-family:monospace; font-size:12px; color:#aaa; background-color:#111; border:1px solid #444; padding:4px; box-sizing:border-box; height:100px; width:clamp(354px, 95vw, 900px); resize:none; margin-bottom:8px;"></textarea>
   <script>
     var logEnabled = true;
     var logTimer = null;

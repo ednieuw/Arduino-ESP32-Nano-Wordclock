@@ -480,6 +480,12 @@ void BlinkTWAALF(int NoofBlinks, int Delayms)
 {
 for (int n=0 ; n<=NoofBlinks; n++) { LedsOff(); SelftestFlash(Delayms); BLINKTWELVE; SelftestFlash(Delayms); }
 }
+//--------------------------------------------                                                //
+// CLOCK Rotary-press feedback (1st/2nd/3rd press) - variant-neutral names the trunk .ino calls
+//--------------------------------------------
+void RotPressOne(void)   { BlinkUUR(3, 300); }
+void RotPressTwo(void)   { BlinkHETISWAS(3, 300); }
+void RotPressThree(void) { BlinkTWAALF(3, 300); }
 //------------------------------------------------------------------------------              //
 // CLOCK Demo mode
 //------------------------------------------------------------------------------
@@ -2156,13 +2162,23 @@ input[type=range]::-moz-range-thumb {
   background: var(--cyan); border: none;
 }
 
-/* Q slider tick numbers */
+/* Q slider tick numbers - right padding matches the swatch width + gap below,
+   so the ticks stay aligned over the (now narrower) slider track, not the swatch */
 .q-ticks {
   display: flex; justify-content: space-between;
   font-size: 0.65rem; color: var(--muted);
-  margin-bottom: 4px; padding: 0 2px;
+  margin-bottom: 4px; padding: 0 42px 0 2px;
 }
 #qlabel { text-align: center; font-size: 0.78rem; color: var(--cyan); margin-top: 6px; }
+
+/* Live colour swatch beside the Q slider - click to open the Colour Picker */
+.q-row { display: flex; align-items: center; gap: 10px; }
+.q-swatch {
+  width: 30px; height: 30px; flex: none;
+  border-radius: 6px; border: 1px solid var(--border);
+  cursor: pointer; transition: border-color 0.2s;
+}
+.q-swatch:hover { border-color: var(--cyan); }
 
 /* Brightness + clock side by side */
 .bright-row { display: flex; gap: 12px; align-items: center; }
@@ -2198,8 +2214,11 @@ input[type=range]::-moz-range-thumb {
     <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
     <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
   </div>
-  <input type="range" id="qslider" min="0" max="9" step="1" value="0"
-         onchange="setQ(this.value)">
+  <div class="q-row">
+    <input type="range" id="qslider" min="0" max="9" step="1" value="0"
+           onchange="setQ(this.value)" style="flex:1;">
+    <div id="qswatch" class="q-swatch" onclick="location.href='/colourpick'" title="Open Colour Picker"></div>
+  </div>
   <div id="qlabel">Q0 &mdash; Default colour</div>
 
   <!-- Brightness sliders + 24h clock side by side -->
@@ -2444,6 +2463,21 @@ document.addEventListener('touchend', nEnd);
 buildClock();
 drawClock();
 
+// ── Colour swatch (live LetterColor next to the Q slider) ──
+function unpackToHex(s) {                          // same unpack logic as ColourPick_html's own copy
+  const n = parseInt(s, 16) >>> 0;
+  const w = (n >>> 24) & 0xFF;
+  if (w !== 0) { const h2 = w.toString(16).padStart(2, '0'); return '#' + h2 + h2 + h2; }
+  return '#' + (n & 0x00FFFFFF).toString(16).padStart(6, '0');
+}
+function setSwatch(hex8) {
+  if (hex8) document.getElementById('qswatch').style.backgroundColor = unpackToHex(hex8);
+}
+function updateSwatch() {
+  fetch('/menustate').then(function(r) { return r.json(); }).then(function(s) { setSwatch(s.lc); }).catch(function() {});
+  setTimeout(updateSwatch, 1000);
+}
+
 // ── Load state from clock ─────────────────────────────────
 function loadState() {
   fetch('/menustate')
@@ -2461,6 +2495,7 @@ function loadState() {
       var qv = s.qval || 0;
       document.getElementById('qslider').value = qv;
       updateQlabel(qv);
+      setSwatch(s.lc);
       document.getElementById('sslider').value = s.sval || 50;
       document.getElementById('lslider').value = s.lval || 5;
       document.getElementById('mslider').value = s.mval || 255;
@@ -2478,6 +2513,7 @@ function loadState() {
     .catch(function() {});
 }
 loadState();
+updateSwatch();
 
 // ── Button handlers ───────────────────────────────────────
 function togbtn(el) { el.classList.toggle('on'); send(el.getAttribute('data-cmd')); setTimeout(loadState, 300); }

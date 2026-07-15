@@ -10,7 +10,9 @@
  Changes V231: Updated comments.      
  Changes V232: Added NOCLOCK. Clockfaces.h,WordClock.h and Fibonacci.h  can be deleted with this option
  Changes V233: Corrected digital clock 
- 
+ Changes V234: Added the new RotPressOne/Two/Three entries in all three variant sections.
+ Changes V235: Live colour in web menu. log screen wider in main menu
+   
 *********************
 How to compile: 
 Install ESP32 boards
@@ -3494,7 +3496,7 @@ void WebPage(void)
      "\"hi\":\"h0%d\",\"qval\":%d,"
      "\"sval\":%d,\"lval\":%d,\"mval\":%d,"
      "\"noff\":%d,\"non\":%d,"
-     "\"ds3231hw\":%d,\"rtcsrc\":\"%s\",\"kldr\":%d,\"kmin\":%d,\"khour\":%d,\"koff\":%d,\"cname\":\"%s\"}",
+     "\"ds3231hw\":%d,\"rtcsrc\":\"%s\",\"kldr\":%d,\"kmin\":%d,\"khour\":%d,\"koff\":%d,\"cname\":\"%s\",\"lc\":\"%08" PRIX32 "\"}",
      Mem.HetIsWasOff      ? 0 : 1,  // t0 )  HET IS WAS ON when HetIsWasOff==0
      Mem.EdSoftLEDSOn     ? 1 : 0,  // t1 (
      LEDsAreOff           ? 0 : 1,  // t2 O  ON when display is on
@@ -3519,7 +3521,8 @@ void WebPage(void)
      Mem.TimeLogPrint==1  ? 1 : 0,  // kmin K1 (log per minute)
      Mem.TimeLogPrint==2  ? 1 : 0,  // khour K2 (log per hour)
      Mem.TimeLogPrint==0  ? 1 : 0,  // koff K0 (logging off)
-     Mem.BLEbroadcastName           // cname shown as page title
+     Mem.BLEbroadcastName,          // cname shown as page title
+     LetterColor                    // lc live LED colour, swatch beside the Q slider
    );
 #endif
    request->send(200, "application/json", json);
@@ -3883,9 +3886,9 @@ void ProcessKeyPressTurn(int encoderPos)
     if(++NoofRotaryPressed > 9) NoofRotaryPressed = 0;
     switch (NoofRotaryPressed)                                                                // No of times the rotary is pressed
       {
-       case 1:  ChangeTime = true;           BlinkUUR(3, 300);      break;                    // Change the hours
-       case 2:  ChangeTime = true;           BlinkHETISWAS(3, 300); break;                    // Change the hours        
-       case 3:  ChangeLightIntensity = true; BlinkTWAALF(3, 300);   break;                    // Turn on TWAALF and change intensity 
+       case 1:  ChangeTime = true;           RotPressOne();         break;                    // Change the hours
+       case 2:  ChangeTime = true;           RotPressTwo();         break;                    // Change the hours
+       case 3:  ChangeLightIntensity = true; RotPressThree();       break;                    // Turn on TWAALF and change intensity
        case 4:                                                      break;                    // 
        case 5:                                                      break;                    // 
        case 6:                                                      break;                    // 

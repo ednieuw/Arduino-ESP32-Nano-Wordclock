@@ -10,8 +10,9 @@ In V230 the word clock sketch was combined with the [Fibonacci clock sketch](htt
 
 Splitting the two clock sketches is made easy with #defines at a few places.<br> 
 
-The sketch can be stripped from the clock functions by a simple: #define NOCLOCK<br> 
-Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
+The sketch can also be stripped from the clock functions by a simple: #define NOCLOCK<br> 
+
+Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
 But of course you can also send time with an IOS app or with a web page using the Bluetooth of your device. See below.
 
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
@@ -30,6 +31,8 @@ The clock can be controlled with a:
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In several browsers the TAB can be split to see the menu and the Serial monitor response in one TAB. <br><br>
 
+<img alt="image" src="Pics/AllMenusV235.jpg" style="width:90%;"  /><br>
+All menus from version V235.
 
 <img alt="image" src="Pics/Colourpicker.png" style="width:90%;"  /><br>
 
