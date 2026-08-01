@@ -17,7 +17,8 @@
                Added: analogWriteResolution(LED_RED, 9); analogWriteFrequency(LED_RED, 5000);  // (same for LED_GREEN, LED_BLUE)
                Added: X in colour when Display is off in HTML menu              
                Added: void InitStatusLEDs(void)
-
+ Changes V238: Make MQTT selectable with Mem.MQTT. Fixed rotary debouncing when no rotary connected
+ 
 *********************
 How to compile: 
 Install ESP32 boards
@@ -155,6 +156,9 @@ uint16_t  MilliSecondValue  = 10;                                               
 uint32_t  Loopcounter       = 100;                                                            // ESP will restart if <10. so start with a larger start value
 static const uint32_t MCURESTART_RESET_AFTER_MS = 120000;                                     // 2 minutes
 static bool mcuRestartCounterCleared = false;
+static const uint32_t CLEARBUTTON_DEBOUNCE_MS = 100;                                          // Minimum continuous LOW time on clearButton before a press is
+                                                                                                // accepted - filters out brief noise glitches on a floating/absent
+                                                                                                // rotary clearButton pin without affecting a genuine press/hold.
 
 struct    EEPROMstorage {                                                                     // Data storage in EEPROM to maintain them after power loss
   byte DisplayChoice    = 0;
@@ -174,7 +178,7 @@ struct    EEPROMstorage {                                                       
   byte TimeReceiver     = 0;                                                                  // Use Time Sender app to set time 
   byte TimeLogPrint     = 0;                                                                  // Print time per minute (1) or hour (2)  
   byte DCF77On          = 0;                                                                  // Not used 
-  byte TimeInput        = 0;                                                                  // Use coding for Rotary encoder ==1 or 3x1 membrane keypad ==2
+  byte TimeInput        = 0;                                                                  // Use coding for Rotary encoder, membrane keypad, IR-remote, Timereceiver
   byte UseDS3231        = 0;                                                                  // Use the DS3231 time module 
   byte LEDstrip         = 0;                                                                  // 0 = SK6812 LED strip. 1 = WS2812 LED strip
   byte FiboChrono       = 0;                                                                  // true = Fibonacci, false = chrono clock display
@@ -182,7 +186,7 @@ struct    EEPROMstorage {                                                       
   byte WIFIcredentials  = 0;                                                                  // Status of the WIFI connection. SSID&PWD set or in AP mode
   byte byteFuture1      = 0;                                                                  // Use Reset pin
   byte byteFuture2      = 0;                                                                  // For future use
-  byte byteFuture3      = 0;                                                                  // For future use
+  byte MQTT             = 0;                                                                  // Turn On or Off MQTT 
   int  IntFuture2       = 0;                                                                  // For future use
   byte TimeSender       = 0;                                                                  // Turn this device on as time sender Code in ESP32Communications.ino sketch
   byte Ringbufcnt       = 0;                                                                  // Ringbuffer counter ON or OFF
@@ -451,7 +455,7 @@ const char *menu[] = {
  "D Date (D15012021), T Time (T132145)",
  "E Timezone (E<-02>2 or E<+01>-1)",
  "F Own, V BKGD color (Fwwrrggbb Fwrgb)",
- "G Scan WIFI networks",
+ "G Scan WIFI networks, _ MQTT On/Off",
  "H H01 rotary H02 buttons H03/04 remote",
  "} Learn IR remote, + Fast BLE",  
  "I Info menu, II long menu",
@@ -573,7 +577,7 @@ void CheckDevices(void)
  CheckBLE();                                                                                  // Something with BLE to do?
  SerialCheck();                                                                               // Check serial port every second
  CheckWIFIcommand();                                                                          // Check if there is a command given from the web page
- CheckMQTT();                                                                                 // Maintain MQTT connection and publish HA discovery once connected
+ if(Mem.MQTT) CheckMQTT();                                                                                 // Maintain MQTT connection and publish HA discovery once connected
 
  if (Mem.TimeInput==1) RotaryEncoderCheck();
  if (Mem.TimeInput==2) Keypad3x1Check();                                                      // 
@@ -804,7 +808,7 @@ void Reset(void)
  Mem.ResetPin         = RST_PIN;                                                              // Use a Reset button on D2 or D6
  Mem.byteFuture1      = 0;                                                                    // For future use
  Mem.byteFuture2      = 0;                                                                    // For future use
- Mem.byteFuture3      = 0;                                                                    // For future use
+ Mem.MQTT             = 0;                                                                    // Use MQTT
  Mem.IntFuture2       = 0;                                                                    // For future use
  Mem.BLEOn            = 1;                                                                    // default BLE On
  Mem.UseBLELongString = 0;                                                                    // Default off. works only with iPhone/iPad with BLEserial app
@@ -1029,12 +1033,12 @@ void SWversion(bool Small)
  char fftext[20], ffftext[20];              
  if(!Small) {snprintf(fftext, sizeof(fftext),"%s", Mem.UseDS3231?"DS3231=On":"DS3231=Off"); }
  if(!Small) {snprintf(ffftext,sizeof(ffftext),"%s", Mem.TimeInput==5?"TimeReceiver=On":"TimeReceiver=Off"); } 
- if(!Small) {snprintf(sptext, sizeof(sptext),"%s %s %s",Mem.TimeInput==0 ?"H00=On":
+ if(!Small) {snprintf(sptext, sizeof(sptext),"%s %s",Mem.TimeInput==0 ?"H00=On":
                         Mem.TimeInput==1 ?"Rotary=On":
                         Mem.TimeInput==2 ?"Membrane=On":
                         Mem.TimeInput==3 ?"IR-remote=On":
-                        Mem.TimeInput==4 ?"Ir-remote=On":"NOP",fftext,ffftext);                 WTekstprintln(sptext); }                           
-  //if(!Small)
+                        Mem.TimeInput==4 ?"Ir-remote=On":"NOP",fftext);                          WTekstprintln(sptext); }
+ if(!Small) {snprintf(sptext, sizeof(sptext),"%s %s", ffftext, Mem.MQTT?"MQTT=On":"MQTT=Off");   WTekstprintln(sptext); }
 { snprintf(sptext, sizeof(sptext), "%d %s LEDs (switch %%) ",
            (int)NUM_LEDS, Mem.LEDstrip==0?"SK6812":Mem.LEDstrip==1?"WS2812":"NOP");             WTekstprintln(sptext, "", " <a href='/colourpick'>&#127752; Set colours</a>"); }
   if(!Small) {sprintf(sptext, "Software: %s", SoftwareName());                                  WTekstprintln(sptext);}
@@ -1483,7 +1487,7 @@ void ReworkInputString(String InputString)
         Tekstprintlnf("Mem.MCUrestarted reset to 0");
         StoreStructInFlashMemory();
         snprintf(sptext, sizeof(sptext),"\n*********\n ESP restarting\n*********\n");            
-        shouldReboot = true; // ESP.restart();
+        shouldReboot = true;                                                                  // ESP.restart();
        } 
       else sprintf(sptext, "**** Length fault. Enter @ ****");
       break;
@@ -1600,13 +1604,18 @@ void ReworkInputString(String InputString)
       else snprintf(sptext, sizeof(sptext), "**** Length fault. Enter + ****");
       break;
       
-    case '_':                                                                                 // NO USE
-      if(len > 1 && len < 4) 
+    case '_':                                                                                 // Turn On / Off MQTT
+      if(len == 1) 
        {
-        byte ff = (byte)InputString.substring(1, 3).toInt();
-        snprintf(sptext, sizeof(sptext), "No use: %d", ff);
-   //     Tekstprintln(sptext);
-       }
+        Mem.MQTT = 1 - Mem.MQTT;
+        if (Mem.WIFIcredentials != SET_AND_OK || WiFi.status() != WL_CONNECTED) 
+          {
+           Mem.MQTT = 0;              // Only try when WIFI is connected and confirmed working
+           Tekstprintln(" *** No WIFI connection. MQTT remains OFF ***"); 
+          }
+        snprintf(sptext, sizeof(sptext), "MQTT is %s\n *** Restart with @ ***", Mem.MQTT ? "ON" : "OFF");
+       } 
+      else snprintf(sptext, sizeof(sptext), "**** Length fault. Enter _ ****");
       break;
 
     case '=':                                                                                 // Print permanent Mem memory
@@ -1714,7 +1723,8 @@ void PrintMem(void)
  Tekstprintlnf("M  MaxBrightness: %d",Mem.UpperBrightness);                                                                                                     
  Tekstprintlnf("CCC        BLEOn: %s",Mem.BLEOn ? "ON" : "OFF");            
  Tekstprintlnf("X          NTPOn: %s",Mem.NTPOn ? "ON" : "OFF");            
- Tekstprintlnf("W         WIFIOn: %s",Mem.WIFIOn ? "ON" : "OFF");           
+ Tekstprintlnf("W         WIFIOn: %s",Mem.WIFIOn ? "ON" : "OFF");  
+ Tekstprintlnf("_           MQTT: %s",Mem.MQTT ? "ON" : "OFF");          
  Tekstprintlnf("P    StatusLEDOn: %s",Mem.StatusLEDOn ? "ON" : "OFF");      
  Tekstprintlnf("    MCUrestarted: %d",Mem.MCUrestarted );                   
  Tekstprintlnf("    LoopRebooted: %d",Mem.LoopRebooted );                   
@@ -3366,8 +3376,9 @@ if(Mem.NTPOn )
 //--------------------------------------------
 void CheckMQTT(void)
 {
+ if (!Mem.MQTT) return; 
  if (Mem.WIFIcredentials != SET_AND_OK || WiFi.status() != WL_CONNECTED) return;              // Only try when WIFI is connected and confirmed working
- if (millis() - MQTTlastLoopCall < 20) return;                                                // connected()/loop() both touch the TCP socket - throttle to ~50x/sec instead of every loop() pass
+ if (millis() - MQTTlastLoopCall < 25) return;                                                // connected()/loop() both touch the TCP socket - throttle to ~40x/sec instead of every loop() pass
  MQTTlastLoopCall = millis();
  if (!MQTTclient.connected())
    {
@@ -4041,8 +4052,31 @@ void Keypad3x1Check(void)
 void RotaryEncoderCheck(void)
 {
  int ActionPress = 999;
- if (digitalRead(clearButton) == LOW )          ProcessKeyPressTurn(0);                       // Set the time by pressing rotary button
- else if (ChangeTime || ChangeLightIntensity)    
+
+ // Debounced, edge-triggered clearButton read: a press only counts once the pin has read LOW
+ // continuously for CLEARBUTTON_DEBOUNCE_MS, and won't re-arm until the pin is seen HIGH again.
+ // Rejects brief EMI/noise glitches on a floating/absent clearButton pin (no rotary connected)
+ // while remaining effectively instant for a genuine press or hold.
+ static uint32_t clearButtonLowSince = 0;
+ static bool     clearButtonArmed    = true;
+ bool clearButtonPressed = false;
+ if (digitalRead(clearButton) == LOW)
+   {
+    if (clearButtonLowSince == 0) clearButtonLowSince = millis();
+    if (clearButtonArmed && (unsigned long)(millis() - clearButtonLowSince) >= CLEARBUTTON_DEBOUNCE_MS)
+      {
+       clearButtonPressed = true;
+       clearButtonArmed   = false;                                                            // Require a HIGH sample (release) before counting another press
+      }
+   }
+ else
+   {
+    clearButtonLowSince = 0;
+    clearButtonArmed    = true;
+   }
+
+ if (clearButtonPressed)                        ProcessKeyPressTurn(0);                       // Set the time by pressing rotary button
+ else if (ChangeTime || ChangeLightIntensity)
   {   
    ActionPress = myEnc.read();                                                                // If the knob is turned store the direction (-1 or 1)
    if (ActionPress == 0) {  ActionPress = 999;  ProcessKeyPressTurn(ActionPress);  }          // Sent 999 = nop (no operation) 
@@ -4050,11 +4084,13 @@ void RotaryEncoderCheck(void)
   } 
  myEnc.write(0);                                                                              // Set encoder pos back to 0
 
-if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                                    // After 60 sec after shaft is pressed time of light intensity can not be changed 
-   {
-    if (ChangeTime || ChangeLightIntensity)                         
+if ((unsigned long) (millis() - RotaryPressTimer) > 60000)                                    // 60s since the last accepted press: decay any in-progress press
+   {                                                                                           // count and end any active change, regardless of ChangeTime/
+                                                                                                // ChangeLightIntensity state - otherwise a count stalled past
+                                                                                                // press 3 (where both flags are already false) never decayed.
+    if (NoofRotaryPressed != 0)
       {
-      Tekstprintln("<-- Changing time is over -->");
+      Tekstprintln("<-- Rotary press sequence timed out, resetting count -->");
       NoofRotaryPressed = 0;
       }
     ChangeTime            = false;
