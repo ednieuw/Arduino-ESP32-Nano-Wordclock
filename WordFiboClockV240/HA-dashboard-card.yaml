@@ -1,0 +1,77 @@
+# Home Assistant dashboard cards for the WordClock / Fibonacci clock (device: ESPRedPCB)
+# ---------------------------------------------------------------
+# Paste into a dashboard: Edit dashboard -> + Add card -> Manual -> paste -> Save.
+#
+# The entity ids below assume the clock's BLE name is "ESPRedPCB" (device id: espredpcb).
+# If your clock has another name, replace "espredpcb" everywhere, or look the ids up in
+# Settings -> Devices & Services -> MQTT -> ESPRedPCB (click an entity to see its id).
+
+# ---- Card 1: all controls -------------------------------------
+type: entities
+title: ESPRedPCB
+show_header_toggle: false
+entities:
+  - entity: switch.espredpcb_display
+    name: Display
+    icon: mdi:clock-digital
+  - entity: number.espredpcb_max_brightness
+    name: Max brightness
+    icon: mdi:brightness-6
+  - entity: select.espredpcb_display_colour_scheme
+    name: Colour scheme
+    icon: mdi:palette
+  - entity: select.espredpcb_random_display
+    name: Random display
+    icon: mdi:shuffle-variant
+  - type: divider
+  - entity: button.espredpcb_led_test
+    name: LED test
+    icon: mdi:led-on
+  - entity: button.espredpcb_statusled_on_off
+    name: Status LEDs on/off
+    icon: mdi:led-outline
+  - entity: button.espredpcb_restart
+    name: Restart clock
+    icon: mdi:restart
+
+# ---- Card 2: sensors ------------------------------------------
+# Paste as a second Manual card.
+#
+# type: entities
+# title: ESPRedPCB sensors
+# entities:
+#   - entity: sensor.espredpcb_cpu_temperature
+#     name: CPU temperature
+#   - entity: sensor.espredpcb_ldr_reading
+#     name: Light (LDR)
+#   - entity: sensor.espredpcb_ds3231_temperature   # only present when a DS3231 is installed
+#     name: DS3231 temperature
+
+# ---- Card 3: diagnostics --------------------------------------
+# Paste as a third Manual card.
+#
+# type: entities
+# title: ESPRedPCB diagnostics
+# entities:
+#   - entity: sensor.espredpcb_wifi_signal
+#     name: WiFi signal
+#   - entity: sensor.espredpcb_uptime
+#     name: Uptime
+#   - entity: sensor.espredpcb_free_heap
+#     name: Free memory
+#   - entity: sensor.espredpcb_mcu_restarts
+#     name: MCU restarts
+#   - entity: sensor.espredpcb_wifi_reboots
+#     name: WiFi reboots
+#   - entity: sensor.espredpcb_loop_stall_reboots
+#     name: Loop-stall reboots
+
+# ---- Card 4 (optional): 24h graph of WiFi signal and temperature
+#
+# type: history-graph
+# title: ESPRedPCB 24h
+# hours_to_show: 24
+# entities:
+#   - sensor.espredpcb_wifi_signal
+#   - sensor.espredpcb_cpu_temperature
+#   - sensor.espredpcb_free_heap
