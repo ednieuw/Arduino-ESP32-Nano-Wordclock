@@ -91,9 +91,8 @@ R"rawliteral(
     // Initialize on page load
     window.onload = function() {
       document.getElementById('commandForm').addEventListener('submit', handleFormSubmit);
-      setInterval(updateDateTime, 1000);          // Updates the digital clock on the web page every second 
+      setInterval(updateDateTime, 1000);          // Updates the digital clock on the web page every second
       updateDateTime();
-      document.getElementById('input1').focus();  // Automatically focus the input
     };
   </script>
 </head>
@@ -139,7 +138,7 @@ R"rawliteral(
     <strong>
       <input name="submit" type="submit" class="button" style="height: 40px" value="Send">
     </strong>&nbsp;
-    <input type="text" id="input1" name="input1" style="width: 272px">
+    <input type="text" id="input1" name="input1" style="width: 204px; font-size: 16px;">
   </form>
   <span class="verdana-black">
     <div id="datetime" style="text-align:left; font-size:16px; margin-top:20px;"></div>

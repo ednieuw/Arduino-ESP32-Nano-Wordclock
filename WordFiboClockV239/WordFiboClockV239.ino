@@ -18,7 +18,9 @@
                Added: X in colour when Display is off in HTML menu              
                Added: void InitStatusLEDs(void)
  Changes V238: Make MQTT selectable with Mem.MQTT. Fixed rotary debouncing when no rotary connected
- 
+ Changes V239: Default HTML menu page does not zoom in anymore on inputfiled. Removed the auto-focus call — page now opens at the top   
+
+
 *********************
 How to compile: 
 Install ESP32 boards
