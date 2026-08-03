@@ -12,7 +12,7 @@ Splitting the two clock sketches is made easy with #defines at a few places.<br>
 
 The sketch can also be stripped from the clock functions by a simple: #define NOCLOCK<br> 
 
-Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was added. The timesender sends NTP time with a HC-12 to another ESP32 with this same sketch.<br>
+Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was added. The timesender sends NTP time with a HC-12 to another ESP32.<br>
 But of course you can also send time with an IOS app or with a web page using the Bluetooth of your device. See below.
 
 [Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
