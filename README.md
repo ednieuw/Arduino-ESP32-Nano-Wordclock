@@ -74,7 +74,7 @@ The PCB can connect a
 The SK6812 RGBW or WS2812 RGB LED-strip operates at 5V. But the data signal from the Nano ESP32 is 3.3V.<br> 
 
 I tried to use optocouplers to amplify the data signal from 3.3V to 5V, but that failed. See here: 
-https://ednieuw.nl/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
+https://ednieuw.com/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 
 For level switching the 74HCT125 level shifter IC is used. It has four ports. The design of the PCB can use the other three ports on the IC for other uses. <br>
 
@@ -213,7 +213,7 @@ Select one of the word clock designs
 ```
 
 - #define NL144CLOCK -> a 144 LED single language clock. Default language is Dutch. For French, German and English copy the coding from the four-language clock between the NL144CLOCK defines.<br>
- [Build instruction for the clock in Dutch and English](https://ednieuw.nl/Woordklok/Bouwpakket/WoordklokSK6812.htm)
+ [Build instruction for the clock in Dutch and English](https://ednieuw.com/Woordklok/Bouwpakket/WoordklokSK6812.htm)
 or [here in this repository](Manual-Instructions)
 
 - #define NLM1M2M3M4L??? -> a ??? LED single language clock with 4 extra LEDs for the minutes and a slightly different design. Many lay-outs are defined.
@@ -428,7 +428,7 @@ The menu, left in the picture below will appear. With these menus almost all fun
 Or open the BLE terminal app. (in some apps you have to press a CONNECT-button).<br>
 Look for the WordClock to connect to and connect.
 
-For Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.nl/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> in the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
+For Apple IOS devices BLE connection can be made with my app <a href="https://ednieuw.com/BLESerial/BLESerialPRO.html"> BLE Serial pro </a> in the <a href="https://apps.apple.com/nl/app/ble-serial-pro/id1632245655?l=en">app store</a> .<br>
 
 For Android <a href="https://play.google.com/store/apps/details?id=com.nordicsemi.nrfUARTv2&amp;hl=en&amp;gl=US"> 
 nRF UART terminal program </a>and <a href="https://play.google.com/store/apps/details?id=de.kai_morich.serial_bluetooth_terminal">
@@ -530,7 +530,7 @@ H05 Turn On/Off the BLE time receiver. <br>
 When enabled, the device listens for time sent by a BLE time sender app running on a nearby phone or PC and uses that to set its clock. <br>
 Compatible senders:
 - HTML BLE time sender (Chrome/Edge): [HTML-BLEserial](https://github.com/ednieuw/HTML-BLEserial)
-- iOS BLE time sender app: [BLEtimeSender](https://ednieuw.nl/BLESerial/BLEtimeSender.html)
+- iOS BLE time sender app: [BLEtimeSender](https://ednieuw.com/BLESerial/BLEtimeSender.html)
 The H05 option can be used when the clock has no WIFI. 
 
 ### } Learn IR remote
