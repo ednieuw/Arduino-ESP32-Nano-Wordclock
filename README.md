@@ -3,43 +3,46 @@
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
-Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs showing one or [four languages](https://github.com/ednieuw/FourLanguageClock) with an Arduino ESP32 Nano.<br>
-The sketch will also work with other ESP32 boards but with different pin numbering.<br>
+Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs, showing one or [four languages](https://github.com/ednieuw/FourLanguageClock), on an Arduino ESP32 Nano.<br>
+The sketch also works on other ESP32 boards, with different pin numbering.<br>
 
-In V230 the word clock sketch was combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) in order to make maintenance easier.<br>
-
-Splitting the two clock sketches is made easy with #defines at a few places.<br> 
-
-The sketch can also be stripped from the clock functions by a simple: #define NOCLOCK<br> 
-
-Coding of a [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was added. The timesender sends NTP time with a HC-12 to another ESP32.<br>
-When no WIFI is available time can be send to the clock with an timesender IOS app or a timesender web page using the Bluetooth of your device. See below.
-
-[Use the word clock selector page to compare other software/hardware designs to make.](https://github.com/ednieuw/WordclockSelector)<br>
+[Compare other word clock software/hardware designs on the selector page.](https://github.com/ednieuw/WordclockSelector)<br>
 
 The clock can be controlled with a:
-- [BLE web page](https://github.com/ednieuw/HTML-BLEserial), 
-- [BLE terminal in a browser](https://arach.nl/BLESerial/BLE_UART_Terminal.html), 
+- [BLE web page](https://github.com/ednieuw/HTML-BLEserial)
+- [BLE terminal in a browser](https://arach.nl/BLESerial/BLE_UART_Terminal.html)
 - [BLE serial terminal app](https://arach.nl/BLESerial/IOSappMain.html)
-- Serial cable connected to your PC, 
-- Rotary encoder, 
-- IR-remote controller, 
-- (membrane) keypad,
-- MQTT using Home Assistant for instance.
-- [Time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).  <sub>[Time sender HTML shortcut](https://ednieuw.home.xs4all.nl/Woordklok/TimeSender/TimeSender.html)</sub>
+- Serial cable connected to your PC
+- Rotary encoder
+- IR-remote controller
+- (Membrane) keypad
+- MQTT, e.g. via Home Assistant
+- [Time sender app (iOS) or web page (Windows/Android)](https://github.com/ednieuw/HTML-TimeSender) —> [open Time sender HTML](https://ednieuw.com/Woordklok/TimeSender/TimeSender.html)
 <br>
 
+## Architecture & related projects
+
+Since V230, the word clock sketch has been combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) to simplify maintenance. The two are kept easy to split apart via `#define`s in a few places, and the clock functions can be stripped out entirely with `#define NOCLOCK`. Functionality can be toggled on/off from the menu.
+
+Coding for an [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added — it sends NTP time over HC-12 to another ESP32. 
+
+When no WiFi is available, time can instead be sent to the clock via a timesender iOS app or web page, using Bluetooth on your phone or tablet.
+
+## Screens
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
 <br>In several browsers the TAB can be split to see the menu and the Serial monitor response in one TAB. <br><br>
 
 <img alt="image" src="Pics/AllMenusV235.jpg" style="width:90%;"  /><br>
-All menus from version V235.
+All menus in a browser since version V235.
 
 <img alt="image" src="Pics/Colourpicker.png" style="width:90%;"  /><br>
 
 To connect the clock to WIFI the SSID and password of the router can be entered by the BLE serial terminal app or the WPS function can be used.<br>
+
 Software updates can be uploaded with OTA (Over the Air).<br>
 
+<img alt="image" src="Pics/MQTT-HA.jpg" style="width:90%;"  /><br>
+With MQTT in Home Assistant.
 
 | | |
 |---|---|
@@ -191,7 +194,7 @@ The ESP32Arduino_WordClockVxxx.ino turns the Nano ESP32 and SK6812 or WS2812 LED
 
 An **user manual** in Dutch and English can be found in this repository [here](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/tree/main/Manual-Instructions)
 
-The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML BLE terminal web page](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html).
+The software can be controlled with Bluetooth on your PC, Android or iPhone/iPad/iMac using a BLE terminal app or with [this HTML BLE terminal web page](https://ednieuw.com/BLESerial/BLE_UART_Terminal.html).
 
 Several designs can be selected before compiling.  (If you have a word clockface plate, of course.)<br>
 Use a word clockface plate design [from this repository](WordPlateFrontCovers)  or use your own and adapt the position of the LEDs in the software.<br>
@@ -276,12 +279,12 @@ If the clock software is started without a SSID router name it will start a WIFI
 ### Connect via Bluetooth
 To make life easy it is preferred to use a phone or tablet and a Bluetooth communication app to enter the WIFI credentials into the clock.<br>
 
-With some browser you can also use [this web based BLE HTML from my site](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html)
+With some browser you can also use [this web based BLE HTML from my site](https://ednieuw.com/BLESerial/BLE_UART_Terminal.html)
 
 | | |
 |:---:|:---:|
 | <img src="Pics/BLEHTMLUART.png" alt="BLE UART terminal" width="350"> | ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/261800f1-7cd6-4078-8c7e-ad9cd2ba47ec) |
-| [BLE UART HTML from my site](https://ednieuw.home.xs4all.nl/BLESerial/BLE_UART_Terminal.html) | Bluetooth UART serial terminal app |   
+| [BLE UART HTML from my site](https://ednieuw.com/BLESerial/BLE_UART_Terminal.html) | Bluetooth UART serial terminal app |   
 
 BLESerial nRF	BLE Serial Pro	Serial Bluetooth Terminal
 - Download a Bluetooth UART serial terminal app on your phone, PC, or tablet.<br>
