@@ -25,7 +25,7 @@ The clock can be controlled with a:
 - Rotary encoder, 
 - IR-remote controller, 
 - (membrane) keypad,
-- Using MQTT to Home Assistant for instance.
+- MQTT using Home Assistant for instance.
 - [Time sender app (IOS) or web page Windows/Android](https://github.com/ednieuw/HTML-TimeSender).  <sub>[Time sender HTML shortcut](https://ednieuw.home.xs4all.nl/Woordklok/TimeSender/TimeSender.html)</sub>
 <br>
 
