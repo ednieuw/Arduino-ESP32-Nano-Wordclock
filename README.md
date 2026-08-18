@@ -116,6 +116,8 @@ After connections are made the PCB and hardware looks like this:
 
 ![image](https://github.com/user-attachments/assets/77fc651e-cfd6-4681-83e5-53c4f6bcfb55)
 
+<img alt="PCB V04" src="Pics/PCBV04metOnderdelen.jpg" style="width:100%;"  /><br>
+All parts on PCB V04 incliding Membrane keypad.
 
 # PCB Connections
 
