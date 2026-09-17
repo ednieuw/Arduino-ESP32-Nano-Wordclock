@@ -20,6 +20,11 @@
  Changes V238: Make MQTT selectable with Mem.MQTT. Fixed rotary debouncing when no rotary connected
  Changes V239: Default HTML menu page does not zoom in anymore on inputfiled. Removed the auto-focus call — page now opens at the top   
  Changes V240: Cleanup code. MQTT controls added
+ Changes V241: Testing
+ Changes V242: Added MQTT minbrightness and slopebrightness
+ Changes V243: Added Low Power MODEMSLEEP. cut power from 0.25A to 0.20A. Will not use it and V244 will be continued from V242
+ Changes V244: Added MQTT sensor for OutPhotocell (LED brightness 0-255 derived from the LDR). Combined all periodic MQTT publishes (CPU temp, LDR, OutPhotocell, display choice, states) into one PublishMQTTStates(), removing duplicate PublishDisplayChoiceState() call on reconnect.
+               Fixed OTA upload: a double-click/double-submit on the /update page could fire two concurrent uploads that interleaved writes into Update and corrupted the image (clock never restarted). Client-side now blocks a second submit while one is in flight; server-side now refuses a second concurrent OTA stream (409 BUSY), with a 30s staleness timeout in case a connection drops mid-upload.
 
 *********************
 How to compile: 
@@ -36,12 +41,12 @@ USB mode: Normal (Tiny USB)
 
 // ------------------>   Define only ONE display type below.
 
-#define NL144CLOCK              // Dutch display for 12 x 12 Front
+//#define NL144CLOCK              // Dutch display for 12 x 12 Front
 //#define UK144CLOCK              // English display for 12 x 12 Front.
 //#define FR144CLOCK              // French display for 12 x 12 Front.
 //#define DE144CLOCK              // German display for 12 x 12 Front.
 //#define NL92CLOCK               // Dutch display for one LED-strip behind every word
-//#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs
+#define FOURLANGUAGECLOCK       // Four-language clock with 625 LEDs
 //#define NLM1M2M3M4L94           // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L114          // NL clock with four extra LEDs for the minutes to light up
 //#define NLM1M2M3M4L144          // NL clock with four extra LEDs for the minutes to light up
@@ -411,6 +416,9 @@ const char* AP_PASSWORD     = "wordclock";
 AsyncWebServer server(80);
 DNSServer dnsServer;
 bool shouldReboot           = false;
+bool OTAupdateInProgress    = false;                                                          // Guards against a second concurrent /update POST (e.g. double-click) interleaving writes into Update and corrupting the OTA image
+unsigned long OTAlastChunkMillis = 0;                                                         // millis() of the last chunk written; a stalled/dropped upload releases the guard after OTA_STALE_MS
+#define OTA_STALE_MS 30000UL                                                                  // If no chunk arrives for 30s the in-progress upload is considered abandoned (e.g. WiFi drop mid-upload)
 bool OptionYRainbow         = false;
 bool DoNotLog               = false;                                                          // Use this flag to suspress Logging to Logviewer 
 volatile bool StopTest      = false;                                                          // Set true to interrupt the running LED test
@@ -531,6 +539,7 @@ void setup()
  while (!Serial && ( (millis()-Tick) < 2002)) { LEDstartup(green);delay(500); }               // Wait max 1.5 sec to establish serial connection
  SetStatusLED(10,0,10);                                                                       // Set the status LED to red
  while (!Serial && ( (millis()-Tick) < 3000)) { LEDstartup(purple); delay(250); }             // Wait max 3 sec to establish serial connection
+ //PrintResetReason();                                                                          // Diagnose unexpected resets (brownout, watchdog, panic, ...)
  PrintHeaps();                                                                                // Print memory usage  
  LEDstartup(capri); Tekstprintln("Serial started\nStored settings loaded\nLED strip started");// InitStorage and StartLEDs must be called first                                                                   // MCU Restart counter     
  if(++Mem.MCUrestarted>5) { Reset();  ResetCredentials(); }                                   // If the MCU restarts during Setup() so often -> Reset() but no ResetCredentials(); 
@@ -641,10 +650,7 @@ void EveryMinuteUpdate(void)
  if (Mem.TimeLogPrint == 1)                                                                   // Print the time string every minute
     { NoTextInLeds = false; DimLeds(true); Displaytime();  Tekstprintln(""); }
  NoTextInLeds = ff;   
- PublishCPUTemperature();                                                                   // TEST: publish CPU temperature to MQTT every minute
- PublishLDRreading();                                                                       // TEST: publish LDR reading to MQTT every minute
- PublishDisplayChoiceState();                                                               // Keep the HA select entity in sync with Mem.DisplayChoice
- PublishMQTTStates();                                                                       // Keep the other HA entities (switch, selects, diagnostics) in sync
+ PublishMQTTStates();                                                                       // Publish all HA entities (switch, selects, sensors, diagnostics) once per minute
  
  if(timeinfo.tm_hour != lasthour) EveryHourUpdate();
 }
@@ -3379,8 +3385,6 @@ void CheckMQTT(void)
        MQTTclient.subscribe((MQTTDeviceId() + "/cmnd").c_str());                              // HA buttons/switches publish their command here
        publishMQTTDiscovery();
        PublishMQTTStates();                                                                   // Publish all states right away so HA entities are not 'unknown' until the next minute
-       PublishDisplayChoiceState();
-       PublishDisplayChoiceState();                                                           // Report current state right away, not up to a minute later
       }
     else
       {
@@ -3415,6 +3419,7 @@ void publishMQTTDiscovery(void)
 
  publishDiscoverySensor(deviceId, "cputemp", "CPU Temperature", baseTopic + "/cputemp", "\xC2\xB0" "C", "temperature", false); // CPU Temperature sensor
  publishDiscoverySensor(deviceId, "ldr",     "LDR Reading",     baseTopic + "/ldr",     "",               "",         false); // Raw LDR reading, no unit/device class
+ publishDiscoverySensor(deviceId, "outphotocell", "OutPhotocell", baseTopic + "/outphotocell", "", "", false); // OutPhotocell - brightness (0-255) sent to the LEDs
  publishDiscoverySensor(deviceId, "rssi",    "WiFi Signal",     baseTopic + "/rssi",    "dBm", "signal_strength",     true);  // WiFi signal strength; graph shows if dropouts are router or clock
  publishDiscoverySensor(deviceId, "uptime",  "Uptime",          baseTopic + "/uptime",  "min", "duration",            true);  // Minutes since last (re)boot
  publishDiscoverySensor(deviceId, "freeheap","Free Heap",       baseTopic + "/freeheap","B",   "data_size",           true);  // Free RAM; a sinking graph reveals memory leaks
@@ -3433,7 +3438,9 @@ void publishMQTTDiscovery(void)
  MQTTclient.publish(("homeassistant/button/" + deviceId + "/randomdisplay/config").c_str(), "", true); // now replaced by the switch and select below
 
  publishDiscoverySwitch(deviceId, "display", "Display", cmndTopic, baseTopic + "/display", "O1", "O0");                       // Switch with state: HA sees whether the display is on
- publishDiscoveryNumber(deviceId, "maxbrightness", "Max Brightness", cmndTopic, baseTopic + "/maxbrightness", 1, 255, "M{{ value }}"); // Slider for Mem.UpperBrightness (menu option M)
+ publishDiscoveryNumber(deviceId, "maxbrightness",   "Max Brightness",   cmndTopic, baseTopic + "/maxbrightness",   1, 255, "M{{ value }}"); // Slider for Mem.UpperBrightness (menu option M)
+ publishDiscoveryNumber(deviceId, "minbrightness",   "Min Brightness",   cmndTopic, baseTopic + "/minbrightness",   0, 250, "L{{ value }}"); // Slider for Mem.LowerBrightness (menu option L)
+ publishDiscoveryNumber(deviceId, "slopebrightness", "Brightness Slope", cmndTopic, baseTopic + "/slopebrightness", 1, 255, "S{{ value }}"); // Slider for Mem.LightReducer (menu option S, %)
 
  publishDiscoverySelect(deviceId, "displaychoice", "Display Colour Scheme", cmndTopic, baseTopic + "/displaychoice", QchoiceNames, LASTITEM + 1); // Q0-Q9 colour scheme picker
  publishDiscoverySelect(deviceId, "randomdisplay", "Random Display",        cmndTopic, baseTopic + "/randomdisplay", RandomChoiceNames, 3);       // Off / per minute / per hour (~0 ~1 ~2)
@@ -3560,9 +3567,10 @@ void publishDiscoveryNumber(String deviceId, String numberKey, String friendlyNa
 }
 
 //--------------------------------------------                                                //
-// MQTT Publish the states of all switches, selects, numbers and diagnostic sensors.
-// Called once per minute from EveryMinuteUpdate(), after every MQTT command (instant feedback
-// in HA) and right after (re)connecting so no entity stays 'unknown'.
+// MQTT Publish every HA entity in one call: switches, selects, numbers, diagnostic sensors and
+// the test sensors (CPU temperature, LDR reading, OutPhotocell brightness). Called once per minute
+// from EveryMinuteUpdate(), after every MQTT command (instant feedback in HA) and right after
+// (re)connecting so no entity stays 'unknown'.
 //--------------------------------------------
 void PublishMQTTStates(void)
 {
@@ -3571,7 +3579,11 @@ void PublishMQTTStates(void)
  char buf[16];
  MQTTclient.publish((base + "/display").c_str(), LEDsAreOff ? "OFF" : "ON", true);
  MQTTclient.publish((base + "/randomdisplay").c_str(), RandomChoiceNames[_min(Mem.RandomDisplay, (byte)2)], true);
- itoa(Mem.UpperBrightness, buf, 10);        MQTTclient.publish((base + "/maxbrightness").c_str(), buf, true);
+ byte dp = _min(Mem.DisplayChoice, LASTITEM);
+ MQTTclient.publish((base + "/displaychoice").c_str(), QchoiceNames[dp], true);
+ itoa(Mem.UpperBrightness, buf, 10);        MQTTclient.publish((base + "/maxbrightness").c_str(),   buf, true);
+ itoa(Mem.LowerBrightness, buf, 10);        MQTTclient.publish((base + "/minbrightness").c_str(),   buf, true);
+ itoa(Mem.LightReducer, buf, 10);           MQTTclient.publish((base + "/slopebrightness").c_str(), buf, true);
  itoa((int)WiFi.RSSI(), buf, 10);           MQTTclient.publish((base + "/rssi").c_str(),          buf, true);
  ultoa(millis() / 60000UL, buf, 10);        MQTTclient.publish((base + "/uptime").c_str(),        buf, true);
  ultoa(ESP.getFreeHeap(), buf, 10);         MQTTclient.publish((base + "/freeheap").c_str(),      buf, true);
@@ -3580,18 +3592,9 @@ void PublishMQTTStates(void)
  itoa(Mem.LoopRebooted, buf, 10);           MQTTclient.publish((base + "/looprestarts").c_str(),  buf, true);
  if (DS3231Installed)
    { dtostrf(RTCklok.getTemperature(), 4, 1, buf); MQTTclient.publish((base + "/ds3231temp").c_str(), buf, true); }
-}
-
-//--------------------------------------------                                                //
-// MQTT TEST: publish the current Display Colour Scheme (QchoiceNames[Mem.DisplayChoice]) so the HA
-// select entity shows the right value. Called every minute from EveryMinuteUpdate() - DisplayChoice
-// can also change from BLE/Serial/the web page/IR remote, so this keeps HA in sync without hooking every call site.
-//--------------------------------------------
-void PublishDisplayChoiceState(void)
-{
- if (!MQTTclient.connected()) return;
- byte dp = _min(Mem.DisplayChoice, LASTITEM);
- MQTTclient.publish((MQTTDeviceId() + "/displaychoice").c_str(), QchoiceNames[dp], true);
+ dtostrf(temperatureRead(), 4, 1, buf);     MQTTclient.publish((base + "/cputemp").c_str(), buf);               // ESP32 internal temperature sensor, degrees Celsius
+ itoa(Previous_LDR_read, buf, 10);          MQTTclient.publish((base + "/ldr").c_str(), buf);                   // Raw LDR reading
+ itoa(OutPhotocell, buf, 10);               MQTTclient.publish((base + "/outphotocell").c_str(), buf);         // LED brightness (0-255) derived from the LDR
 }
 
 //--------------------------------------------                                                //
@@ -3609,15 +3612,14 @@ void MQTTCallback(char* topic, byte* payload, unsigned int length)
 
  for (byte i = 0; i <= LASTITEM; i++)                                                         // Is this a Display Colour Scheme name from the HA select?
    {
-    if (strcmp(buf, QchoiceNames[i]) == 0) { ReworkInputString(String("Q") + i); PublishMQTTStates(); PublishDisplayChoiceState(); return; }
+    if (strcmp(buf, QchoiceNames[i]) == 0) { ReworkInputString(String("Q") + i); PublishMQTTStates(); return; }
    }
  for (byte i = 0; i < 3; i++)                                                                 // Is this a Random Display name from the HA select?
    {
-    if (strcmp(buf, RandomChoiceNames[i]) == 0) { ReworkInputString(String("~") + i); PublishMQTTStates(); PublishDisplayChoiceState(); return; }
+    if (strcmp(buf, RandomChoiceNames[i]) == 0) { ReworkInputString(String("~") + i); PublishMQTTStates(); return; }
    }
  ReworkInputString(String(buf));
  PublishMQTTStates();                                                                         // Report the new states back so HA switches/selects update instantly
- PublishDisplayChoiceState();
 }
 
 //--------------------------------------------                                                //
@@ -3646,28 +3648,6 @@ void publishDiscoverySensor(String deviceId, String sensorKey, String friendlyNa
 
  bool ok = MQTTclient.publish(configTopic.c_str(), payload.c_str(), true);                     // Retain = true, so HA sees it immediately on restart without waiting for a republish
  Tekstprintlnf("[MQTT] Discovery publish %s (%u bytes): %s", ok ? "OK" : "FAILED - packet too big for MQTT buffer?", payload.length(), configTopic.c_str());
-}
-
-//--------------------------------------------                                                //
-// MQTT TEST: publish the ESP32 internal CPU temperature. Called every minute from EveryMinuteUpdate()
-//--------------------------------------------
-void PublishCPUTemperature(void)
-{
- if (!MQTTclient.connected()) return;
- char cpuTempStr[8];
- dtostrf(temperatureRead(), 4, 1, cpuTempStr);                                                // ESP32 internal temperature sensor, degrees Celsius
- MQTTclient.publish((MQTTDeviceId() + "/cputemp").c_str(), cpuTempStr);
-}
-
-//--------------------------------------------                                                //
-// MQTT TEST: publish the LDR (light sensor) reading. Called every second from EverySecondCheck()
-//--------------------------------------------
-void PublishLDRreading(void)
-{
- if (!MQTTclient.connected()) return;
- char ldrStr[8];
- itoa(Previous_LDR_read, ldrStr, 10);
- MQTTclient.publish((MQTTDeviceId() + "/ldr").c_str(), ldrStr);
 }
 
 //--------------------------------------------                                                //
@@ -3904,22 +3884,42 @@ void WebPage(void)
    {  request->send(200, "text/html", OTA_html);});
  server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request)                           // Handle the actual OTA upload
    {
+    bool rejected = request->_tempObject && *(bool*)request->_tempObject;                    // Set by the upload handler below when this request was refused as a second concurrent upload
+    if (rejected)
+      {
+       AsyncWebServerResponse *response = request->beginResponse(409, "text/plain", "BUSY: an update is already in progress");
+       response->addHeader("Connection", "close");
+       request->send(response);
+       free(request->_tempObject); request->_tempObject = nullptr;
+       return;
+      }
     shouldReboot = !Update.hasError();
+    OTAupdateInProgress = false;
     AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", shouldReboot ? "OK" : "FAIL");
     response->addHeader("Connection", "close");
     request->send(response);
-   },  
-  [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) 
+   },
+  [](AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
    {
-    if (!index) 
+    if (!index)
       {
+       if (OTAupdateInProgress && (millis() - OTAlastChunkMillis < OTA_STALE_MS))            // Another upload is already writing to flash - refuse this one instead of interleaving writes
+         {
+          Tekstprintln("OTA rejected: an update is already in progress");
+          request->_tempObject = malloc(sizeof(bool)); *(bool*)request->_tempObject = true;
+          return;
+         }
+       if (OTAupdateInProgress) Tekstprintln("OTA: previous upload went stale, allowing new upload"); // Dropped connection never sent a final chunk - release the guard
+       OTAupdateInProgress = true;
        Tekstprintf("OTA Start: %s\n", filename.c_str());
        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { Update.printError(Serial); }
       }
+    if (request->_tempObject) return;                                                        // Chunks belonging to a rejected second upload - ignore them
+    OTAlastChunkMillis = millis();
     if (Update.write(data, len) != len) { Update.printError(Serial); }
-    if (final) 
+    if (final)
       {
-       if (Update.end(true)) { Tekstprintf("OTA Success: %u bytes\n", index + len);  } 
+       if (Update.end(true)) { Tekstprintf("OTA Success: %u bytes\n", index + len);  }
        else {Update.printError(Serial); }
       }
    });

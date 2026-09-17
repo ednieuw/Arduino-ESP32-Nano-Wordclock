@@ -3,7 +3,7 @@
 The clock appears in Home Assistant via MQTT with:
 
 - **Controls:** a Display on/off switch, a Max Brightness slider, a Display Colour Scheme selector, a Random Display selector (off / per minute / per hour) and buttons for LED test, StatusLED on/off and Restart.
-- **Sensors:** CPU temperature, LDR light reading and, when a DS3231 module is installed, its temperature.
+- **Sensors:** CPU temperature, LDR light reading, LED brightness (OutPhotocell) and, when a DS3231 module is installed, its temperature.
 - **Diagnostics:** WiFi signal strength, uptime, free memory and the three reboot counters. The whole device shows *unavailable* in Home Assistant as soon as the clock goes offline. The clock connects to `homeassistant.local`, port 1883, and logs in with username **mqtt_user** and, as password, **the same password as your WiFi router password** (the one entered in the clock with menu option **B**).
 
 ## Setup in Home Assistant
