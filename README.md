@@ -22,9 +22,11 @@ The clock can be controlled with a:
 
 ## Architecture & related projects
 
-Since V230, the word clock sketch has been combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) to simplify maintenance. The two are kept easy to split apart via `#define`s in a few places, and the clock functions can be stripped out entirely with `#define NOCLOCK`. Functionality can be toggled on/off from the menu.
+Since V230, the word clock sketch has been combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) to simplify maintenance. There is also a third option; NOCLOCK.
 
-Coding for an [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added — it sends NTP time over HC-12 to another ESP32. 
+The three architectues are easy to split apart via `#define`s in a few places, and the clock functions can be stripped out entirely with `#define NOCLOCK`. Functionality can be toggled on/off from the menu.
+
+Coding for an [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added — it sends NTP time over HC-12 to another MCU equiped with a HC-12 module to receive the transmission up to 1000 meters away. 
 
 When no WiFi is available, time can instead be sent to the clock via a timesender iOS app or web page, using Bluetooth on your phone or tablet.
 
@@ -78,9 +80,9 @@ https://ednieuw.com/ElecProj/OptoSK6812/OptocouplerSK6812.html<br>
 
 For level switching the 74HCT125 level shifter IC is used. It has four ports. The design of the PCB can use the other three ports on the IC for other uses. <br>
 
-A SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32 without using the 74HCT125 level shifter IC. I have not tested strips with more than 14 LEDs LEDs in the strip.<br>
+A SK6812 RGBW strip, with 14 LEDs, also happily worked when the data line was connected directly to the 3.3V data line of the Nano ESP32 without using the 74HCT125 level shifter IC. I have not tested strips with more than 14 LEDs in the strip.<br>
 
-The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter. <br> But success is not guaranteed.
+The lesson of this story is that you can connect the SK6812 RGBW strip with a 470 ohm resistor in the data line and a 200 - 1000 uF capacitor over the 5V and GND directly to the strip without the use of a level shifter. <br>But success is not guaranteed.
  
 ![Nano-ESP32-V04](https://github.com/user-attachments/assets/3ad06452-0dd4-4310-8b51-25c115ec3959)
 
