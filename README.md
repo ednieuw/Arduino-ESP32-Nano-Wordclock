@@ -24,11 +24,11 @@ The clock can be controlled with a:
 
 Since V230, the word clock sketch has been combined with the [Fibonacci clock sketch](https://github.com/ednieuw/Fibonacci-Nano-ESP32-clock) to simplify maintenance. There is also a third option; NOCLOCK.
 
-The three architectues are easy to split apart via `#define`s in a few places, and the clock functions can be stripped out entirely with `#define NOCLOCK`. Functionality can be toggled on/off from the menu.
+The three architectues are easy to split apart via `#define`'s in a few places, and the clock functions can be stripped out entirely with `#define NOCLOCK`. Functionality can be toggled on/off from the menu.
 
 Coding for an [HC-12 timesender](https://github.com/ednieuw/ESP32-HC12) was also added — it sends NTP time over HC-12 to another MCU equiped with a HC-12 module to receive the transmission up to 1000 meters away. 
 
-When no WiFi is available, time can instead be sent to the clock via a timesender iOS app or web page, using Bluetooth on your phone or tablet.
+When no WiFi is available, time can instead be sent to the clock via a timesender iOS app or a timesender web page, using Bluetooth on your phone or tablet.
 
 ## Screens
 <img alt="image" src="https://github.com/user-attachments/assets/e150fc48-650f-4d71-bbd8-eef1fb64d26b" style="width:90%;"  />
