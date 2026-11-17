@@ -1,6 +1,8 @@
 
 # Arduino-ESP32-Nano-Word clock
 
+[Nederlands](READMENL.md)
+
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
 
 Build your own word clock with WS2812 RGB or SK6812 RGBW LEDs, showing one or [four languages](https://github.com/ednieuw/FourLanguageClock), on an Arduino ESP32 Nano.<br>
@@ -10,8 +12,8 @@ The sketch also works on other ESP32 boards, with different pin numbering.<br>
 
 The clock can be controlled with a:
 - [BLE web page](https://github.com/ednieuw/HTML-BLEserial)
-- [BLE terminal in a browser](https://arach.nl/BLESerial/BLE_UART_Terminal.html)
-- [BLE serial terminal app](https://arach.nl/BLESerial/IOSappMain.html)
+- [BLE terminal in a browser](https://ednieuw.com/BLESerial/BLE_UART_Terminal.html)
+- [BLE serial terminal app](https://ednieuw.com/BLESerial/IOSappMain.html)
 - Serial cable connected to your PC
 - Rotary encoder
 - IR-remote controller
@@ -351,7 +353,7 @@ In both cases send the character I of Information and the menu shows up.<br>
 Enter the first character of the setting you want to change followed with a code. <br>
 Some entries just toggle On and Off. Like the W to set WIFI Off or On. 
   
-<p> To change the SSID and password: <br>
+ To change the SSID and password: <br>
 Amy-ssid and send this command. Eg AFRITZ!Box01 or aFRITZ!Box01. 
 Starting with an upper or lower case character is an identical instruction in the command string <br>
 Then Bmy-passwordand send the password.(for example: bSecret<br>
@@ -446,7 +448,7 @@ For example to set the colours of the characters in the display to white enter: 
  Set time by entering T130245. (130245 will also work) <br>
 <br>
  Turn off WIFI by sending a W. 
-<p >Reset the MCU with the character @.<br>
+Reset the MCU with the character @.<br>
 Reset to default setting by send R.<br><br>
  In the BLE connection the SSID and password will be shown.  <br>
 	
@@ -455,8 +457,7 @@ Reset to default setting by send R.<br><br>
 <td style="width: 280px">
 <img alt="Phone" src="Pics/V200HTMLserialMenu.jpg" height="550" class="auto-style4" /></td>
 <td>
-<img alt="WIFI-BLE" src="Pics/V200BLE
-serialMenu.jpg" height="550" class="auto-style4" /></td>
+<img alt="WIFI-BLE" src="Pics/V200BLEserialMenu.jpg" height="550" class="auto-style4" /></td>
 </tr>
 <tr>
 <td style="width: 280px" >HTML page</td>
@@ -546,7 +547,7 @@ Print the menu.
 `ii` prints the extended menu (long help).
 
 ### J DS3231 RTC module On/Off
-When DS3231 is enabled, NTP may be turned off. Use option `X` to toggle NTP if needed.<>r>
+When DS3231 is enabled, NTP may be turned off. Use option `X` to toggle NTP if needed.<br>
 The flashing orange status LED on the board will turn off when the DS3231 time is used.
 
 ### K LDR reads/sec toggle On/Off<br>
@@ -633,7 +634,7 @@ or display. </td>
 <td> 
 
 <br>
-### W=WIFI, X=NTP, Y=BLE<br>
+### W=WIFI, X=NTP, Y=BLE
 Toggle WIFI, NTP and BLE on and off.<br>
 Sending the character will toggle it on or off. <br>
 At the bottom of the long menu (ii) the state is printed.<br>
@@ -697,10 +698,10 @@ Changing date and time only works when a DS3231 RTC module is attached.
 The settings of the Arduino Nano ESP32 board is as follows.<br>
 Remember to install the ESP32 boards as explained above.<br>
 
-<img alt="Board settings" height="497" src="https://github.com/ednieuw/ESP32-C3-Clock-and-more/P/img6.gif" width="488" />
-<p>
+<img alt="Board settings" height="497" src="Pics/img6.gif" width="488" />
 
-<p># Program explanation
+
+# Program explanation
  The program uses the following standard libraries.   
 <br>
 <pre>
