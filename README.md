@@ -19,7 +19,7 @@ The clock can be controlled with a:
 - IR-remote controller
 - (Membrane) keypad
 - MQTT, e.g. via Home Assistant
-- [Time sender app (iOS) or web page (Windows/Android)](https://github.com/ednieuw/HTML-TimeSender) —> [open Time sender HTML](https://ednieuw.com/Woordklok/TimeSender/TimeSender.html)
+- [iOS Time sender app](https://apps.apple.com/nl/app/bluetooth-uart-time/id6760344877?l=en-GB)<br> [or via HTML web page app](Windows/Android)](https://github.com/ednieuw/HTML-TimeSender) —> [open Time sender HTML](https://ednieuw.com/Woordklok/TimeSender/TimeSender.html)
 <br>
 
 ## Architecture & related projects
