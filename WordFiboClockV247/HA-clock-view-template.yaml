@@ -1,0 +1,89 @@
+# HA-clock-view-template.yaml
+# Template voor een Home Assistant-dashboardpagina van een WordFiboClock.
+# Gebruik: ./make-clock-view.sh <device-id> [Weergavenaam]
+#   CLOCKID   wordt vervangen door de device-id (BLE-naam in kleine letters, spaties -> _)
+#   CLOCKNAME wordt vervangen door de weergavenaam van de pagina
+# Regels die met # beginnen worden door het script verwijderd.
+#
+# Plak de uitvoer in het dashboard (raw-configuratie-editor) onder "views:",
+# op hetzelfde inspring-niveau als de andere pagina's.
+#
+# De entity-id's hieronder zijn afgeleid van de namen waarmee de klok zich aanmeldt
+# (bijv. "Max Brightness" -> number.CLOCKID_max_brightness). Controleer ze eenmalig in
+# Home Assistant onder Instellingen > Apparaten en diensten > Entiteiten en pas ze zo nodig aan.
+- title: CLOCKNAME
+  path: CLOCKID
+  icon: mdi:clock-digital
+  cards:
+    - type: entities
+      title: Bediening
+      show_header_toggle: false
+      entities:
+        - entity: switch.CLOCKID_display
+          name: Display
+        - entity: select.CLOCKID_display_colour_scheme
+          name: Kleurschema
+        - entity: select.CLOCKID_random_display
+          name: Kleurschema wisselen
+        - entity: number.CLOCKID_max_brightness
+          name: Maximale helderheid
+        - entity: number.CLOCKID_min_brightness
+          name: Minimale helderheid
+        - entity: number.CLOCKID_brightness_slope
+          name: Helling helderheid
+    - type: entities
+      title: Acties
+      show_header_toggle: false
+      entities:
+        - entity: button.CLOCKID_led_test
+          name: LED-test
+          secondary_info: none
+        - entity: button.CLOCKID_statusled_on_off
+          name: Status-LED aan/uit
+        - entity: button.CLOCKID_restart
+          name: Herstart de klok
+    - type: horizontal-stack
+      cards:
+        - type: gauge
+          entity: sensor.CLOCKID_cpu_temperature
+          name: CPU
+          min: 20
+          max: 90
+          needle: true
+        - type: gauge
+          entity: sensor.CLOCKID_outphotocell
+          name: LED-helderheid
+          min: 0
+          max: 255
+    - type: history-graph
+      title: Licht en temperatuur
+      hours_to_show: 24
+      entities:
+        - entity: sensor.CLOCKID_ldr_reading
+          name: LDR
+        - entity: sensor.CLOCKID_outphotocell
+          name: Helderheid LEDs
+        - entity: sensor.CLOCKID_cpu_temperature
+          name: CPU-temperatuur
+    - type: entities
+      title: Diagnose
+      show_header_toggle: false
+      entities:
+        - entity: sensor.CLOCKID_wifi_signal
+          name: WIFI-signaal
+        - entity: sensor.CLOCKID_uptime
+          name: Uptime
+        - entity: sensor.CLOCKID_free_heap
+          name: Vrij geheugen
+        - entity: sensor.CLOCKID_mcu_restarts
+          name: Herstarts tijdens opstarten
+        - entity: sensor.CLOCKID_wifi_reboots
+          name: WIFI-herstarts
+        - entity: sensor.CLOCKID_loop_stall_reboots
+          name: Herstarts door vastlopen
+    - type: history-graph
+      title: WIFI-signaal en geheugen
+      hours_to_show: 48
+      entities:
+        - entity: sensor.CLOCKID_wifi_signal
+        - entity: sensor.CLOCKID_free_heap
