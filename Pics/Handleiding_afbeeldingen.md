@@ -11,7 +11,7 @@ Volgorde van voorkomen in de handleiding; de kolom Context is de laatste tekstre
 | Handleiding_05.png | image5.png | Android |
 | Handleiding_06.png | image6.png | Android |
 | Handleiding_07.png | image7.png | De klok is ingesteld om met WIFI de tijd te ontvangen. Als de naam van de WIFI-router en w |
-| Handleiding_08.wmf | image8.wmf | Open de Bluetooth app. |
+| Handleiding_08.png | image8.wmf | Open de Bluetooth app. |
 | Handleiding_09.jpeg | image9.jpeg | Stuur de juiste tijd en datum via het menu. (bijv stuur: T143000 voor ‘half drie’ en bijv  |
 | Handleiding_10.png | image10.png | De klok kan ook via een browser worden aangestuurd als er verbinding is gemaakt met WIFI. |
 | Handleiding_11.png | image11.png | De klok kan ook via een browser worden aangestuurd als er verbinding is gemaakt met WIFI. |

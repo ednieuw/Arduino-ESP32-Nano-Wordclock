@@ -161,7 +161,7 @@ Instellen gaat het makkelijkst met de Bluetooth-app.
 4. Stuur `b` gevolgd door het wachtwoord, bijvoorbeeld `bGeHeim1234`.
 5. Stuur `@` om de klok te herstarten.
 
-![Bluetooth-app](Pics/Handleiding_08.wmf)
+![Bluetooth-app](Pics/Handleiding_08.png)
 
 ### 3C - Via WPS
 

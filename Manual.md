@@ -161,7 +161,7 @@ Setting up is easiest with the Bluetooth app.
 4. Send `b` followed by the password, for example `bSecret1234`.
 5. Send `@` to restart the clock.
 
-![Bluetooth app](Pics/Handleiding_08.wmf)
+![Bluetooth app](Pics/Handleiding_08.png)
 
 ### 3C - Through WPS
 
