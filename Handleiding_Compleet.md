@@ -2,7 +2,7 @@
 
 *Software WordFiboClock V247 - alle hoofdstukken in één bestand*
 
-[English](Manual.md) · [README](READMENL.md) · [Korte gebruikershandleiding](Gebruikershandleiding.md)
+[English](Manual_Complete.md) · [README](READMENL.md) · [Korte gebruikershandleiding](Gebruikershandleiding.md)
 
 Dit bestand bevat de volledige handleiding, de hardware en bouw (hoofdstuk 3) en de programmauitleg (hoofdstuk 12). Het wordt automatisch samengesteld uit `Handleiding.md`, `Hardware.md` en `Programmauitleg.md`.
 

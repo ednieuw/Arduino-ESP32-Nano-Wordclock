@@ -25,6 +25,7 @@ The clock can be controlled with a:
 | For whom | Document |
 |---|---|
 | **Users of a clock** | [Short user guide](UserGuide.md) (also as [PDF](Manual-Instructions/UserGuide_V247.pdf)) |
+| **Everything in one file** | [Complete manual](Manual_Complete.md): manual, hardware and program explanation together (also as [PDF](Manual-Instructions/Manual_Complete_V247.pdf)). In Dutch: [Handleiding compleet](Handleiding_Compleet.md) ([PDF](Manual-Instructions/Handleiding_Compleet_V247.pdf)) |
 | **Everything about the clock** | [Manual](Manual.md): quick start, installing, operation, all menu commands, MQTT and Home Assistant, Fibonacci clock, maintenance, appendices and time zones |
 | **Builders** | [Hardware and construction](Hardware_EN.md): components, printed circuit boards (PCBs), power supply, connections, the clock case |
 | **Developers** | [Program explanation](ProgramExplanation.md): structure of the sketch and how the software can be modified |

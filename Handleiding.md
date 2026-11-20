@@ -231,13 +231,13 @@ Er zijn twee cores waarmee de Nano ESP32 kan worden geprogrammeerd: de core *Ard
 
 ## 4.2 De bibliotheken installeren
 
-Bibliotheken worden voortdurend bijgewerkt, wat na verloop van tijd tot incompatibiliteit met deze broncode kan leiden. Daarom staan de gebruikte versies in het bestand **`librariesV245.zip`** (in de hoofdmap van de repository).
+Bibliotheken worden voortdurend bijgewerkt, wat na verloop van tijd tot incompatibiliteit met deze broncode kan leiden. Daarom staan de gebruikte versies in het bestand **`librariesV247.zip`** (in de hoofdmap van de repository).
 
 1. Pak het zipbestand uit.
 2. Kopieer de mappen naar de map `libraries` binnen de map waar de Arduino IDE de sketches bewaart (meestal `Documenten\Arduino\libraries`).
 3. Herstart de Arduino IDE.
 
-Het zipbestand bevat: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_Async_WebServer`, `EdSoftLED`, `Encoder`, `IRremote`, `Keypad`, `NimBLE-Arduino` en `RTClib`.
+Het zipbestand bevat: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_Async_WebServer`, `EdSoftLED`, `Encoder`, `IRremote`, `Keypad`, `NimBLE-Arduino`, `PubSubClient` en `RTClib`.
 
 | Bibliotheek | Gebruik |
 |---|---|
@@ -249,7 +249,7 @@ Het zipbestand bevat: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_A
 | `Encoder` | Rotary encoder |
 | `Keypad` | Drie drukknoppen (membraan) |
 | `IRremote` | IR-afstandsbediening |
-| `PubSubClient` | MQTT. **Zit niet in het zipbestand**, installeer via *Tools → Manage Libraries* (zoek `PubSubClient3` van Nick O'Leary) |
+| `PubSubClient` | MQTT |
 
 
 ## 4.3 De sketch openen en de klokvariant kiezen
@@ -1847,7 +1847,7 @@ De pinnen zoals ze in de sketch zijn vastgelegd (Arduino-pinnummering, zie [hoof
 | [`MQTT-HomeAssistant-setup.md`](MQTT-HomeAssistant-setup.md) | Uitgebreide uitleg over MQTT en Home Assistant (zie [hoofdstuk 9](#9-mqtt-en-home-assistant)). Staat in de hoofdmap naast `README.md`, niet bij de sketch |
 | `make-clock-view.sh`, `HA-clock-view-template.yaml` | Dashboardpagina voor Home Assistant |
 | `WordFiboClockV247.NL144.bin` (en optioneel andere `.bin`-bestanden) | Gecompileerde software voor een klokvariant. NL144 wordt standaard meegeleverd |
-| `librariesV245.zip` | De bibliotheken om de sketch te compileren |
+| `librariesV247.zip` | De bibliotheken om de sketch te compileren |
 | `BinUploader.html` | Hulpmiddel voor het uploaden van `.bin`-bestanden met `esptool` |
 
 

@@ -227,13 +227,13 @@ There are two cores with which the Nano ESP32 can be programmed: the core *Ardui
 
 ## 4.2 Installing the libraries
 
-Libraries are updated all the time, which can lead to incompatibility with this source code over time. For that reason the versions that are used are included in the file **`librariesV245.zip`** (in the main folder of the repository).
+Libraries are updated all the time, which can lead to incompatibility with this source code over time. For that reason the versions that are used are included in the file **`librariesV247.zip`** (in the main folder of the repository).
 
 1. Unzip the zip file.
 2. Copy the folders into the `libraries` folder inside the folder where the Arduino IDE stores the sketches (usually `Documents\Arduino\libraries`).
 3. Restart the Arduino IDE.
 
-The zip file contains: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_Async_WebServer`, `EdSoftLED`, `Encoder`, `IRremote`, `Keypad`, `NimBLE-Arduino` and `RTClib`.
+The zip file contains: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_Async_WebServer`, `EdSoftLED`, `Encoder`, `IRremote`, `Keypad`, `NimBLE-Arduino`, `PubSubClient` and `RTClib`.
 
 | Library | Use |
 |---|---|
@@ -245,7 +245,7 @@ The zip file contains: `Adafruit_BusIO`, `Adafruit_NeoPixel`, `Async_TCP`, `ESP_
 | `Encoder` | Rotary encoder |
 | `Keypad` | Three push buttons (membrane) |
 | `IRremote` | IR remote control |
-| `PubSubClient` | MQTT. **Not in the zip file**, install it through *Tools → Manage Libraries* (search for `PubSubClient3` by Nick O'Leary) |
+| `PubSubClient` | MQTT |
 
 ## 4.3 Opening the sketch and choosing the clock variant
 
@@ -1831,7 +1831,7 @@ The pins as laid down in the sketch (Arduino pin numbering; see [chapter 4](#4-i
 | [`MQTT-HomeAssistant-setup.md`](MQTT-HomeAssistant-setup.md) | Extensive explanation of MQTT and Home Assistant (see [chapter 9](#9-mqtt-and-home-assistant)). Located in the main folder next to `README.md`, not with the sketch |
 | `make-clock-view.sh`, `HA-clock-view-template.yaml` | Dashboard page for Home Assistant |
 | `WordFiboClockV247.NL144.bin` (and optionally other `.bin` files) | Compiled software for a clock variant. NL144 is supplied by default |
-| `librariesV245.zip` | The libraries to compile the sketch |
+| `librariesV247.zip` | The libraries to compile the sketch |
 | `BinUploader.html` | Tool for uploading `.bin` files with `esptool` |
 
 ## 13.4 Version history

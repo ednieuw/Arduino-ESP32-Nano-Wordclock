@@ -26,6 +26,7 @@ De klok kan worden bediend met:
 | Voor wie | Document |
 |---|---|
 | **Gebruikers van een klok** | [Korte gebruikershandleiding](Gebruikershandleiding.md) (ook als [PDF](Manual-Instructions/Gebruikershandleiding_V247.pdf)) |
+| **Alles in één bestand** | [Handleiding compleet](Handleiding_Compleet.md): handleiding, hardware en programmauitleg samen (ook als [PDF](Manual-Instructions/Handleiding_Compleet_V247.pdf)). In het Engels: [Complete manual](Manual_Complete.md) ([PDF](Manual-Instructions/Manual_Complete_V247.pdf)) |
 | **Alles over de klok** | [Handleiding](Handleiding.md): snelle start, installeren, bediening, alle menucommando's, MQTT en Home Assistant, Fibonacci-klok, onderhoud, bijlagen en tijdzones |
 | **Bouwers** | [Hardware en bouw](Hardware.md): onderdelen, printplaten (PCB's), voeding, aansluitingen, de klokkast |
 | **Ontwikkelaars** | [Programmauitleg](Programmauitleg.md): opbouw van de sketch en hoe de software kan worden aangepast |
