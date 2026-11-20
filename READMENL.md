@@ -1,8 +1,9 @@
 # Arduino-ESP32-Nano-Woordklok
 
-[English](README.md)
 
 ![image](https://github.com/ednieuw/Arduino-ESP32-Nano-Wordclock/assets/12166816/d5d450ce-df3c-4274-94ba-184792a7ee3d)
+
+[English](README.md)
 
 Bouw een eigen woordklok met WS2812 RGB- of SK6812 RGBW-LEDs, met één of [vier talen](https://github.com/ednieuw/FourLanguageClock), op een Arduino ESP32 Nano.<br>
 De sketch werkt ook op andere ESP32-borden, met een andere pinnummering.<br>
